@@ -57,7 +57,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class PaymentPlan(models.Model):
-    type = models.TextField()
+    name = models.TextField()
+    price = models.DecimalField(max_digits=7, decimal_places=2, default=500)
 
 
 class Parent(models.Model):
@@ -71,11 +72,16 @@ class Groups(models.Model):
 class Kid(models.Model):
     gender_choices = ((1, 'Chłopiec'), (2, 'Dziewczynka'))
     first_name = models.CharField(max_length=128)
-    last_name = models.CharField(max_length=128, null=True)
+    last_name = models.CharField(max_length=128, default='cos')
     parents = models.ManyToManyField(Parent)
-    group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True)
-    gender = models.IntegerField(choices=gender_choices, null=True)
-    start = models.DateField(null=True)
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE)
+    gender = models.IntegerField(choices=gender_choices, default=1)
+    start = models.DateField()
     end = models.DateField(null=True)
-    payment_plan = models.OneToOneField(PaymentPlan, on_delete=models.CASCADE, null=True)
+    payment_plan = models.ForeignKey(PaymentPlan, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=20, decimal_places=2, null=True)
 
+
+class Meals(models.Model):
+    name = models.CharField(max_length=128)
+    description = models.TextField(null=True)

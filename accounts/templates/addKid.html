@@ -58,7 +58,7 @@
                                                 <label class="mr-2">Wybierz grupe:</label><br>
                                                 <select class="select ml-3" name="group">
                                                     {% for group in groups %}
-                                                        <option value="{{ group.name }}">{{ group.name }}</option>
+                                                        <option value="{{ group.id }}">{{ group.name }}</option>
                                                     {% endfor %}
                                                 </select>
 
@@ -104,8 +104,8 @@
                                                 <label class="mr-2">Plan płatnosci:</label><br>
                                                 <select class="select ml-3" name="payment">
 
-                                                    {% for group in groups %}
-                                                        <option value="{{ forloop.counter }}">{{ group.name }}</option>
+                                                    {% for plan in plans %}
+                                                        <option value="{{ plan.id }}">{{ plan.name }}</option>
                                                     {% endfor %}
                                                 </select>
 

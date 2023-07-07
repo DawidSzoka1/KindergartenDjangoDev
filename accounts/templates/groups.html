@@ -1,25 +1,134 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-    {% for group in groups %}
-        <div id="accordion">
-            <div class="card">
-                <div class="card-header" id="headingOne">
-                    <h5 class="mb-0">
-                        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#collapseOne"
-                                aria-expanded="true" aria-controls="collapseOne">
-                            {{ group.name }}
-                        </button>
-                    </h5>
-                </div>
+    <link rel="stylesheet" href="{% static 'kids.css' %}">
+    <div class="container mt-3 mb-4 center">
+        <div class="col-lg-9 mt-4 mt-lg-0">
 
-                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-bs-parent="#accordion">
-                    {% for kid in group.kid_set.all %}
-                        <div class="card-body">
-                            {{ kid.first_name }}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Lista grup</h5>
+                            <a href="{% url 'addGroup' %}" class="btn btn-light btn-sm">Dodaj grupe</a>
                         </div>
-                    {% endfor %}
+
+                        {% for group in groups %}
+                            <div id="accordion">
+                                <div class="card">
+                                    <div class="card-header" id="headingOne">
+
+                                        <h5 class="mb-0 justify-content-between align-items-center">
+                                            <button class="btn btn-link" data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseOne"
+                                                    aria-expanded="true" aria-controls="collapseOne">
+                                                {{ group.name }}
+                                            </button>
+                                            <a href="{% url 'addKid' %}" class="btn btn-light btn-sm">Dodaj dziecko</a>
+                                        </h5>
+                                    </div>
+
+                                    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                                         data-bs-parent="#accordion">
+                                        <table class="table manage-candidates-top mb-0">
+                                            <thead>
+                                            <tr>
+                                                <th>Imię i Nazwisko Dziecka</th>
+                                                <th class="text-center">Status</th>
+                                                <th class="action text-right">Action</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% for kid in group.kid_set.all %}
+                                                <tr class="candidates-list">
+                                                    <td class="title">
+                                                        <div class="thumb">
+                                                            <img class="img-fluid"
+                                                                 src="https://bootdey.com/img/Content/avatar/avatar7.png"
+                                                                 alt="">
+                                                        </div>
+                                                        <div class="candidate-list-details">
+                                                            <div class="candidate-list-info">
+                                                                <div class="candidate-list-title">
+                                                                    <h5 class="mb-0"><a
+                                                                            href="#">{{ kid.first_name }} {{ kid.last_name }}</a>
+                                                                    </h5>
+                                                                </div>
+                                                                <div class="candidate-list-option">
+                                                                    <ul class="list-unstyled">
+                                                                        <li>
+                                                                            <i class="fas fa-filter pr-1"></i>{{ kid.group.name }}
+                                                                        </li>
+                                                                        <li>
+                                                                            <i class="fas fa-filter pr-1"></i>{{ kid.payment_plan.name }}
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    {% if kid.parents_set.all %}
+                                                        <td class="candidate-list-favourite-time text-center"
+                                                            style="color:green;">&#9745; dziala
+                                                        </td>
+                                                    {% else %}
+                                                        <td class="candidate-list-favourite-time text-center"
+                                                            style="color:red;">&#9746;<br>
+                                                            <a class="candidate-list-favourite order-2 text-danger"
+                                                               href="#">Dodaj konto rodzica<i
+                                                                    class="fas fa-heart"></i></a>
+
+                                                        </td>
+                                                    {% endif %}
+                                                    {#                                    <td class="candidate-list-favourite-time text-center">#}
+                                                    {#                                        <a class="candidate-list-favourite order-2 text-danger" href="#"><i#}
+                                                    {#                                                class="fas fa-heart"></i></a>#}
+                                                    {#                                        <span class="candidate-list-time order-1">Czy ma podpietego rodzica</span>#}
+                                                    {#                                    </td>#}
+                                                    <td>
+                                                        <div class="drodown">
+                                                            <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
+                                                               href="#"
+                                                               id="navbarDropdownMenuAvatar"
+                                                               role="button"
+                                                               data-bs-toggle="dropdown"
+                                                               aria-expanded="false">
+                                                                <img
+                                                                        src="{{ user.profilemodel.image.url }}"
+                                                                        class="rounded-circle"
+                                                                        height="30"
+                                                                        alt="Action"
+                                                                        loading="lazy"
+                                                                />
+                                                            </a>
+                                                            <ul
+                                                                    class="dropdown-menu dropdown-menu-end"
+                                                                    aria-labelledby="navbarDropdownMenuAvatar"
+                                                            >
+                                                                <li>
+                                                                    <a href="#" class="dropdown-item">View detail</a>
+                                                                </li>
+                                                                <li>
+                                                                    <a href="/change/info/?kid_id={{ kid.id }}"
+                                                                       class="dropdown-item">Change info</a>
+                                                                </li>
+                                                                <li>
+                                                                    <a href="#!" class="dropdown-item">Delete user</a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
-    {% endfor %}
+    </div>
 {% endblock %}
