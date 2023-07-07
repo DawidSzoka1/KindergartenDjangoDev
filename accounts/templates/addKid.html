@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <form method="post" action="#">
+        {% csrf_token %}
+        <section class="h-100 bg-dark">
+            <div class="container py-5 h-100">
+                <div class="row d-flex justify-content-center align-items-center h-100">
+                    <div class="col">
+                        <div class="card card-registration my-4">
+                            <div class="row g-0">
+                                <div class="col-xl-6 d-none d-xl-block">
+                                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/img4.webp"
+                                         alt="Sample photo" class="img-fluid"
+                                         style="border-top-left-radius: .25rem; border-bottom-left-radius: .25rem;"/>
+                                </div>
+                                <div class="col-xl-6">
+                                    <div class="card-body p-md-5 text-black">
+                                        <h3 class="mb-5 text-uppercase">Dodaj dziecko</h3>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <input type="text" id="form3Example1m"
+                                                           class="form-control form-control-lg" name="first_name"/>
+                                                    <label class="form-label" for="form3Example1m">Imię</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <input type="text" id="form3Example1n"
+                                                           class="form-control form-control-lg" name="last_name"/>
+                                                    <label class="form-label" for="form3Example1n" >Nazwisko</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-md-flex justify-content-start align-items-center mb-4 py-2">
+
+                                            <h6 class="mb-0 me-4">Płec dziecka: </h6>
+
+                                            <div class="form-check form-check-inline mb-0 me-4">
+                                                <input class="form-check-input" type="radio" name="gender"
+                                                       id="femaleGender"
+                                                       value="2"/>
+                                                <label class="form-check-label" for="femaleGender">Dziewczynka</label>
+                                            </div>
+
+                                            <div class="form-check form-check-inline mb-0 me-4">
+                                                <input class="form-check-input" type="radio" name="gender"
+                                                       id="maleGender"
+                                                       value="1"/>
+                                                <label class="form-check-label" for="maleGender">Chłopiec</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4">
+                                                <label class="mr-2">Wybierz grupe:</label><br>
+                                                <select class="select ml-3" name="group">
+                                                    {% for group in groups %}
+                                                        <option value="{{ group.name }}">{{ group.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4">
+                                                <label class="mr-2">Posilki:</label><br>
+                                                <select class="select ml-3" name="meals" multiple>
+
+                                                    {% for group in groups %}
+                                                        <option value="{{ group.name }}">{{ group.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-outline mb-4">
+                                            <label class="form-label" for="form3Example9">Czas Trwania umowy:</label>
+                                            <h6 class="text-muted">Początek</h6>
+                                            <input type="date" id="form3Example9" class="form-control form-control-lg"
+                                                   name="start"/>
+                                            <div>
+                                                <label class="form-check-label mb-0 me-4" for="mySwitch">Umowa na czas
+                                                    nieokteślony:</label>
+
+                                                <div class="form-check form-switch">
+
+                                                    <input class="form-check-input" type="checkbox" id="mySwitch"
+                                                           onclick="myFunction()"
+                                                           name="indefinite" value="yes" checked>
+
+                                                </div>
+                                            </div>
+                                            <div id="end">
+                                                <h6 class="text-muted mt-2">Koniec</h6>
+                                                <input type="date" class="form-control form-control-lg" name="end"/>
+                                            </div>
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4">
+                                                <label class="mr-2">Plan płatnosci:</label><br>
+                                                <select class="select ml-3" name="payment">
+
+                                                    {% for group in groups %}
+                                                        <option value="{{ forloop.counter }}">{{ group.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="d-flex justify-content-end pt-3">
+                                            <button type="submit" class="btn btn-warning btn-lg ms-2">Add
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </form>
+    <script src="{% static 'checkbox.js' %}"></script>
+{% endblock %}
+
