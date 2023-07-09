@@ -2,12 +2,12 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
-from .models import Kid, Groups, PaymentPlan
+from .models import Kid, Groups, PaymentPlan, SuperUser
 from django.core.mail import send_mail, EmailMessage
 from MarchewkaDjango.settings import EMAIL_HOST_USER
 
 
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
 def add_kid(request):
     groups = Groups.objects.all()
     plans = PaymentPlan.objects.all()
@@ -29,25 +29,26 @@ def add_kid(request):
         if first_name and last_name and gender and payment and group and start:
 
             if end:
-                Kid.objects.create(first_name=first_name,
-                                   last_name=last_name,
-                                   group=group,
-                                   gender=gender,
-                                   start=start,
-                                   payment_plan=payment,
-                                   end=end,
-                                   amount=amount
-
-                                   )
+                kid = Kid.objects.create(first_name=first_name,
+                                         last_name=last_name,
+                                         group=group,
+                                         gender=gender,
+                                         start=start,
+                                         payment_plan=payment,
+                                         end=end,
+                                         amount=amount
+                                         )
             else:
-                Kid.objects.create(first_name=first_name,
-                                   last_name=last_name,
-                                   group=group,
-                                   gender=gender,
-                                   start=start,
-                                   payment_plan=payment,
-                                   amount=amount
-                                   )
+                kid = Kid.objects.create(first_name=first_name,
+                                         last_name=last_name,
+                                         group=group,
+                                         gender=gender,
+                                         start=start,
+                                         payment_plan=payment,
+                                         amount=amount
+                                         )
+            user = SuperUser.objects.get(user=request.user.id)
+            user.kids.add(kid)
 
             return redirect('childrens')
 
@@ -55,65 +56,62 @@ def add_kid(request):
     return render(request, 'addKid.html', {"plans": plans, 'groups': groups})
 
 
-@user_passes_test(lambda u: u.is_superuser)
 def super_profile(request):
-
     return render(request, 'settings.html')
 
 
-@user_passes_test(lambda u: u.is_superuser)
 def kids(request):
-    kids_db = Kid.objects.all()
+    user = SuperUser.objects.get(user=request.user.id)
+    kids_db = user.kids.all()
     return render(request, 'childrens.html', {"kids": kids_db})
 
 
-@user_passes_test(lambda u: u.is_superuser)
 def add_group(request):
     if request.method == "POST":
         name = request.POST.get('name')
         if name:
-            Groups.objects.create(name=name)
+            user = SuperUser.objects.get(user=request.user.id)
+            group = Groups.objects.create(name=name)
+            user.groups.add(group)
             return redirect('groups')
     return render(request, 'addGroup.html')
 
 
-@user_passes_test(lambda u: u.is_superuser)
 def groups_view(request):
-    groups = Groups.objects.all()
+    user = SuperUser.objects.get(user=request.user.id)
+    groups = user.groups.all()
     return render(request, 'groups.html', {'groups': groups})
 
 
-@user_passes_test(lambda u: u.is_superuser)
 def payment_plans(request):
-    plans = PaymentPlan.objects.all()
+    user = SuperUser.objects.get(user=request.user.id)
+    plans = user.payment_plan.all()
     return render(request, 'payments.html', {"plans": plans})
 
 
-@user_passes_test(lambda u: u.is_superuser)
 def add_payment_plans(request):
     if request.method == "POST":
         name = request.POST.get("name")
         price = float(request.POST.get("price"))
         if name and price:
-            PaymentPlan.objects.create(name=name, price=price)
+            user = SuperUser.objects.get(user=request.user.id)
+            payment = PaymentPlan.objects.create(name=name, price=price)
+            user.payment_plan.add(payment)
             return redirect('payments_plans')
     return render(request, 'addPayment.html')
 
 
-@user_passes_test(lambda u: u.is_superuser)
 def change_info(request):
-    if request.method == "GET":
-        kid_id = request.GET.get('kid_id')
-        kid = Kid.objects.get(id=int(kid_id))
-    plans = PaymentPlan.objects.all()
-    group = Groups.objects.all()
+    user = SuperUser.objects.get(user=request.user.id)
+    plans = user.payment_plan.all()
+    group = user.groups.all()
+    kid_id = request.GET.get('kid_id')
+    kid = user.kids.get(id=int(kid_id))
     if request.method == "POST":
-        kid_id = request.GET.get('kid_id')
-        kid = Kid.objects.get(id=int(kid_id))
         plan = int(request.POST.get("plan"))
         group = int(request.POST.get('group'))
-        plan = PaymentPlan.objects.get(id=plan)
-        group = Groups.objects.get(id=group)
+        plan = user.payment_plan.get(id=plan)
+        group = user.groups.get(id=group)
         if plan and group:
             kid.group = group
             kid.payment_plan = plan

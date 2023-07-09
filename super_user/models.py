@@ -1,21 +1,13 @@
 from django.db import models
 from accounts.models import User
 from django.utils.timezone import now
+from parent.models import Parent
 
 
 # Create your models here.
 class PaymentPlan(models.Model):
     name = models.TextField()
     price = models.DecimalField(max_digits=7, decimal_places=2, default=500)
-
-
-class Parent(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=128, null=True)
-    last_name = models.CharField(max_length=128, null=True)
-
-    def __str__(self):
-        return f'{self.user.email} Profile'
 
 
 class Groups(models.Model):
@@ -38,3 +30,12 @@ class Kid(models.Model):
 class Meals(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField(null=True)
+
+
+class SuperUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    kids = models.ManyToManyField(Kid)
+    meals = models.ManyToManyField(Meals)
+    groups = models.ManyToManyField(Groups)
+    payment_plan = models.ManyToManyField(PaymentPlan)
+    parent = models.ManyToManyField(Parent)
