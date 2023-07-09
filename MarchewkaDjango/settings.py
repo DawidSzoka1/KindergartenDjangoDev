@@ -40,7 +40,10 @@ INSTALLED_APPS = [
     'crispy_forms',
     'accounts.apps.AccountsConfig',
     'app',
-    "crispy_bootstrap5"
+    "crispy_bootstrap5",
+    "parent",
+    "super_user",
+    "teacher",
 ]
 
 MIDDLEWARE = [
@@ -135,4 +138,12 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 LOGIN_REDIRECT_URL = 'home_page'
 
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'backenddjangodawid@gmail.com'
+EMAIL_HOST_PASSWORD = 'jpwquggrtpgfxtja'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
 
