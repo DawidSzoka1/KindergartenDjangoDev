@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'app',
     "crispy_bootstrap5",
-    "parent",
+    "parentsAccounts",
     "director",
     "teacher",
 ]

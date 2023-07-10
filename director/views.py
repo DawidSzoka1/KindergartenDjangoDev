@@ -1,11 +1,15 @@
 from django.shortcuts import render, redirect
 from django.views import View
-from django.contrib import messages
-from django.contrib.auth.decorators import user_passes_test
 from .models import Kid, Groups, PaymentPlan, Director
-from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth.decorators import permission_required
+from django.core.mail import EmailMultiAlternatives
+from MarchewkaDjango.settings import EMAIL_HOST_USER
+from django.template.loader import render_to_string
+from accounts.models import User
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+from parentsAccounts.models import ParentA
+from django.db.utils import IntegrityError
 
 
 class AddKid(PermissionRequiredMixin, View):
@@ -73,6 +77,7 @@ class Kids(PermissionRequiredMixin, View):
 
     def get(self, request):
         user = Director.objects.get(user=request.user.id)
+
         kids_db = user.kids.all()
         return render(request, 'kids_list.html', {"kids": kids_db})
 
@@ -150,3 +155,46 @@ class ChangeInfo(PermissionRequiredMixin, View):
             self.kid.save()
             return redirect('childrens')
         return render(request, 'changePayment.html', {"plans": self.plans, "groups": self.groups, 'kid': self.kid})
+
+
+class InviteParent(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request):
+        user = Director.objects.get(user=request.user.id)
+        kid_id = request.GET.get('kid_id')
+        kid = user.kids.get(id=int(kid_id))
+        return render(request, 'invite_parent.html', {'kid': kid})
+
+    def post(self, request):
+        user = Director.objects.get(user=request.user.id)
+
+        kid_id = request.GET.get('kid_id')
+        kid = user.kids.get(id=int(kid_id))
+        parent_email = request.POST.get('email')
+
+        if parent_email:
+            try:
+                password = User.objects.make_random_password()
+                parent_user = User.objects.create_user(email=parent_email, password=password)
+                content_type = ContentType.objects.get_for_model(ParentA)
+                permission = Permission.objects.get(content_type=content_type, codename='parentsAccounts')
+                par_user = ParentA.objects.create(user=parent_user)
+                user.parent_profiles.add(par_user)
+                kid.parents.add(par_user)
+                par_user.user.user_permissions.clear()
+                par_user.user.user_permissions.add(permission)
+                parent_user.parent.save()
+            except:
+                return render(request, "login.html")
+
+            subject = f"Zaproszenie na konto przedszkola dla rodzica {kid.first_name}"
+            from_email = EMAIL_HOST_USER
+            text_content = "Marchewka zaprasza do korzustania z konto do ubslugi dzieci"
+            html_content = render_to_string('email_to_parent.html', {'password': password})
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [parent_email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            return redirect('kids')
+        else:
+            return render(request, 'invite_parent.html', {'kid': kid})

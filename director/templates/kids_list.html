@@ -49,7 +49,7 @@
                                         <td class="candidate-list-favourite-time text-center" style="color:green;">&#9745; dziala</td>
                                     {% else %}
                                         <td class="candidate-list-favourite-time text-center" style="color:red;">&#9746;<br>
-                                        <a class="candidate-list-favourite order-2 text-danger" href="#">Dodaj konto rodzica<i
+                                        <a class="candidate-list-favourite order-2 text-danger" href="/invite/parent/?kid_id={{ kid.id }}">Dodaj konto rodzica<i
                                                 class="fas fa-heart"></i></a>
 
                                         </td>
@@ -102,4 +102,6 @@
             </div>
         </div>
     </div>
+
+
 {% endblock %}

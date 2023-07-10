@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from director.views import AddKid, Kids, GroupsView, DirectorProfile, AddGroup, \
-    PaymentPlans, AddPaymentsPlan, ChangeInfo
+    PaymentPlans, AddPaymentsPlan, ChangeInfo, InviteParent
 from accounts.views import Register
 from app.views import Home
 from django.contrib.auth import views as auth_views
@@ -35,6 +35,7 @@ urlpatterns = [
     path('paymentsPlans/', PaymentPlans.as_view(), name='payments_plans'),
     path('add/payments/plans/', AddPaymentsPlan.as_view(), name='add_payment_plans'),
     path('change/info/', ChangeInfo.as_view(), name='change_info'),
+    path('invite/parentsAccounts/', InviteParent.as_view(), name='invite_parent'),
     path('register/', Register.as_view(), name='register'),
     path('password-reset/',
          auth_views.PasswordResetView.as_view(
