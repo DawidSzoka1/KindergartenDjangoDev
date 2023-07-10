@@ -32,10 +32,15 @@ class Meals(models.Model):
     description = models.TextField(null=True)
 
 
-class SuperUser(models.Model):
+class Director(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     kids = models.ManyToManyField(Kid)
     meals = models.ManyToManyField(Meals)
     groups = models.ManyToManyField(Groups)
     payment_plan = models.ManyToManyField(PaymentPlan)
     parent = models.ManyToManyField(Parent)
+
+    class Meta:
+        permissions = [
+            ("is_director", "Is the director of kindergarten")
+            ]

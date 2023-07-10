@@ -16,8 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from director.views import add_kid, kids, groups_view, director_profile, add_group, \
-    payment_plans, add_payment_plans, change_info
+from director.views import AddKid, Kids, GroupsView, DirectorProfile, AddGroup, \
+    PaymentPlans, AddPaymentsPlan, ChangeInfo
 from accounts.views import Register
 from app.views import Home
 from django.contrib.auth import views as auth_views
@@ -25,16 +25,16 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", Home.as_view(), name="home_page"),
-    path('addKid/', add_kid, name='addKid'),
+    path('addKid/', AddKid.as_view(), name='addKid'),
     path("login/", auth_views.LoginView.as_view(template_name='login.html'), name="login"),
     path("logout/", auth_views.LogoutView.as_view(template_name='logout.html'), name="logout"),
-    path("settings/", director_profile, name="director_profile"),
-    path("childrens/", kids, name="childrens"),
-    path("groups/", groups_view, name="groups"),
-    path('addGroup/', add_group, name='addGroup'),
-    path('paymentsPlans/', payment_plans, name='payments_plans'),
-    path('add/payments/plans/', add_payment_plans, name='add_payment_plans'),
-    path('change/info/', change_info, name='change_info'),
+    path("settings/", DirectorProfile.as_view(), name="director_profile"),
+    path("kids/", Kids.as_view(), name="kids"),
+    path("groups/", GroupsView.as_view(), name="groups"),
+    path('addGroup/', AddGroup.as_view(), name='addGroup'),
+    path('paymentsPlans/', PaymentPlans.as_view(), name='payments_plans'),
+    path('add/payments/plans/', AddPaymentsPlan.as_view(), name='add_payment_plans'),
+    path('change/info/', ChangeInfo.as_view(), name='change_info'),
     path('register/', Register.as_view(), name='register'),
     path('password-reset/',
          auth_views.PasswordResetView.as_view(
