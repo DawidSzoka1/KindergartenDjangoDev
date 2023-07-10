@@ -90,16 +90,13 @@
                             aria-labelledby="navbarDropdownMenuAvatar"
                     >
                         <li>
-                            <a class="dropdown-item" href="{% url 'settings' %}">My profile</a>
+                            <a class="dropdown-item" href="{% url 'director_profile' %}">My profile</a>
                         </li>
                         <li>
                             <a class="dropdown-item" href="#">Profile Settings</a>
 
                         </li>
-                         <li>
-                            <a class="dropdown-item" href="{% url 'test' %}">Test</a>
-                        </li>
-                        {% if user.is_superuser %}
+                        {% if user.user_permissions == 'director' %}
                             <li>
                                 <a class="dropdown-item" href="#">Ustawienia</a>
                             </li>

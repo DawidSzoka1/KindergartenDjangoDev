@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from super_user.models import Parent, User, SuperUser
+from director.models import Parent, User, SuperUser
 
 
 @receiver(post_save, sender=User)

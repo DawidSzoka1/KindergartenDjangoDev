@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from super_user.views import add_kid, kids, groups_view, super_profile, add_group, \
+from director.views import add_kid, kids, groups_view, director_profile, add_group, \
     payment_plans, add_payment_plans, change_info
 from accounts.views import Register
 from app.views import Home
@@ -28,7 +28,7 @@ urlpatterns = [
     path('addKid/', add_kid, name='addKid'),
     path("login/", auth_views.LoginView.as_view(template_name='login.html'), name="login"),
     path("logout/", auth_views.LogoutView.as_view(template_name='logout.html'), name="logout"),
-    path("settings/", super_profile, name="settings"),
+    path("settings/", director_profile, name="director_profile"),
     path("childrens/", kids, name="childrens"),
     path("groups/", groups_view, name="groups"),
     path('addGroup/', add_group, name='addGroup'),

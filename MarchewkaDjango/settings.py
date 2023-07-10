@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'app',
     "crispy_bootstrap5",
     "parent",
-    "super_user",
+    "director",
     "teacher",
 ]
 

@@ -2,9 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 
-
 class CustomUserManager(BaseUserManager):
-    def _create_user(self, email, password,  **extra_fields):
+    def _create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError("Email must be provided")
         if not password:
@@ -19,12 +18,12 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, password,  **extra_fields):
+    def create_user(self, email, password, **extra_fields):
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
-        return self._create_user(email, password,  **extra_fields)
+        return self._create_user(email, password, **extra_fields)
 
-    def create_superuser(self, email, password,  **extra_fields):
+    def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
@@ -33,13 +32,19 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
 
-        return self._create_user(email, password,  **extra_fields)
+        return self._create_user(email, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    permissions = (
+        ('parent', 'parent'),
+        ('teacher', 'teacher'),
+        ('director', 'director')
+                   )
     email = models.EmailField(db_index=True, unique=True, max_length=254)
 
-    is_staff = models.BooleanField(default=True)
+    user_permissions = models.TextField(choices=permissions, default='director')
+    is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
 
@@ -51,5 +56,3 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
-
-
