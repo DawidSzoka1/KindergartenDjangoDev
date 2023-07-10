@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
                 ('end', models.DateField(null=True)),
                 ('amount', models.DecimalField(decimal_places=2, max_digits=20, null=True)),
                 ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='director.groups')),
-                ('parents', models.ManyToManyField(to='parent.parent')),
+                ('parent', models.ManyToManyField(to='parent.parent')),
                 ('payment_plan', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='director.paymentplan')),
             ],
         ),

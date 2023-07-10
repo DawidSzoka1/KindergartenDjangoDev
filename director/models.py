@@ -1,5 +1,5 @@
 from django.db import models
-from parentsAccounts.models import ParentA
+from parent.models import ParentA
 from accounts.models import User
 from django.utils import timezone
 

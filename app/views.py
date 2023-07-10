@@ -8,6 +8,5 @@ from director.models import Director
 class Home(View):
     def get(self, request):
 
-        users = User.objects.get(email=f"{request.user.email}"
-)
-        return render(request, 'home.html', {'users': users})
+        # users = User.objects.get(email=f"{request.user.email}"
+        return render(request, 'home.html')

@@ -45,8 +45,12 @@
                                             </div>
                                         </div>
                                     </td>
-                                    {% if kid.parents_set.all %}
-                                        <td class="candidate-list-favourite-time text-center" style="color:green;">&#9745; dziala</td>
+                                    {% if kid.parents.all %}
+                                        <td class="candidate-list-favourite-time text-center" style="color:green;">&#9745;<br>
+                                        <a class="candidate-list-favourite order-2" href="/invite/parent/?kid_id={{ kid.id }}">Dodaj kolejnego rodzica<i
+                                                class="fas fa-heart"></i></a>
+                                        </td>
+
                                     {% else %}
                                         <td class="candidate-list-favourite-time text-center" style="color:red;">&#9746;<br>
                                         <a class="candidate-list-favourite order-2 text-danger" href="/invite/parent/?kid_id={{ kid.id }}">Dodaj konto rodzica<i

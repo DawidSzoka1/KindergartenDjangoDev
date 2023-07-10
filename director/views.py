@@ -8,7 +8,7 @@ from django.template.loader import render_to_string
 from accounts.models import User
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from parentsAccounts.models import ParentA
+from parent.models import ParentA
 from django.db.utils import IntegrityError
 
 
@@ -174,19 +174,16 @@ class InviteParent(PermissionRequiredMixin, View):
         parent_email = request.POST.get('email')
 
         if parent_email:
-            try:
-                password = User.objects.make_random_password()
-                parent_user = User.objects.create_user(email=parent_email, password=password)
-                content_type = ContentType.objects.get_for_model(ParentA)
-                permission = Permission.objects.get(content_type=content_type, codename='parentsAccounts')
-                par_user = ParentA.objects.create(user=parent_user)
-                user.parent_profiles.add(par_user)
-                kid.parents.add(par_user)
-                par_user.user.user_permissions.clear()
-                par_user.user.user_permissions.add(permission)
-                parent_user.parent.save()
-            except:
-                return render(request, "login.html")
+            password = User.objects.make_random_password()
+            parent_user = User.objects.create_user(email=parent_email, password=password)
+            content_type = ContentType.objects.get_for_model(ParentA)
+            permission = Permission.objects.get(content_type=content_type, codename='parent')
+            par_user = ParentA.objects.create(user=parent_user)
+            user.parent_profiles.add(par_user)
+            kid.parents.add(par_user)
+            par_user.user.user_permissions.clear()
+            par_user.user.user_permissions.add(permission)
+            parent_user.parenta.save()
 
             subject = f"Zaproszenie na konto przedszkola dla rodzica {kid.first_name}"
             from_email = EMAIL_HOST_USER
@@ -196,5 +193,6 @@ class InviteParent(PermissionRequiredMixin, View):
             msg.attach_alternative(html_content, "text/html")
             msg.send()
             return redirect('kids')
+
         else:
             return render(request, 'invite_parent.html', {'kid': kid})
