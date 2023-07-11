@@ -13,5 +13,5 @@ class ParentA(models.Model):
 
     class Meta:
         permissions = [
-            ("parent", 'parent permission')
+            ("is_parent", 'parent permission')
         ]

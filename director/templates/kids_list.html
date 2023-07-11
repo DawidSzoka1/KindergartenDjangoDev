@@ -10,7 +10,16 @@
                     <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
                         <div class="card-header d-flex justify-content-between align-items-center mb-2">
                             <h5 class="mb-0">Lista dzieci</h5>
-                            <a href="{% url 'addKid' %}" class="btn btn-light btn-sm">Dodaj</a>
+                            <a href="{% url 'addKid' %}" class="btn btn-light btn-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+                                    <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                                    <path fill-rule="evenodd"
+                                          d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
+                                </svg>
+                                Dodaj
+
+                            </a>
                         </div>
                         <table class="table manage-candidates-top mb-0">
                             <thead>
@@ -38,7 +47,8 @@
                                                     <ul class="list-unstyled">
                                                         <li><i class="fas fa-filter pr-1"></i>{{ kid.group.name }}
                                                         </li>
-                                                        <li><i class="fas fa-filter pr-1"></i>{{ kid.payment_plan.name }}
+                                                        <li>
+                                                            <i class="fas fa-filter pr-1"></i>{{ kid.payment_plan.name }}
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -46,23 +56,26 @@
                                         </div>
                                     </td>
                                     {% if kid.parents.all %}
-                                        <td class="candidate-list-favourite-time text-center" style="color:green;">&#9745;<br>
-                                        <a class="candidate-list-favourite order-2 text-success" href="/invite/parent/?kid_id={{ kid.id }}">Dodaj kolejnego rodzica<i
-                                                class="fas fa-heart"></i></a>
+                                        <td class="candidate-list-favourite-time text-center" style="color:green;">
+                                            &#9745;<br>
+                                            <a class="candidate-list-favourite order-2 text-success"
+                                               href="/invite/parent/?kid_id={{ kid.id }}">Dodaj kolejnego rodzica<i
+                                                    class="fas fa-heart"></i></a>
                                         </td>
 
                                     {% else %}
                                         <td class="candidate-list-favourite-time text-center" style="color:red;">&#9746;<br>
-                                        <a class="candidate-list-favourite order-2 text-danger" href="/invite/parent/?kid_id={{ kid.id }}">Dodaj konto rodzica<i
-                                                class="fas fa-heart"></i></a>
+                                            <a class="candidate-list-favourite order-2 text-danger"
+                                               href="/invite/parent/?kid_id={{ kid.id }}">Dodaj konto rodzica<i
+                                                    class="fas fa-heart"></i></a>
 
                                         </td>
                                     {% endif %}
-{#                                    <td class="candidate-list-favourite-time text-center">#}
-{#                                        <a class="candidate-list-favourite order-2 text-danger" href="#"><i#}
-{#                                                class="fas fa-heart"></i></a>#}
-{#                                        <span class="candidate-list-time order-1">Czy ma podpietego rodzica</span>#}
-{#                                    </td>#}
+                                    {#                                    <td class="candidate-list-favourite-time text-center">#}
+                                    {#                                        <a class="candidate-list-favourite order-2 text-danger" href="#"><i#}
+                                    {#                                                class="fas fa-heart"></i></a>#}
+                                    {#                                        <span class="candidate-list-time order-1">Czy ma podpietego rodzica</span>#}
+                                    {#                                    </td>#}
                                     <td>
                                         <div class="drodown">
                                             <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
@@ -87,7 +100,8 @@
                                                     <a href="#" class="dropdown-item">View detail</a>
                                                 </li>
                                                 <li>
-                                                    <a href="/change/info/?kid_id={{ kid.id }}" class="dropdown-item">Change info</a>
+                                                    <a href="/change/info/?kid_id={{ kid.id }}" class="dropdown-item">Change
+                                                        info</a>
                                                 </li>
                                                 <li>
                                                     <a href="#!" class="dropdown-item">Delete user</a>

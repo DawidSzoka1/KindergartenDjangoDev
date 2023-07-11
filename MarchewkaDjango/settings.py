@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "parent",
     "director",
     "teacher",
+    'django_bootstrap_icons',
 ]
 
 MIDDLEWARE = [
