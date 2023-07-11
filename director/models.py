@@ -14,6 +14,11 @@ class Groups(models.Model):
     name = models.CharField(max_length=128)
 
 
+class Meals(models.Model):
+    name = models.CharField(max_length=128)
+    description = models.TextField(null=True)
+
+
 class Kid(models.Model):
     gender_choices = ((1, 'Chłopiec'), (2, 'Dziewczynka'))
     first_name = models.CharField(max_length=128)
@@ -25,11 +30,7 @@ class Kid(models.Model):
     payment_plan = models.ForeignKey(PaymentPlan, on_delete=models.CASCADE)
     parents = models.ManyToManyField(ParentA)
     amount = models.DecimalField(max_digits=20, decimal_places=2, null=True)
-
-
-class Meals(models.Model):
-    name = models.CharField(max_length=128)
-    description = models.TextField(null=True)
+    kid_meals = models.ManyToManyField(Meals)
 
 
 class Director(models.Model):
