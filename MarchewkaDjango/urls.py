@@ -22,7 +22,7 @@ from director.views import AddKid, Kids, GroupsView, DirectorProfile, AddGroup, 
     PaymentPlans, AddPaymentsPlan, ChangeInfo, InviteParent, AddMeals, AllMeals, \
     DetailsKid
 from accounts.views import Register
-from blog.views import Home, PostListView, PostCreateView, PostDetailView
+from blog.views import Home, PostListView, PostCreateView, PostDetailView, PostUpdateView, PostDeleteView
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -30,7 +30,9 @@ urlpatterns = [
     path("", Home.as_view(), name="home_page"),
     path("wydarzenia/", PostListView.as_view(), name='post_list_view'),
     path("wydarzenie/szczegoly/<int:pk>/", PostDetailView.as_view(), name='post_detail_view'),
+    path("wydarzenie/update/<int:pk>/", PostUpdateView.as_view(), name='post_update'),
     path("wydarzenie/nowe/", PostCreateView.as_view(), name='post_create_view'),
+    path("wydarzenie/delete/<int:pk>/", PostDeleteView.as_view(), name='post_delete'),
     path('addKid/', AddKid.as_view(), name='addKid'),
     path("login/", auth_views.LoginView.as_view(template_name='login.html'), name="login"),
     path("logout/", auth_views.LogoutView.as_view(template_name='logout.html'), name="logout"),

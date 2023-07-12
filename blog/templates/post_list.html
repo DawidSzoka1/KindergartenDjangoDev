@@ -17,7 +17,7 @@
         Hero
         =============================================== -->
         <section class="hero">
-            <div class="container mb-2">
+            <div class="container mb-2 mt-2">
                 <div class="row">
 
                     <div class="col-lg-6 offset-lg-3">
@@ -31,11 +31,14 @@
                                             aria-expanded="false">
                                         <em class="fa fa-ellipsis-h"></em>
                                     </button>
-                                    <div class="dropdown-menu dropdown-scale dropdown-menu-right"  role="menu"
+                                    <div class="dropdown-menu dropdown-scale dropdown-menu-right" role="menu"
                                          style="position: absolute; transform: translate3d(-136px, 28px, 0px); top: 0px; left: 0px; will-change: transform;">
                                         <a class="dropdown-item" href="{% url 'post_detail_view' post.id %}">Details</a>
-                                        <a class="dropdown-item" href="#">Stop following</a>
-                                        <a class="dropdown-item" href="#">Report</a>
+                                        {% if post.author == user %}
+                                            <a class="dropdown-item" href="{% url 'post_update' post.id %}">Update</a>
+                                            <a class="dropdown-item" href="{% url 'post_delete' post.id %}">Delete</a>
+                                        {% endif %}
+
                                     </div>
                                 </div><!--/ dropdown -->
                                 <div class="media m-0">
