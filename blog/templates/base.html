@@ -38,8 +38,8 @@
             <!-- Navbar brand -->
             <a class="navbar-brand mt-2 mt-lg-0" href="#">
                 <img
-                        src="#"
-                        height="15"
+                        src="{% static 'marchewk.jpeg' %}"
+                        height="30"
                         alt="Logo"
                         loading="lazy"
                 />
@@ -50,10 +50,10 @@
                     <a class="nav-link" href="{% url 'home_page' %}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Team</a>
+                    <a class="nav-link" href="{% url 'post_list_view' %}">Wydarzenia</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Projects</a>
+                    <a class="nav-link" href="#">Kalendarz obecnosci</a>
                 </li>
             </ul>
             <!-- Left links -->

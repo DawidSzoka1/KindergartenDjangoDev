@@ -52,13 +52,12 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
-                                                <label class="mr-2">Posilki:</label><br>
-                                                <select class="select ml-3" name="meals" multiple>
+                                                 <label class="mr-2">Posilki:</label><br>
 
-                                                    {% for group in groups %}
-                                                        <option value="{{ group.name }}">{{ group.name }}</option>
+
+                                                    {% for meal in meals %}
+                                                        <input type="checkbox" name="meals" value="{{ meal.id }}">{{ meal.name }}
                                                     {% endfor %}
-                                                </select>
 
                                             </div>
                                         </div>

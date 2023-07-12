@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crispy_forms',
     'accounts.apps.AccountsConfig',
-    'app',
+    'blog',
     "crispy_bootstrap5",
     "parent",
     "director",
@@ -147,4 +147,7 @@ EMAIL_HOST_PASSWORD = 'jpwquggrtpgfxtja'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 

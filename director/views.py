@@ -9,20 +9,24 @@ from accounts.models import User
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from parent.models import ParentA
+from django.views.generic import ListView
 
 
 class AddKid(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
-        groups = Groups.objects.all()
-        plans = PaymentPlan.objects.all()
-        meals = Meals.objects.all()
+        user = Director.objects.get(user=request.user.id)
+        groups = user.groups.all()
+        plans = user.payment_plan.all()
+        meals = user.meals.all()
         return render(request, 'add_kid.html', {"plans": plans, 'groups': groups, 'meals': meals})
 
     def post(self, request):
-        groups = Groups.objects.all()
-        plans = PaymentPlan.objects.all()
+        user = Director.objects.get(user=request.user.id)
+        groups = user.groups.all()
+        plans = user.payment_plan.all()
+        meals_avaible = user.meals.all()
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         gender = 1 if request.POST.get("gender") == 'Chłopiec' else 2
@@ -61,12 +65,11 @@ class AddKid(PermissionRequiredMixin, View):
             for meal in meals:
                 meal_object = Meals.objects.get(id=int(meal))
                 kid.kid_meals.add(meal_object)
-            user = Director.objects.get(user=request.user.id)
             user.kids.add(kid)
 
             return redirect('kids')
 
-        return render(request, 'add_kid.html', {"plans": plans, 'groups': groups})
+        return render(request, 'add_kid.html', {"plans": plans, 'groups': groups, 'meals': meals_avaible})
 
 
 class DirectorProfile(PermissionRequiredMixin, View):
@@ -81,7 +84,6 @@ class Kids(PermissionRequiredMixin, View):
 
     def get(self, request):
         user = Director.objects.get(user=request.user.id)
-
         kids_db = user.kids.all()
         return render(request, 'kids_list.html', {"kids": kids_db})
 
@@ -90,14 +92,15 @@ class AddMeals(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
-
         return render(request, 'add_meals.html')
 
     def post(self, request):
         name = request.POST.get('name')
         desc = request.POST.get('desc')
         if name and desc:
-            Meals.objects.create(name=name, description=desc)
+            meal = Meals.objects.create(name=name, description=desc)
+            user = Director.objects.get(user=request.user.id)
+            user.meals.add(meal)
             return redirect('all_meals')
         return render(request, 'add_meals.html')
 
@@ -106,7 +109,8 @@ class AllMeals(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
-        meals = Meals.objects.all()
+        user = Director.objects.get(user=request.user.id)
+        meals = user.meals.all()
         return render(request, 'all_meals.html', {'meals': meals})
 
 
@@ -168,26 +172,34 @@ class ChangeInfo(PermissionRequiredMixin, View):
         user = Director.objects.get(user=request.user.id)
         plans = user.payment_plan.all()
         groups = user.groups.all()
+        meals = user.meals.all()
         kid_id = request.GET.get('kid_id')
         kid = user.kids.get(id=int(kid_id))
-        return render(request, 'change_payment.html', {"plans": plans, "groups": groups, 'kid': kid})
+        return render(request, 'change_payment.html', {"plans": plans, "groups": groups, 'kid': kid, 'meals': meals})
 
     def post(self, request):
         user = Director.objects.get(user=request.user.id)
         plans = user.payment_plan.all()
         groups = user.groups.all()
+        meals = user.meals.all()
         kid_id = request.GET.get('kid_id')
         kid = user.kids.get(id=int(kid_id))
         plan = int(request.POST.get("plan"))
         group = int(request.POST.get('group'))
+        meals_to_change = request.POST.getlist('meals')
+
         plan = user.payment_plan.get(id=plan)
         group = user.groups.get(id=group)
-        if plan and group:
+        if plan and group and meals_to_change:
+            kid.kid_meals.clear()
+            for meal in meals_to_change:
+                objec = user.meals.get(id=int(meal))
+                kid.kid_meals.add(objec)
             kid.group = group
             kid.payment_plan = plan
             kid.save()
             return redirect('childrens')
-        return render(request, 'change_payment.html', {"plans": plans, "groups": groups, 'kid': kid})
+        return render(request, 'change_payment.html', {"plans": plans, "groups": groups, 'kid': kid, 'meals': meals})
 
 
 class InviteParent(PermissionRequiredMixin, View):
@@ -229,3 +241,13 @@ class InviteParent(PermissionRequiredMixin, View):
 
         else:
             return render(request, 'invite_parent.html', {'kid': kid})
+
+
+class DetailsKid(View):
+    permission_required = "director.is_director"
+
+    def get(self, request):
+        kid_id = request.GET.get("kid_id")
+        user = Director.objects.get(user=request.user.id)
+        kid = user.kids.get(id=int(kid_id))
+        return render(request, 'kid_details.html', {'kid': kid})

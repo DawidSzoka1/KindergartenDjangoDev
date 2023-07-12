@@ -31,21 +31,28 @@
                             </thead>
                             <tbody>
                             {% for kid in kids %}
+
+
+
+
                                 <tr class="candidates-list">
                                     <td class="title">
                                         <div class="thumb">
                                             <img class="img-fluid"
-                                                 src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="">
+                                                 src="https://bootdey.com/img/Content/avatar/avatar7.png"
+                                                 alt="">
                                         </div>
                                         <div class="candidate-list-details">
                                             <div class="candidate-list-info">
                                                 <div class="candidate-list-title">
                                                     <h5 class="mb-0"><a
-                                                            href="#">{{ kid.first_name }} {{ kid.last_name }}</a></h5>
+                                                            href="#">{{ kid.first_name }} {{ kid.last_name }}</a>
+                                                    </h5>
                                                 </div>
                                                 <div class="candidate-list-option">
                                                     <ul class="list-unstyled">
-                                                        <li><i class="fas fa-filter pr-1"></i>{{ kid.group.name }}
+                                                        <li>
+                                                            <i class="fas fa-filter pr-1"></i>{{ kid.group.name }}
                                                         </li>
                                                         <li>
                                                             <i class="fas fa-filter pr-1"></i>{{ kid.payment_plan.name }}
@@ -56,15 +63,19 @@
                                         </div>
                                     </td>
                                     {% if kid.parents.all %}
-                                        <td class="candidate-list-favourite-time text-center" style="color:green;">
+                                        <td class="candidate-list-favourite-time text-center"
+                                            style="color:green;">
                                             &#9745;<br>
                                             <a class="candidate-list-favourite order-2 text-success"
-                                               href="/invite/parent/?kid_id={{ kid.id }}">Dodaj kolejnego rodzica<i
-                                                    class="fas fa-heart"></i></a>
+                                               href="/invite/parent/?kid_id={{ kid.id }}">Dodaj kolejnego
+                                                rodzica<i
+                                                        class="fas fa-heart"></i></a>
                                         </td>
 
                                     {% else %}
-                                        <td class="candidate-list-favourite-time text-center" style="color:red;">&#9746;<br>
+                                        <td class="candidate-list-favourite-time text-center"
+                                            style="color:red;">
+                                            &#9746;<br>
                                             <a class="candidate-list-favourite order-2 text-danger"
                                                href="/invite/parent/?kid_id={{ kid.id }}">Dodaj konto rodzica<i
                                                     class="fas fa-heart"></i></a>
@@ -97,10 +108,12 @@
                                                     aria-labelledby="navbarDropdownMenuAvatar"
                                             >
                                                 <li>
-                                                    <a href="#" class="dropdown-item">View detail</a>
+                                                    <a href="/kid/details/?kid_id={{ kid.id }}"
+                                                       class="dropdown-item">View detail</a>
                                                 </li>
                                                 <li>
-                                                    <a href="/change/info/?kid_id={{ kid.id }}" class="dropdown-item">Change
+                                                    <a href="/change/info/?kid_id={{ kid.id }}"
+                                                       class="dropdown-item">Change
                                                         info</a>
                                                 </li>
                                                 <li>
@@ -110,6 +123,7 @@
                                         </div>
                                     </td>
                                 </tr>
+
                             {% endfor %}
 
                             </tbody>

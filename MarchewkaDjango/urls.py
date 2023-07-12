@@ -16,15 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from director.views import AddKid, Kids, GroupsView, DirectorProfile, AddGroup, \
-    PaymentPlans, AddPaymentsPlan, ChangeInfo, InviteParent, AddMeals, AllMeals
+    PaymentPlans, AddPaymentsPlan, ChangeInfo, InviteParent, AddMeals, AllMeals, \
+    DetailsKid
 from accounts.views import Register
-from app.views import Home
+from blog.views import Home, PostListView, PostCreateView, PostDetailView
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", Home.as_view(), name="home_page"),
+    path("wydarzenia/", PostListView.as_view(), name='post_list_view'),
+    path("wydarzenie/szczegoly/<int:pk>/", PostDetailView.as_view(), name='post_detail_view'),
     path('addKid/', AddKid.as_view(), name='addKid'),
     path("login/", auth_views.LoginView.as_view(template_name='login.html'), name="login"),
     path("logout/", auth_views.LogoutView.as_view(template_name='logout.html'), name="logout"),
@@ -39,6 +44,7 @@ urlpatterns = [
     path('add/meal/', AddMeals.as_view(), name='add_meals'),
     path('all/meals/', AllMeals.as_view(), name='all_meals'),
     path('register/', Register.as_view(), name='register'),
+    path('kid/details/', DetailsKid.as_view(), name='kid_details'),
     path('password-reset/',
          auth_views.PasswordResetView.as_view(
              template_name='password_reset.html'
@@ -62,3 +68,7 @@ urlpatterns = [
 
 
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
