@@ -1,10 +1,7 @@
 from django.shortcuts import render
 from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from accounts.models import User
-from director.models import Director
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from .models import Post
-# Create your views here.
 from django.views.generic import (
     ListView,
     DetailView,
@@ -35,10 +32,16 @@ class PostDetailView(DetailView):
     context_object_name = 'post'
 
 
-class PostCreateView(LoginRequiredMixin, CreateView):
+class PostCreateView(PermissionRequiredMixin, CreateView):
+    permission_required = "director.is_director"
     model = Post
-    fields = ['title', 'content']
+    fields = ['title', 'content', 'image']
     template_name = 'post_form.html'
+
+    def get_form(self, form_class=None):
+        form = super(PostCreateView, self).get_form(form_class)
+        form.fields['image'].required = False
+        return form
 
     def form_valid(self, form):
         form.instance.author = self.request.user
