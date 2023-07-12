@@ -2,7 +2,7 @@ from django.db import models
 from parent.models import ParentA
 from accounts.models import User
 from django.utils import timezone
-
+from teacher.models import Teacher
 
 
 # Create your models here.
@@ -13,6 +13,7 @@ class PaymentPlan(models.Model):
 
 class Groups(models.Model):
     name = models.CharField(max_length=128)
+    teachers = models.ManyToManyField(Teacher)
 
 
 class Meals(models.Model):
@@ -35,12 +36,15 @@ class Kid(models.Model):
 
 
 class Director(models.Model):
+    first_name = models.CharField(max_length=128, null=True)
+    last_name = models.CharField(max_length=128, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     kids = models.ManyToManyField(Kid)
     meals = models.ManyToManyField(Meals)
     groups = models.ManyToManyField(Groups)
     payment_plan = models.ManyToManyField(PaymentPlan)
     parent_profiles = models.ManyToManyField(ParentA)
+    teachers = models.ManyToManyField(Teacher)
 
     class Meta:
         permissions = [
