@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+    {{ parent_logged }}
+    {% for kid in parent_kids %}
+        {{ kid.first_name }}
+    {% endfor %}
+{% endblock %}

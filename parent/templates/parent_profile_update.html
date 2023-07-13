@@ -14,7 +14,8 @@
 
                                     <form class="mx-1 mx-md-4" method="POST" enctype="multipart/form-data">
                                         {% csrf_token %}
-                                        {{ password_form|crispy }}
+                                        {{ u_form|crispy }}
+                                        {{ p_form|crispy }}
                                         <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                                             <button type="submit" class="btn btn-primary btn-lg">Update</button>
                                         </div>

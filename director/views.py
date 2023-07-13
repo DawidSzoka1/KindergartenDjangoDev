@@ -9,7 +9,13 @@ from accounts.models import User
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from parent.models import ParentA
-from django.views.generic import ListView
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView
+)
 
 
 class AddKid(PermissionRequiredMixin, View):
@@ -222,7 +228,7 @@ class InviteParent(PermissionRequiredMixin, View):
             password = User.objects.make_random_password()
             parent_user = User.objects.create_user(email=parent_email, password=password)
             content_type = ContentType.objects.get_for_model(ParentA)
-            permission = Permission.objects.get(content_type=content_type, codename='parent')
+            permission = Permission.objects.get(content_type=content_type, codename='is_parent')
             par_user = ParentA.objects.create(user=parent_user)
             user.parent_profiles.add(par_user)
             kid.parents.add(par_user)
