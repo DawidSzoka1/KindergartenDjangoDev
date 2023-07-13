@@ -16,7 +16,7 @@ class ParentProfileView(LoginRequiredMixin, View):
 
 class ParentProfileUpdate(LoginRequiredMixin, View):
     def get(self, request):
-        p_form = ParentUpdateForm(instance=request.user)
+        p_form = ParentUpdateForm(instance=request.user.parenta)
         u_form = UserUpdateForm(instance=request.user)
 
         context = {
@@ -27,7 +27,7 @@ class ParentProfileUpdate(LoginRequiredMixin, View):
         return render(request, 'parent_profile_update.html', context)
 
     def post(self, request):
-        p_form = ParentUpdateForm(request.POST, instance=request.user)
+        p_form = ParentUpdateForm(request.POST, instance=request.user.parenta)
         u_form = UserUpdateForm(request.POST, instance=request.user)
 
         if p_form.is_valid() and u_form.is_valid():

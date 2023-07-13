@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-    {{ parent_logged }}
+    {{ parent_logged.first_name }}
+    {{ parent_logged.user }}
     {% for kid in parent_kids %}
         {{ kid.first_name }}
     {% endfor %}
