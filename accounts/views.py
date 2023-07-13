@@ -3,9 +3,10 @@ from django.views import View
 from .forms import UserRegisterForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class Register(View):
+class Register(LoginRequiredMixin, View):
     def get(self, request):
         form = UserRegisterForm()
         return render(request, "register.html", {'form': form})
@@ -21,7 +22,7 @@ class Register(View):
         return render(request, "register.html", {'form': form})
 
 
-class ParentProfileUpdate(View):
+class ProfilePasswordUpdate(View):
     def get(self, request):
 
         password_form = PasswordChangeForm(request.user)
@@ -36,5 +37,5 @@ class ParentProfileUpdate(View):
         if password_form.is_valid():
             user = password_form.save()
             update_session_auth_hash(request, user)
-            if user.user_permissions == 'parent.is_parent':
-                return redirect('parent_profile')
+
+            return redirect('parent_profile')

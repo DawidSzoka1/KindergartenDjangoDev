@@ -22,7 +22,7 @@ from director.views import AddKid, Kids, GroupsView, DirectorProfile, AddGroup, 
     PaymentPlans, AddPaymentsPlan, ChangeInfo, InviteParent, AddMeals, AllMeals, \
     DetailsKid
 from parent.views import ParentProfileView, ParentProfileUpdate
-from accounts.views import Register
+from accounts.views import Register, ProfilePasswordUpdate
 from blog.views import Home, PostListView, PostCreateView, PostDetailView, PostUpdateView, PostDeleteView
 from django.contrib.auth import views as auth_views
 
@@ -69,6 +69,7 @@ urlpatterns = [
              template_name='password_reset_complete.html'
          ),
          name='password_reset_complete'),
+    path('profile/password/update/', ProfilePasswordUpdate.as_view(), name='password_change'),
     path('parent/profile/', ParentProfileView.as_view(), name='parent_profile'),
     path('parent/profile/update/', ParentProfileUpdate.as_view(), name='parent_profile_update'),
 

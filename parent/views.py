@@ -3,17 +3,18 @@ from django.views import View
 from director.models import Director
 from .forms import ParentUpdateForm, UserUpdateForm
 from .models import ParentA
+from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
 
-class ParentProfileView(View):
+class ParentProfileView(LoginRequiredMixin, View):
     def get(self, request):
         parent_logged = ParentA.objects.get(user=request.user.id)
         parent_kids = parent_logged.kid_set.all()
         return render(request, 'parent_profile.html', {'parent_logged': parent_logged, 'parent_kids': parent_kids})
 
 
-class ParentProfileUpdate(View):
+class ParentProfileUpdate(LoginRequiredMixin, View):
     def get(self, request):
         p_form = ParentUpdateForm(instance=request.user)
         u_form = UserUpdateForm(instance=request.user)
