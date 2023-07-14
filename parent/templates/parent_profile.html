@@ -4,7 +4,7 @@
 {% block content %}
     <link rel="stylesheet" href="{% static 'profile_page.css' %}">
     <form method="post" action="#">
-    {% csrf_token %}
+        {% csrf_token %}
         <div class="container mt-4">
             <div class="row gutters">
                 <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
@@ -65,75 +65,91 @@
                                         <a href="{% url 'password_change' %}">Change password</a>
                                     </div>
                                 </div>
-
-
-                            </div>
-
-                            <div class="row gutters mt-3 text-light">
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                    <h6 class="mb-3 text-primary">Kids</h6>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                    <div class="row gutters">
+                                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                            <div class="form-group">
+                                                <button type="submit" id="submit" name="submit" class="btn btn-primary">
+                                                    Update
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                {% for kid in parent_kids %}
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div class="form-group">
-                                            <label for="Street">First name</label>
-                                            <input type="text" class="form-control" id="Street"
-                                                   value="{{ kid.first_name }}" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div class="form-group">
-                                            <label for="kid_last_name">Last name</label>
-                                            <input type="text" class="form-control" id="kid_last_name"
-                                                   value="{{ kid.last_name }}" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div class="form-group">
-                                            <label for="sTate">Group name</label>
-                                            <input type="text" class="form-control" id="sTate"
-                                                   value="{{ kid.group.name }}" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div class="form-group">
-                                            <label for="zIp">Payment plan</label>
-                                            <input type="text" class="form-control" id="zIp"
-                                                   value="{{ kid.payment_plan.name }}" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div class="form-group">
-                                            <label for="zIp">Cost for this month in this moment</label>
-                                            <input type="text" class="form-control" id="zIp"
-                                                   value="{{ kid.payment_plan.price }}" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                        <div class="form-group">
-                                            <label for="zIp">payment overdue</label>
-                                            <input type="text" class="form-control" id="zIp"
-                                                   value="{{ kid.payment_plan.price }}" readonly>
-                                        </div>
-                                    </div>
-                                {% endfor %}
                             </div>
 
-                            <div class="row gutters">
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                    <div class="col text-right mt-3">
-                                        <button type="submit" id="submit" name="submit" class="btn btn-secondary">Cancel
-                                        </button>
-                                        <button type="submit" id="submit" name="submit" class="btn btn-primary">Update
-                                        </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="row gutters mt-3 text-light">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                    <h6 class="mb-3 text-primary">Kids</h6>
+                </div>
+                {% for kid in parent_kids %}
+                    <div class="card h-90">
+                        <div class="card-body">
+                            <div class="row gutters mt-3 text-light">
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label for="Street">First name</label>
+                                        <input type="text" class="form-control" id="Street"
+                                               value="{{ kid.first_name }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label for="kid_last_name">Last name</label>
+                                        <input type="text" class="form-control" id="kid_last_name"
+                                               value="{{ kid.last_name }}" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label for="sTate">Group name</label>
+                                        <input type="text" class="form-control" id="sTate"
+                                               value="{{ kid.group.name }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label for="zIp">Payment plan</label>
+                                        <input type="text" class="form-control" id="zIp"
+                                               value="{{ kid.payment_plan.name }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label for="zIp">Cost for this month in this moment</label>
+                                        <input type="text" class="form-control" id="zIp"
+                                               value="{{ kid.payment_plan.price }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label for="zIp">payment overdue</label>
+                                        <input type="text" class="form-control" id="zIp"
+                                               value="{{ kid.payment_plan.price }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                    <div class="form-group mt-2">
+                                        <a href="">presence calendar</a>
+
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
+                {% endfor %}
             </div>
         </div>
+
+
     </form>
 {% endblock %}
