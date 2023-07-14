@@ -9,22 +9,19 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 class ParentProfileView(LoginRequiredMixin, View):
     def get(self, request):
-        parent_logged = ParentA.objects.get(user=request.user.id)
-        parent_kids = parent_logged.kid_set.all()
-        return render(request, 'parent_profile.html', {'parent_logged': parent_logged, 'parent_kids': parent_kids})
-
-
-class ParentProfileUpdate(LoginRequiredMixin, View):
-    def get(self, request):
         p_form = ParentUpdateForm(instance=request.user.parenta)
         u_form = UserUpdateForm(instance=request.user)
+        parent_logged = ParentA.objects.get(user=request.user.id)
+        parent_kids = parent_logged.kid_set.all()
 
         context = {
             'p_form': p_form,
             'u_form': u_form,
+            'parent_logged': parent_logged,
+            'parent_kids': parent_kids,
 
         }
-        return render(request, 'parent_profile_update.html', context)
+        return render(request, 'parent_profile.html', context)
 
     def post(self, request):
         p_form = ParentUpdateForm(request.POST, instance=request.user.parenta)

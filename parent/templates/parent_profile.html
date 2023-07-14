@@ -1,8 +1,133 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
 {% block content %}
-    {{ parent_logged.first_name }}
-    {{ parent_logged.user }}
-    {% for kid in parent_kids %}
-        {{ kid.first_name }}
-    {% endfor %}
+    <link rel="stylesheet" href="{% static 'profile_page.css' %}">
+    <form method="post" action="#">
+    {% csrf_token %}
+        <div class="container mt-4">
+            <div class="row gutters">
+                <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="account-settings text-light">
+                                <div class="user-profile">
+                                    <div class="user-avatar">
+                                        <img src="https://bootdey.com/img/Content/avatar/avatar1.png"
+                                             alt="Maxwell Admin">
+                                    </div>
+                                    <h5 class="user-name">{{ parent_logged.first_name }}</h5>
+                                    <h6 class="user-email">{{ parent_logged.user }}</h6>
+                                </div>
+                                <div class="about">
+                                    <h5 class="mb-2 text-primary">Info</h5>
+                                    <p>This is your account as a parent of {{ parent_kids.count }} kid</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="row gutters text-light">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <h6 class="mb-3 text-primary">Personal Details</h6>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+
+                                    <div class="form-group">
+                                        {{ u_form|crispy }}
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+
+                                    <div class="form-group">
+                                        {{ p_form.first_name|as_crispy_field }}
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+
+                                    <div class="form-group">
+                                        {{ p_form.last_name|as_crispy_field }}
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+
+                                    <div class="form-group">
+                                        {{ p_form.phone|as_crispy_field }}
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <div class="row gutters mt-3 text-light">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <h6 class="mb-3 text-primary">Kids</h6>
+                                </div>
+                                {% for kid in parent_kids %}
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label for="Street">First name</label>
+                                            <input type="text" class="form-control" id="Street"
+                                                   value="{{ kid.first_name }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label for="kid_last_name">Last name</label>
+                                            <input type="text" class="form-control" id="kid_last_name"
+                                                   value="{{ kid.last_name }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label for="sTate">Group name</label>
+                                            <input type="text" class="form-control" id="sTate"
+                                                   value="{{ kid.group.name }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label for="zIp">Payment plan</label>
+                                            <input type="text" class="form-control" id="zIp"
+                                                   value="{{ kid.payment_plan.name }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label for="zIp">Cost for this month in this moment</label>
+                                            <input type="text" class="form-control" id="zIp"
+                                                   value="{{ kid.payment_plan.price }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label for="zIp">payment overdue</label>
+                                            <input type="text" class="form-control" id="zIp"
+                                                   value="{{ kid.payment_plan.price }}" readonly>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="row gutters">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <div class="col text-right mt-3">
+                                        <button type="submit" id="submit" name="submit" class="btn btn-secondary">Cancel
+                                        </button>
+                                        <button type="submit" id="submit" name="submit" class="btn btn-primary">Update
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
 {% endblock %}
