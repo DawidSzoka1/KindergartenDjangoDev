@@ -15,40 +15,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from director.views import AddKid, Kids, GroupsView, DirectorProfile, AddGroup, \
-    PaymentPlans, AddPaymentsPlan, ChangeInfo, InviteParent, AddMeals, AllMeals, \
-    DetailsKid
-from parent.views import ParentProfileView
 from accounts.views import Register, ProfilePasswordUpdate
-from blog.views import Home, PostListView, PostCreateView, PostDetailView, PostUpdateView, PostDeleteView
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
+    path('', include('blog.urls')),
+    path('', include('director.urls')),
+    path('', include('parent.urls')),
     path('admin/', admin.site.urls),
-    path("", Home.as_view(), name="home_page"),
-    path("wydarzenia/", PostListView.as_view(), name='post_list_view'),
-    path("wydarzenie/szczegoly/<int:pk>/", PostDetailView.as_view(), name='post_detail_view'),
-    path("wydarzenie/update/<int:pk>/", PostUpdateView.as_view(), name='post_update'),
-    path("wydarzenie/nowe/", PostCreateView.as_view(), name='post_create_view'),
-    path("wydarzenie/delete/<int:pk>/", PostDeleteView.as_view(), name='post_delete'),
-    path('addKid/', AddKid.as_view(), name='addKid'),
     path("login/", auth_views.LoginView.as_view(template_name='login.html'), name="login"),
     path("logout/", auth_views.LogoutView.as_view(template_name='logout.html'), name="logout"),
-    path("settings/", DirectorProfile.as_view(), name="director_profile"),
-    path("kids/", Kids.as_view(), name="kids"),
-    path("groups/", GroupsView.as_view(), name="groups"),
-    path('addGroup/', AddGroup.as_view(), name='addGroup'),
-    path('paymentsPlans/', PaymentPlans.as_view(), name='payments_plans'),
-    path('add/payments/plans/', AddPaymentsPlan.as_view(), name='add_payment_plans'),
-    path('change/info/', ChangeInfo.as_view(), name='change_info'),
-    path('invite/parent/', InviteParent.as_view(), name='invite_parent'),
-    path('add/meal/', AddMeals.as_view(), name='add_meals'),
-    path('all/meals/', AllMeals.as_view(), name='all_meals'),
-    path('register/', Register.as_view(), name='register'),
-    path('kid/details/', DetailsKid.as_view(), name='kid_details'),
     path('password-reset/',
          auth_views.PasswordResetView.as_view(
              template_name='password_reset.html'
@@ -70,12 +49,9 @@ urlpatterns = [
          ),
          name='password_reset_complete'),
     path('profile/password/update/', ProfilePasswordUpdate.as_view(), name='password_change'),
-    path('parent/profile/', ParentProfileView.as_view(), name='parent_profile'),
-
-
+    path('register/', Register.as_view(), name='register'),
 
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

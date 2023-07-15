@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from .models import Post
+from director.models import Kid
 from django.views.generic import (
     ListView,
     DetailView,
@@ -9,6 +10,13 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
+
+
+class CalendarKid(View):
+    def get(self, request, pk):
+        kid = Kid.objects.get(id=pk)
+        start = Kid.start
+        return render(request, 'calendar.html', {'kid': kid})
 
 
 class Home(View):
