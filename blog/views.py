@@ -23,7 +23,6 @@ class CalendarKid(LoginRequiredMixin, View):
         month_number = int(timezone.now().month)
         year = int(timezone.now().year)
         cal = HTMLCalendar().formatyear(year, month_number)
-
         if permissions[0].name == 'director permission':
             kid = Kid.objects.get(id=pk)
             return render(request, 'calendar.html', {'kid': kid})
@@ -31,6 +30,7 @@ class CalendarKid(LoginRequiredMixin, View):
             parent = ParentA.objects.get(user=request.user.id)
             kids = parent.kid_set.all()
             return render(request, 'calendar.html', {'kids': kids, 'cal': cal})
+
 
 class Home(View):
     def get(self, request):
