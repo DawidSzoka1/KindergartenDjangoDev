@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
 from .models import Post
@@ -23,13 +23,15 @@ class CalendarKid(LoginRequiredMixin, View):
         month_number = int(timezone.now().month)
         year = int(timezone.now().year)
         cal = HTMLCalendar().formatyear(year, month_number)
-        if permissions[0].name == 'director permission':
+
+        if permissions[0].name == 'Is the director of kindergarten':
             kid = Kid.objects.get(id=pk)
             return render(request, 'calendar.html', {'kid': kid})
         elif permissions[0].name == 'parent permission':
             parent = ParentA.objects.get(user=request.user.id)
             kids = parent.kid_set.all()
             return render(request, 'calendar.html', {'kids': kids, 'cal': cal})
+        return HttpResponse(permissions[0].name)
 
 
 class Home(View):

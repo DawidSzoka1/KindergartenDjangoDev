@@ -25,6 +25,7 @@ urlpatterns = [
     path('', include('blog.urls')),
     path('', include('director.urls')),
     path('', include('parent.urls')),
+    path('', include('accounts.urls')),
     path('admin/', admin.site.urls),
     path("login/", auth_views.LoginView.as_view(template_name='login.html'), name="login"),
     path("logout/", auth_views.LogoutView.as_view(template_name='logout.html'), name="logout"),
@@ -48,8 +49,7 @@ urlpatterns = [
              template_name='password_reset_complete.html'
          ),
          name='password_reset_complete'),
-    path('profile/password/update/', ProfilePasswordUpdate.as_view(), name='password_change'),
-    path('register/', Register.as_view(), name='register'),
+
 
 ]
 

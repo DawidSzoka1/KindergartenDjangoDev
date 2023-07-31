@@ -40,7 +40,7 @@
                 </li>
                 <li>
                     {% if perms.director.is_director or perms.teacher.is_teacher %}
-                        <a href="{% url 'post_create_view' %}" class="nav-link">Add post</a>
+                        <a href="{% url 'post_create_view' %}" class="text-color-darker">Add post</a>
                     {% endif %}
 
                 </li>

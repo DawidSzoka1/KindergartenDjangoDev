@@ -6,7 +6,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class Register(LoginRequiredMixin, View):
+class Register(View):
     def get(self, request):
         form = UserRegisterForm()
         return render(request, "register.html", {'form': form})
@@ -22,7 +22,7 @@ class Register(LoginRequiredMixin, View):
         return render(request, "register.html", {'form': form})
 
 
-class ProfilePasswordUpdate(View):
+class ProfilePasswordUpdate(LoginRequiredMixin, View):
     def get(self, request):
 
         password_form = PasswordChangeForm(request.user)
