@@ -2,16 +2,18 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('addKid/', views.AddKid.as_view(), name='addKid'),
-    path("settings/", views.DirectorProfile.as_view(), name="director_profile"),
-    path("kids/", views.Kids.as_view(), name="kids"),
-    path("groups/", views.GroupsView.as_view(), name="groups"),
-    path('addGroup/', views.AddGroup.as_view(), name='addGroup'),
-    path('paymentsPlans/', views.PaymentPlans.as_view(), name='payments_plans'),
-    path('add/payments/plans/', views.AddPaymentsPlan.as_view(), name='add_payment_plans'),
-    path('change/info/', views.ChangeInfo.as_view(), name='change_info'),
-    path('invite/parent/', views.InviteParent.as_view(), name='invite_parent'),
-    path('add/meal/', views.AddMeals.as_view(), name='add_meals'),
-    path('all/meals/', views.AllMeals.as_view(), name='all_meals'),
-    path('kid/details/', views.DetailsKid.as_view(), name='kid_details'),
+    path("director/profile/", views.DirectorProfileView.as_view(), name="director_profile"),
+    path('director/add/kid/', views.AddKidView.as_view(), name='add_kid'),
+    path('director/add/group/', views.AddGroupView.as_view(), name='add_group'),
+    path('director/add/payments/plans/', views.AddPaymentsPlanView.as_view(), name='add_payment_plans'),
+    path('director/add/meal/', views.AddMealView.as_view(), name='add_meal'),
+
+    path("director/list/kids/", views.KidsListView.as_view(), name="list_kids"),
+    path("director/list/groups", views.GroupsListView.as_view(), name="list_groups"),
+    path('director/list/payments/plans/', views.PaymentPlansListView.as_view(), name='list_payments_plans'),
+    path('director/list/meals/', views.MealsListView.as_view(), name='list_meals'),
+
+    path('director/change/kid/info/', views.ChangeKidInfoView.as_view(), name='change_kid_info'),
+    path('director/invite/parent/', views.InviteParentView.as_view(), name='invite_parent'),
+    path('director/kid/details/', views.DetailsKidView.as_view(), name='kid_details'),
 ]

@@ -23,7 +23,6 @@ html {
 body {
   font-family: "Open Sans", sans-serif;
   font-weight: 400;
-  background: repeat url("/static/images/image.png");
 }
 
 p {
