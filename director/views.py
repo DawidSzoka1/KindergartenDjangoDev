@@ -32,7 +32,7 @@ class AddKidView(PermissionRequiredMixin, View):
             return redirect('add_payment_plans')
         if not groups:
             messages.error(request, 'Najpierw musisz dodac jakas grupe')
-            return redirect('addGroup')
+            return redirect('add_group')
         if not meals:
             messages.error(request, 'Najpierw musisz dodac jakies posilki')
             return redirect('add_meal')
@@ -40,9 +40,6 @@ class AddKidView(PermissionRequiredMixin, View):
 
     def post(self, request):
         user = Director.objects.get(user=request.user.id)
-        groups = user.groups.all()
-        plans = user.payment_plan.all()
-        meals_avaible = user.meals.all()
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         gender = 1 if request.POST.get("gender") == 'Chłopiec' else 2
@@ -83,9 +80,9 @@ class AddKidView(PermissionRequiredMixin, View):
                 kid.kid_meals.add(meal_object)
             user.kids.add(kid)
 
-            return redirect('kids')
-
-        return render(request, 'director-add-kid.html', {"plans": plans, 'groups': groups, 'meals': meals_avaible})
+            return redirect('list_kids')
+        messages.error(request, 'Wypelnij wszystkie pola')
+        return redirect('add_kid')
 
 
 class DirectorProfileView(PermissionRequiredMixin, View):
@@ -118,7 +115,8 @@ class AddMealView(PermissionRequiredMixin, View):
             user = Director.objects.get(user=request.user.id)
             user.meals.add(meal)
             return redirect('list_meals')
-        return render(request, 'director-add-meal.html')
+        messages.error(request, 'Wypelnij wszystkie pola')
+        return redirect('add_meal')
 
 
 class MealsListView(PermissionRequiredMixin, View):
@@ -142,8 +140,9 @@ class AddGroupView(PermissionRequiredMixin, View):
             user = Director.objects.get(user=request.user.id)
             group = Groups.objects.create(name=name)
             user.groups.add(group)
-            return redirect('groups')
-        return render(request, 'director-add-group.html')
+            return redirect('list_groups')
+        messages.error(request, 'Wypelnij wszystkie pola')
+        return redirect('add_group')
 
 
 class GroupsListView(PermissionRequiredMixin, View):
@@ -172,13 +171,14 @@ class AddPaymentsPlanView(PermissionRequiredMixin, View):
 
     def post(self, request):
         name = request.POST.get("name")
-        price = float(request.POST.get("price"))
+        price = request.POST.get("price")
         if name and price:
             user = Director.objects.get(user=request.user.id)
-            payment = PaymentPlan.objects.create(name=name, price=price)
+            payment = PaymentPlan.objects.create(name=name, price=float(price))
             user.payment_plan.add(payment)
             return redirect('list_payments_plans')
-        return render(request, 'director-add-payment-plans.html')
+        messages.error(request, 'Wypelnij wszystkie pola')
+        return redirect('add_payment_plans')
 
 
 class ChangeKidInfoView(PermissionRequiredMixin, View):
@@ -253,7 +253,7 @@ class InviteParentView(PermissionRequiredMixin, View):
             msg = EmailMultiAlternatives(subject, text_content, from_email, [parent_email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
-            return redirect('kids')
+            return redirect('list_kids')
 
         else:
             return render(request, 'director-invite-parent.html', {'kid': kid})
