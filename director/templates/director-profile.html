@@ -1,25 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="text-center mt-5">
-{#        <div class="col-md-6">#}
-                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_kids' %}'">
-                        Dzieci
-                </button>
-{#        </div>#}
-{#        <div class="col-md-6">#}
-                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_groups' %}'">
-                        Grupy
-                </button>
-{#        </div>#}
-{#        <div class="col-md-6">#}
-                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_payments_plans' %}'">
-                        Plany platnicze
-                </button>
-{#        </div>#}
-{#        <div class="col-md-6">#}
-                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_meals' %}'">
-                        Posilki
-                </button>
-{#        </div>#}
+
+        <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_kids' %}'">
+            Dzieci
+        </button>
+
+
+        <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_groups' %}'">
+            Grupy
+        </button>
+
+
+        <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_payments_plans' %}'">
+            Plany platnicze
+        </button>
+
+
+        <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_meals' %}'">
+            Posilki
+        </button>
+        <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_teachers' %}'">
+            Nauczyciele
+        </button>
+
     </div>
 {% endblock %}

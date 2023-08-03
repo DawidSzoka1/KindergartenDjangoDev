@@ -17,9 +17,17 @@
                                 </div>
                                 <div class="col-xl-6">
                                     <div class="card-body p-md-5 text-black">
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                <div class="alert alert-danger">
+                                                    {{ message }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
                                         <div class="row">
                                             <div class="col mb-4">
-                                                <h3 class="text-uppercase d-flex justify-content-start">Dodaj Dziecko</h3>
+                                                <h3 class="text-uppercase d-flex justify-content-start">Dodaj
+                                                    Dziecko</h3>
                                             </div>
                                             <div class="col mb-4">
                                                 <div class="d-flex justify-content-end noPadding">
@@ -42,7 +50,7 @@
                                                 <div class="form-outline">
                                                     <input type="text" id="form3Example1n"
                                                            class="form-control form-control-lg" name="last_name"/>
-                                                    <label class="form-label" for="form3Example1n" >Nazwisko</label>
+                                                    <label class="form-label" for="form3Example1n">Nazwisko</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -66,8 +74,8 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
-                                                <label class="mr-2">Wybierz grupe:</label><br>
-                                                <select class="select ml-3" name="group">
+                                                <label class="mr-2 mb-2">Wybierz grupe:</label><br>
+                                                <select class="form-select form-select-lg" name="group">
                                                     {% for group in groups %}
                                                         <option value="{{ group.id }}">{{ group.name }}</option>
                                                     {% endfor %}
@@ -80,9 +88,10 @@
                                                 <label class="mr-2">Posilki:</label><br>
 
 
-                                                    {% for meal in meals %}
-                                                        <input type="checkbox" name="meals" value="{{ meal.id }}">{{ meal.name }}
-                                                    {% endfor %}
+                                                {% for meal in meals %}
+                                                    <input type="checkbox" name="meals" value="{{ meal.id }}">
+                                                    {{ meal.name }}
+                                                {% endfor %}
 
 
                                             </div>

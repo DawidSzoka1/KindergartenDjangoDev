@@ -22,28 +22,45 @@
                                                 </div>
                                             {% endfor %}
                                         {% endif %}
-                                        <h3 class="mb-5 text-uppercase">Dodaj Rodzica</h3>
+                                        <div class="row">
+                                            <div class="col mb-4">
+                                                <h3 class="text-uppercase d-flex justify-content-start">Dodaj
+                                                    nauczyciela</h3>
+                                            </div>
+                                            <div class="col mb-4">
+                                                <div class="d-flex justify-content-end noPadding">
+                                                    <a href="{% url 'list_teachers' %}"
+                                                       class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
+                                                </div>
+                                            </div>
 
+                                        </div>
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
 
-                                                    <h3>Imie dziecka:</h3>
-                                                    <h4>{{ kid.first_name }}</h4>
-                                                    <h3>Nazwisko dziecka:</h3>
-                                                    <h4>{{ kid.last_name }}</h4>
-                                                </div>
+                                                    <label class="form-label" for="form3Example1n">Email
+                                                        nauczyciela:</label>
+                                                    <input type="email" id="form3Example1n"
+                                                           class="form-control form-control-lg" name="email"/>
 
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 mb-4">
-                                            <div class="form-outline">
-                                                <label class="form-label" for="form3Example1n">Email rodzica:</label>
-                                                <input type="email" id="form3Example1n"
-                                                       class="form-control form-control-lg" name="email"/>
+
+
 
                                             </div>
+
+                                            <div class="col-md-6 mb-4">
+                                                <label class="mr-2 mb-2">Wybierz grupe dla nauczyciela:</label><br>
+                                                <select class="form-select form-select-lg" name="group">
+                                                    {% for group in groups %}
+                                                        <option value="{{ group.id }}">{{ group.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+
+                                            </div>
+
                                         </div>
+
+
                                         <div class="d-flex justify-content-end pt-3">
                                             <button type="submit" class="btn btn-warning btn-lg ms-2">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"

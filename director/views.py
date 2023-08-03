@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib import messages
 from .models import Kid, Groups, PaymentPlan, Director, Meals
+from teacher.models import Teacher
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.mail import EmailMultiAlternatives
 from MarchewkaDjango.settings import EMAIL_HOST_USER
@@ -247,7 +248,7 @@ class InviteParentView(PermissionRequiredMixin, View):
             subject = f"Zaproszenie na konto przedszkola dla rodzica {kid.first_name}"
             from_email = EMAIL_HOST_USER
             text_content = "Marchewka zaprasza do korzystania z konto do ubslugi dzieci"
-            html_content = render_to_string('email_to_parent.html', {'password': password})
+            html_content = render_to_string('email_to_parent.html', {'password': password, 'email': parent_email})
             msg = EmailMultiAlternatives(subject, text_content, from_email, [parent_email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
@@ -264,3 +265,52 @@ class DetailsKidView(PermissionRequiredMixin, View):
         user = Director.objects.get(user=request.user.id)
         kid = user.kids.get(id=int(pk))
         return render(request, 'director-kid-details.html', {'kid': kid})
+
+
+class TeachersListView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request):
+        user = Director.objects.get(user=request.user.id)
+        teachers = user.teachers.all()
+        return render(request, 'director-list-teachers.html', {'teachers': teachers})
+
+
+class AddTeacherView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request):
+        user = Director.objects.get(user=request.user.id)
+        groups = user.groups.all()
+        return render(request, 'director-add-teacher.html', {'groups': groups})
+
+    def post(self, request):
+        user = Director.objects.get(user=request.user.id)
+        group_id = request.POST.get('group')
+        group = user.groups.get(id=int(group_id))
+        teacher_email = request.POST.get('email')
+        if teacher_email:
+            password = User.objects.make_random_password()
+            teacher_user = User.objects.create_user(email=teacher_email, password=password)
+            content_type = ContentType.objects.get_for_model(Teacher)
+            permission = Permission.objects.get(content_type=content_type, codename='is_teacher')
+
+            teacher_object = Teacher.objects.create(user=teacher_user)
+            user.teachers.add(teacher_object)
+            group.teachers.add(teacher_object)
+            teacher_object.user.user_permissions.clear()
+            teacher_object.user.user_permissions.add(permission)
+            teacher_user.teacher.save()
+            subject = f"Zaproszenie na konto przedszkola dla nauczyciela"
+            from_email = EMAIL_HOST_USER
+            text_content = "Marchewka zaprasza do korzystania z konto jako nauczyciel"
+            html_content = render_to_string('email_to_parent.html', {'password': password, 'email': teacher_email})
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [teacher_email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            return redirect('list_teachers')
+
+        else:
+            messages.error(request, 'wypelnij wszystkie pola')
+            return redirect('add_teacher')
+
