@@ -226,11 +226,9 @@ class InviteParentView(PermissionRequiredMixin, View):
         kid = user.kids.get(id=int(pk))
         return render(request, 'director-invite-parent.html', {'kid': kid})
 
-    def post(self, request):
+    def post(self, request, pk):
         user = Director.objects.get(user=request.user.id)
-
-        kid_id = request.GET.get('kid_id')
-        kid = user.kids.get(id=int(kid_id))
+        kid = user.kids.get(id=int(pk))
         parent_email = request.POST.get('email')
 
         if parent_email:
