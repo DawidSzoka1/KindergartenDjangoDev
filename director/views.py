@@ -184,13 +184,12 @@ class AddPaymentsPlanView(PermissionRequiredMixin, View):
 class ChangeKidInfoView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
-    def get(self, request):
+    def get(self, request, pk):
         user = Director.objects.get(user=request.user.id)
         plans = user.payment_plan.all()
         groups = user.groups.all()
         meals = user.meals.all()
-        kid_id = request.GET.get('kid_id')
-        kid = user.kids.get(id=int(kid_id))
+        kid = user.kids.get(id=int(pk))
         return render(request, 'director-change-kid-info.html', {"plans": plans, "groups": groups, 'kid': kid, 'meals': meals})
 
     def post(self, request):
@@ -221,10 +220,9 @@ class ChangeKidInfoView(PermissionRequiredMixin, View):
 class InviteParentView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
-    def get(self, request):
+    def get(self, request, pk):
         user = Director.objects.get(user=request.user.id)
-        kid_id = request.GET.get('kid_id')
-        kid = user.kids.get(id=int(kid_id))
+        kid = user.kids.get(id=int(pk))
         return render(request, 'director-invite-parent.html', {'kid': kid})
 
     def post(self, request):
@@ -259,11 +257,10 @@ class InviteParentView(PermissionRequiredMixin, View):
             return render(request, 'director-invite-parent.html', {'kid': kid})
 
 
-class DetailsKidView(View):
+class DetailsKidView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
-    def get(self, request):
-        kid_id = request.GET.get("kid_id")
+    def get(self, request, pk):
         user = Director.objects.get(user=request.user.id)
-        kid = user.kids.get(id=int(kid_id))
+        kid = user.kids.get(id=int(pk))
         return render(request, 'director-kid-details.html', {'kid': kid})

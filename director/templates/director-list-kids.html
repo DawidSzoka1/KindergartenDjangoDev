@@ -69,7 +69,7 @@
                                             style="color:green;">
                                             &#9745;<br>
                                             <a class="candidate-list-favourite order-2 text-success"
-                                               href="/invite/parent/?kid_id={{ kid.id }}">Dodaj kolejnego
+                                               href="{% url 'invite_parent'  pk=kid.id %}">Dodaj kolejnego
                                                 rodzica<i
                                                         class="fas fa-heart"></i></a>
                                         </td>
@@ -79,7 +79,7 @@
                                             style="color:red;">
                                             &#9746;<br>
                                             <a class="candidate-list-favourite order-2 text-danger"
-                                               href="/invite/parent/?kid_id={{ kid.id }}">Dodaj konto rodzica<i
+                                               href="{% url 'invite_parent'  pk=kid.id %}">Dodaj konto rodzica<i
                                                     class="fas fa-heart"></i></a>
 
                                         </td>
@@ -110,11 +110,11 @@
                                                     aria-labelledby="navbarDropdownMenuAvatar"
                                             >
                                                 <li>
-                                                    <a href="director/kid/details/?kid_id={{ kid.id }}"
+                                                    <a href="{% url 'kid_details'  pk=kid.id %}"
                                                        class="dropdown-item">View detail</a>
                                                 </li>
                                                 <li>
-                                                    <a href="director/change/kid/info/?kid_id={{ kid.id }}"
+                                                    <a href="{% url 'change_kid_info'  pk=kid.id %}"
                                                        class="dropdown-item">Change
                                                         info</a>
                                                 </li>
