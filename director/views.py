@@ -234,16 +234,28 @@ class InviteParentView(PermissionRequiredMixin, View):
         parent_email = request.POST.get('email')
 
         if parent_email:
-            password = User.objects.make_random_password()
-            parent_user = User.objects.create_user(email=parent_email, password=password)
-            content_type = ContentType.objects.get_for_model(ParentA)
-            permission = Permission.objects.get(content_type=content_type, codename='is_parent')
-            par_user = ParentA.objects.create(user=parent_user)
-            user.parent_profiles.add(par_user)
-            kid.parents.add(par_user)
-            par_user.user.user_permissions.clear()
-            par_user.user.user_permissions.add(permission)
-            parent_user.parenta.save()
+            try:
+                test = User.objects.get(email=parent_email)
+            except User.DoesNotExist:
+                test = None
+            if test:
+                messages.error(request, 'Ten rodzic juz istnieje')
+                return redirect('add_teacher')
+            try:
+                password = User.objects.make_random_password()
+                parent_user = User.objects.create_user(email=parent_email, password=password)
+                content_type = ContentType.objects.get_for_model(ParentA)
+                permission = Permission.objects.get(content_type=content_type, codename='is_parent')
+                par_user = ParentA.objects.create(user=parent_user)
+                user.parent_profiles.add(par_user)
+                kid.parents.add(par_user)
+                par_user.user.user_permissions.clear()
+                par_user.user.user_permissions.add(permission)
+                parent_user.parenta.save()
+            except Exception as e:
+                User.objects.filter(email=parent_email).first().delete()
+                messages.error(request, f'Wystąpił blad {e}')
+                return redirect('add_teacher')
 
             subject = f"Zaproszenie na konto przedszkola dla rodzica {kid.first_name}"
             from_email = EMAIL_HOST_USER
@@ -290,17 +302,29 @@ class AddTeacherView(PermissionRequiredMixin, View):
         group = user.groups.get(id=int(group_id))
         teacher_email = request.POST.get('email')
         if teacher_email:
-            password = User.objects.make_random_password()
-            teacher_user = User.objects.create_user(email=teacher_email, password=password)
-            content_type = ContentType.objects.get_for_model(Teacher)
-            permission = Permission.objects.get(content_type=content_type, codename='is_teacher')
+            try:
+                test = User.objects.get(email=teacher_email)
+            except User.DoesNotExist:
+                test = None
+            if test:
+                messages.error(request, 'Ten nauczyciel juz istnieje')
+                return redirect('add_teacher')
+            try:
+                password = User.objects.make_random_password()
+                teacher_user = User.objects.create_user(email=teacher_email, password=password)
+                content_type = ContentType.objects.get_for_model(Teacher)
+                permission = Permission.objects.get(content_type=content_type, codename='is_teacher')
+                teacher_object = Teacher.objects.create(user=teacher_user)
+                user.teachers.add(teacher_object)
+                group.teachers.add(teacher_object)
+                teacher_object.user.user_permissions.clear()
+                teacher_object.user.user_permissions.add(permission)
+                teacher_user.teacher.save()
+            except Exception as e:
+                User.objects.filter(email=teacher_email).first().delete()
 
-            teacher_object = Teacher.objects.create(user=teacher_user)
-            user.teachers.add(teacher_object)
-            group.teachers.add(teacher_object)
-            teacher_object.user.user_permissions.clear()
-            teacher_object.user.user_permissions.add(permission)
-            teacher_user.teacher.save()
+                messages.error(request, f'Wystąpił blad {e}')
+                return redirect('add_teacher')
             subject = f"Zaproszenie na konto przedszkola dla nauczyciela"
             from_email = EMAIL_HOST_USER
             text_content = "Marchewka zaprasza do korzystania z konto jako nauczyciel"

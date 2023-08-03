@@ -5,8 +5,8 @@
     <div class="container mt-3 mb-4 center">
         <div class="col-lg-9 mt-4 mt-lg-0">
             <div class="col d-flex justify-content-end mb-2 noPadding">
-                    <a href="{% url 'director_profile' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
-                </div>
+                <a href="{% url 'director_profile' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
+            </div>
             <div class="row">
                 <div class="col-md-12">
                     <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
@@ -32,7 +32,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% for teachers in teachers %}
+                            {% for teacher in teachers %}
 
 
 
@@ -48,18 +48,30 @@
                                             <div class="candidate-list-info">
                                                 <div class="candidate-list-title">
                                                     <h5 class="mb-0"><a
-                                                            href="#">{{ teachers.first_name }} {{ teachers.last_name }}</a>
+                                                            href="#">{{ teacher.user.email }}</a>
                                                     </h5>
                                                 </div>
                                                 <div class="candidate-list-option">
                                                     <ul class="list-unstyled">
-                                                        <li>
-                                                            <i class="fas fa-filter pr-1"></i>{{ teachers.group.name }}
-                                                        </li>
+                                                        {% if teacher.first_name %}
+                                                            <li>
+                                                                <i class="fas fa-filter pr-1"></i>{{ teacher.first_name }}
+                                                            </li>
+                                                        {% endif %}
+                                                        {% if teacher.last_name %}
+                                                            <li>
+                                                                <i class="fas fa-filter pr-1"></i>{{ teacher.last_name }}
+                                                            </li>
+                                                        {% endif %}
                                                     </ul>
                                                 </div>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td>
+                                        {% for group in teacher.groups_set.all %}
+                                            {{ group.name }}
+                                        {% endfor %}
                                     </td>
                                     <td>
                                         <div class="drodown">
@@ -81,15 +93,15 @@
                                                     class="dropdown-menu dropdown-menu-end"
                                                     aria-labelledby="navbarDropdownMenuAvatar"
                                             >
-                                                <li>
-                                                    <a href="{% url 'teachers_details'  pk=teachers.id %}"
-                                                       class="dropdown-item">View detail</a>
-                                                </li>
-                                                <li>
-                                                    <a href="{% url 'change_teachers_info'  pk=teachers.id %}"
-                                                       class="dropdown-item">Change
-                                                        info</a>
-                                                </li>
+                                                {#                                                <li>#}
+                                                {#                                                    <a href="{% url 'teachers_details'  pk=teachers.id %}"#}
+                                                {#                                                       class="dropdown-item">View detail</a>#}
+                                                {#                                                </li>#}
+                                                {#                                                <li>#}
+                                                {#                                                    <a href="{% url 'change_teachers_info'  pk=teachers.id %}"#}
+                                                {#                                                       class="dropdown-item">Change#}
+                                                {#                                                        info</a>#}
+                                                {#                                                </li>#}
                                             </ul>
                                         </div>
                                     </td>
