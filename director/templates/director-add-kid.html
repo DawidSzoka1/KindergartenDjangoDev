@@ -41,66 +41,39 @@
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
                                                 <div class="form-outline">
-                                                    <input type="text" id="form3Example1m"
-                                                           class="form-control form-control-lg" name="first_name"/>
-                                                    <label class="form-label" for="form3Example1m">Imię</label>
+                                                    {{ form.first_name|as_crispy_field }}
+
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-4">
                                                 <div class="form-outline">
-                                                    <input type="text" id="form3Example1n"
-                                                           class="form-control form-control-lg" name="last_name"/>
-                                                    <label class="form-label" for="form3Example1n">Nazwisko</label>
+                                                    {{ form.last_name|as_crispy_field }}
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="d-md-flex justify-content-start align-items-center mb-4 py-2">
 
-                                            <h6 class="mb-0 me-4">Płec dziecka: </h6>
 
-                                            <div class="form-check form-check-inline mb-0 me-4">
-                                                <input class="form-check-input" type="radio" name="gender"
-                                                       id="femaleGender"
-                                                       value="2"/>
-                                                <label class="form-check-label" for="femaleGender">Dziewczynka</label>
-                                            </div>
+                                            {{ form.gender|as_crispy_field }}
 
-                                            <div class="form-check form-check-inline mb-0 me-4">
-                                                <input class="form-check-input" type="radio" name="gender"
-                                                       id="maleGender"
-                                                       value="1"/>
-                                                <label class="form-check-label" for="maleGender">Chłopiec</label>
-                                            </div>
+
+
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
-                                                <label class="mr-2 mb-2">Wybierz grupe:</label><br>
-                                                <select class="form-select form-select-lg" name="group">
-                                                    {% for group in groups %}
-                                                        <option value="{{ group.id }}">{{ group.name }}</option>
-                                                    {% endfor %}
-                                                </select>
+                                                {{ form.group|as_crispy_field }}
 
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
-                                                <label class="mr-2">Posilki:</label><br>
-
-
-                                                {% for meal in meals %}
-                                                    <input type="checkbox" name="meals" value="{{ meal.id }}">
-                                                    {{ meal.name }}
-                                                {% endfor %}
+                                                {{ form.kid_meals|as_crispy_field }}
 
 
                                             </div>
                                         </div>
                                         <div class="form-outline mb-4">
-                                            <label class="form-label" for="form3Example9">Czas Trwania umowy:</label>
-                                            <h6 class="text-muted">Początek</h6>
-                                            <input type="date" id="form3Example9" class="form-control form-control-lg"
-                                                   name="start"/>
+                                           {{ form.start|as_crispy_field }}
                                             <div>
                                                 <label class="form-check-label mb-0 me-4" for="mySwitch">Umowa na czas
                                                     nieokteślony:</label>
@@ -114,20 +87,13 @@
                                                 </div>
                                             </div>
                                             <div id="end">
-                                                <h6 class="text-muted mt-2">Koniec</h6>
-                                                <input type="date" class="form-control form-control-lg" name="end"/>
+                                                {{ form.end|as_crispy_field }}
                                             </div>
 
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
-                                                <label class="mr-2">Plan płatnosci:</label><br>
-                                                <select class="select ml-3" name="payment">
-
-                                                    {% for plan in plans %}
-                                                        <option value="{{ plan.id }}">{{ plan.name }}</option>
-                                                    {% endfor %}
-                                                </select>
+                                                {{ form.payment_plan|as_crispy_field }}
 
                                             </div>
                                         </div>
@@ -149,4 +115,3 @@
     </form>
     <script src="{% static 'checkbox.js' %}"></script>
 {% endblock %}
-

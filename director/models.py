@@ -10,15 +10,33 @@ class PaymentPlan(models.Model):
     name = models.TextField()
     price = models.DecimalField(max_digits=7, decimal_places=2, default=500)
 
+    def __str__(self):
+        """
+        String representation
+        """
+        return f'{self.name}'
+
 
 class Groups(models.Model):
     name = models.CharField(max_length=128)
-    teachers = models.ManyToManyField(Teacher)
+    teachers = models.ManyToManyField(Teacher, null=True)
+
+    def __str__(self):
+        """
+        String representation
+        """
+        return f'{self.name}'
 
 
 class Meals(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField(null=True)
+
+    def __str__(self):
+        """
+        String representation
+        """
+        return f'{self.name}'
 
 
 class Kid(models.Model):

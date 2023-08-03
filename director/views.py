@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views import View
+from django.urls import reverse_lazy
 from django.contrib import messages
+from .forms import KidAddForm, PaymentPlanForm, MealsForm, GroupsForm
 from .models import Kid, Groups, PaymentPlan, Director, Meals
 from teacher.models import Teacher
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -20,72 +22,6 @@ from django.views.generic import (
 )
 
 
-class AddKidView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
-    def get(self, request):
-        user = Director.objects.get(user=request.user.id)
-        groups = user.groups.all()
-        plans = user.payment_plan.all()
-        meals = user.meals.all()
-        if not plans:
-            messages.error(request, 'Najpierw musisz dodac plan platniczy')
-            return redirect('add_payment_plans')
-        if not groups:
-            messages.error(request, 'Najpierw musisz dodac jakas grupe')
-            return redirect('add_group')
-        if not meals:
-            messages.error(request, 'Najpierw musisz dodac jakies posilki')
-            return redirect('add_meal')
-        return render(request, 'director-add-kid.html', {"plans": plans, 'groups': groups, 'meals': meals})
-
-    def post(self, request):
-        user = Director.objects.get(user=request.user.id)
-        first_name = request.POST.get("first_name")
-        last_name = request.POST.get("last_name")
-        gender = 1 if request.POST.get("gender") == 'Chłopiec' else 2
-        group = request.POST.get("group")
-        meals = request.POST.getlist("meals")
-        start = request.POST.get("start")
-        indefinite = request.POST.get("indefinite")
-        end = 0
-        if not indefinite:
-            end = request.POST.get("end")
-        payment = request.POST.get("payment")
-        payment = PaymentPlan.objects.get(id=int(payment))
-        group = Groups.objects.get(id=int(group))
-        amount = payment.price
-        if first_name and last_name and gender and payment and group and start:
-
-            if end:
-                kid = Kid.objects.create(first_name=first_name,
-                                         last_name=last_name,
-                                         group=group,
-                                         gender=gender,
-                                         start=start,
-                                         payment_plan=payment,
-                                         end=end,
-                                         amount=amount
-                                         )
-            else:
-                kid = Kid.objects.create(first_name=first_name,
-                                         last_name=last_name,
-                                         group=group,
-                                         gender=gender,
-                                         start=start,
-                                         payment_plan=payment,
-                                         amount=amount
-                                         )
-            for meal in meals:
-                meal_object = Meals.objects.get(id=int(meal))
-                kid.kid_meals.add(meal_object)
-            user.kids.add(kid)
-
-            return redirect('list_kids')
-        messages.error(request, 'Wypelnij wszystkie pola')
-        return redirect('add_kid')
-
-
 class DirectorProfileView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
@@ -93,93 +29,110 @@ class DirectorProfileView(PermissionRequiredMixin, View):
         return render(request, 'director-profile.html')
 
 
-class KidsListView(PermissionRequiredMixin, View):
+class AddPaymentsPlanView(PermissionRequiredMixin, CreateView):
     permission_required = "director.is_director"
+    model = PaymentPlan
+    template_name = 'director-add-payment-plans.html'
+    form_class = PaymentPlanForm
+    success_url = reverse_lazy('list_payments_plans')
 
-    def get(self, request):
-        user = Director.objects.get(user=request.user.id)
-        kids_db = user.kids.all()
-        return render(request, 'director-list-kids.html', {"kids": kids_db})
+    def form_valid(self, form):
+        form.instance.save()
+        Director.objects.get(user=self.request.user.id).payment_plan.add(form.instance)
+        return super().form_valid(form)
 
 
-class AddMealView(PermissionRequiredMixin, View):
+class PaymentPlansListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
+    model = PaymentPlan
+    template_name = 'director-list-payments-plans.html'
 
-    def get(self, request):
-        return render(request, 'director-add-meal.html')
-
-    def post(self, request):
-        name = request.POST.get('name')
-        desc = request.POST.get('desc')
-        if name and desc:
-            meal = Meals.objects.create(name=name, description=desc)
-            user = Director.objects.get(user=request.user.id)
-            user.meals.add(meal)
-            return redirect('list_meals')
-        messages.error(request, 'Wypelnij wszystkie pola')
-        return redirect('add_meal')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["plans"] = Director.objects.get(user=self.request.user.id).payment_plan.all()
+        return context
 
 
-class MealsListView(PermissionRequiredMixin, View):
+class AddMealView(PermissionRequiredMixin, CreateView):
     permission_required = "director.is_director"
+    model = Meals
+    template_name = 'director-add-meal.html'
+    form_class = MealsForm
+    success_url = reverse_lazy('list_meals')
 
-    def get(self, request):
-        user = Director.objects.get(user=request.user.id)
-        meals = user.meals.all()
-        return render(request, 'director-list-meals.html', {'meals': meals})
+    def form_valid(self, form):
+        form.instance.save()
+        Director.objects.get(user=self.request.user.id).meals.add(form.instance)
+        return super().form_valid(form)
 
 
-class AddGroupView(PermissionRequiredMixin, View):
+class MealsListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
+    model = Meals
+    template_name = 'director-list-meals.html'
 
-    def get(self, request):
-        return render(request, 'director-add-group.html')
-
-    def post(self, request):
-        name = request.POST.get('name')
-        if name:
-            user = Director.objects.get(user=request.user.id)
-            group = Groups.objects.create(name=name)
-            user.groups.add(group)
-            return redirect('list_groups')
-        messages.error(request, 'Wypelnij wszystkie pola')
-        return redirect('add_group')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["meals"] = Director.objects.get(user=self.request.user.id).meals.all()
+        return context
 
 
-class GroupsListView(PermissionRequiredMixin, View):
+class AddGroupView(PermissionRequiredMixin, CreateView):
     permission_required = "director.is_director"
+    model = Groups
+    template_name = 'director-add-group.html'
+    form_class = GroupsForm
+    success_url = reverse_lazy('list_groups')
 
-    def get(self, request):
-        user = Director.objects.get(user=request.user.id)
-        groups = user.groups.all()
-        return render(request, 'director-list-groups.html', {'groups': groups})
+    def get_form(self, form_class=None):
+        form = super(AddGroupView, self).get_form(form_class)
+        form.fields['teachers'].required = False
+        return form
+
+    def form_valid(self, form):
+        form.instance.save()
+        Director.objects.get(user=self.request.user.id).groups.add(form.instance)
+        return super().form_valid(form)
 
 
-class PaymentPlansListView(PermissionRequiredMixin, View):
+class GroupsListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
+    model = Groups
+    template_name = 'director-list-groups.html'
 
-    def get(self, request):
-        user = Director.objects.get(user=request.user.id)
-        plans = user.payment_plan.all()
-        return render(request, 'director-list-payments-plans.html', {"plans": plans})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["groups"] = Director.objects.get(user=self.request.user.id).groups.all()
+        return context
 
 
-class AddPaymentsPlanView(PermissionRequiredMixin, View):
+class AddKidView(PermissionRequiredMixin, CreateView):
     permission_required = "director.is_director"
+    model = Kid
+    template_name = 'director-add-kid.html'
+    form_class = KidAddForm
+    success_url = reverse_lazy('list_kids')
 
-    def get(self, request):
-        return render(request, 'director-add-payment-plans.html')
+    def get_form(self, form_class=None):
+        form = super(AddKidView, self).get_form(form_class)
+        form.fields['end'].required = False
+        return form
 
-    def post(self, request):
-        name = request.POST.get("name")
-        price = request.POST.get("price")
-        if name and price:
-            user = Director.objects.get(user=request.user.id)
-            payment = PaymentPlan.objects.create(name=name, price=float(price))
-            user.payment_plan.add(payment)
-            return redirect('list_payments_plans')
-        messages.error(request, 'Wypelnij wszystkie pola')
-        return redirect('add_payment_plans')
+    def form_valid(self, form):
+        form.instance.save()
+        Director.objects.get(user=self.request.user.id).kids.add(form.instance)
+        return super().form_valid(form)
+
+
+class KidsListView(PermissionRequiredMixin, ListView):
+    permission_required = "director.is_director"
+    model = Kid
+    template_name = 'director-list-kids.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["kids"] = Director.objects.get(user=self.request.user.id).kids.all()
+        return context
 
 
 class ChangeKidInfoView(PermissionRequiredMixin, View):
@@ -191,7 +144,8 @@ class ChangeKidInfoView(PermissionRequiredMixin, View):
         groups = user.groups.all()
         meals = user.meals.all()
         kid = user.kids.get(id=int(pk))
-        return render(request, 'director-change-kid-info.html', {"plans": plans, "groups": groups, 'kid': kid, 'meals': meals})
+        return render(request, 'director-change-kid-info.html',
+                      {"plans": plans, "groups": groups, 'kid': kid, 'meals': meals})
 
     def post(self, request):
         user = Director.objects.get(user=request.user.id)
@@ -215,7 +169,8 @@ class ChangeKidInfoView(PermissionRequiredMixin, View):
             kid.payment_plan = plan
             kid.save()
             return redirect('list_kids')
-        return render(request, 'director-change-kid-info.html', {"plans": plans, "groups": groups, 'kid': kid, 'meals': meals})
+        return render(request, 'director-change-kid-info.html',
+                      {"plans": plans, "groups": groups, 'kid': kid, 'meals': meals})
 
 
 class InviteParentView(PermissionRequiredMixin, View):
@@ -274,6 +229,7 @@ class DetailsKidView(PermissionRequiredMixin, View):
     def get(self, request, pk):
         user = Director.objects.get(user=request.user.id)
         kid = user.kids.get(id=int(pk))
+
         return render(request, 'director-kid-details.html', {'kid': kid})
 
 
@@ -335,4 +291,3 @@ class AddTeacherView(PermissionRequiredMixin, View):
         else:
             messages.error(request, 'wypelnij wszystkie pola')
             return redirect('add_teacher')
-
