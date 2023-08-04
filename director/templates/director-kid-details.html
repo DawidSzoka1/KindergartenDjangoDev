@@ -3,161 +3,178 @@
 {% load static %}
 {% block content %}
     <link rel="stylesheet" href="{% static 'profile_page.css' %}">
-    <form method="post" action="#">
-        {% csrf_token %}
-        <div class="container mt-4">
-            <div class="row gutters">
-                <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <div class="account-settings text-light">
-                                <div class="user-profile">
-                                    <div class="user-avatar">
-                                        <img src="https://bootdey.com/img/Content/avatar/avatar1.png"
-                                             alt="Maxwell Admin">
+    {% if kid %}
+        <form method="post" action="#">
+            {% csrf_token %}
+            <div class="container mt-4">
+                <div class="row gutters">
+                    <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="account-settings text-light">
+                                    <div class="user-profile">
+                                        <div class="user-avatar">
+                                            <img src="https://bootdey.com/img/Content/avatar/avatar1.png"
+                                                 alt="Maxwell Admin">
+                                        </div>
+                                        <h5 class="user-name">{{ kid.first_name }}</h5>
+                                        <h6 class="user-email">{{ kid.last_name }}</h6>
                                     </div>
-                                    <h5 class="user-name">{{ kid.first_name }}</h5>
-                                    <h6 class="user-email">{{ kid.last_name }}</h6>
-                                </div>
-                                <div class="about">
-                                    <h5 class="mb-2 text-primary">Info</h5>
-                                    <p>This is your account as a kid</p>
+                                    <div class="about">
+                                        <h5 class="mb-2 text-primary">Info</h5>
+                                        <p>This is your account as a kid</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <div class="row gutters text-light">
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                                    <h6 class="mb-3 text-primary">Personal Details</h6>
-                                </div>
-                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-
-                                    <div class="form-group">
-                                        <label for="gender">Płeć dziecka:</label>
-                                        <input class="form-control" name="gender" type="text" value="{{ kid.gender }}">
-
+                    <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="row gutters text-light">
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                        <h6 class="mb-3 text-primary">Personal Details</h6>
                                     </div>
-                                </div>
-                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-
-                                    <div class="form-group">
-                                        <label for="group">Nazwa grupy:</label>
-                                        <input class="form-control" name="group" type="text"
-                                               value="{{ kid.group.name }}">
-
-                                    </div>
-                                </div>
-                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
-
-                                    <div class="form-group">
-                                        <label for="start">Poczatek umowy:</label>
-                                        <input class="form-control" name="start" type="text" value="{{ kid.start }}">
-
-                                    </div>
-                                </div>
-                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
-
-                                    <div class="form-group">
-                                        <label for="end">Koniec umowy:</label>
-                                        <input class="form-control" name="end" type="text"
-                                                {% if kid.end %}
-                                               value="{{ kid.end }}"
-                                                {% else %}
-                                               value="Na czas nieokreslony"
-                                                {% endif %}
-                                        >
-
-                                    </div>
-                                </div>
-                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
-
-                                    <div class="form-group">
-                                        <label for="payment">Plan Platniczy</label>
-                                        <input class="form-control" name="payment" type="text"
-                                               value="{{ kid.payment_plan.name }}">
-
-                                    </div>
-                                </div>
-                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
-
-                                    <div class="form-group">
-                                        <label for="to-pay">Stały koszt miesieczny:</label>
-                                        <input class="form-control" name="to-pay" type="text" value="{{ kid.payment_plan.price }}">
-
-                                    </div>
-                                </div>
-                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
-
-                                    <div class="form-group">
-                                        <label for="with-meals">Do zapłaty w tym miesiacu:</label>
-                                        <input class="form-control" name="with-meals" type="text" value="{{ kid.amount }}">
-
-                                    </div>
-                                </div>
-                                {% for meal in kid.kid_meals.all %}
-                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
 
                                         <div class="form-group">
-                                            <label for="meals">Plan zywieniowy:</label>
-                                            <input class="form-control" name="meals" type="text"
-                                                   value="{{ meal.name }}">
+                                            <label for="gender">Płeć dziecka:</label>
+                                            <input class="form-control" name="gender" type="text"
+                                                   value="{{ kid.gender }}">
 
                                         </div>
                                     </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+
+                                        <div class="form-group">
+                                            <label for="group">Nazwa grupy:</label>
+                                            <input class="form-control" name="group" type="text"
+                                                   value="{{ kid.group.name }}">
+
+                                        </div>
                                     </div>
-                                {% endfor %}
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
+
+                                        <div class="form-group">
+                                            <label for="start">Poczatek umowy:</label>
+                                            <input class="form-control" name="start" type="text"
+                                                   value="{{ kid.start }}">
+
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
+
+                                        <div class="form-group">
+                                            <label for="end">Koniec umowy:</label>
+                                            <input class="form-control" name="end" type="text"
+                                                    {% if kid.end %}
+                                                   value="{{ kid.end }}"
+                                                    {% else %}
+                                                   value="Na czas nieokreslony"
+                                                    {% endif %}
+                                            >
+
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
+
+                                        <div class="form-group">
+                                            <label for="payment">Plan Platniczy</label>
+                                            <input class="form-control" name="payment" type="text"
+                                                   value="{{ kid.payment_plan.name }}">
+
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
+
+                                        <div class="form-group">
+                                            <label for="to-pay">Stały koszt miesieczny:</label>
+                                            <input class="form-control" name="to-pay" type="text"
+                                                   value="{{ kid.payment_plan.price }}">
+
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
+
+                                        <div class="form-group">
+                                            <label for="with-meals">Do zapłaty w tym miesiacu:</label>
+                                            <input class="form-control" name="with-meals" type="text"
+                                                   value="{{ kid.amount }}">
+
+                                        </div>
+                                    </div>
+                                    {% for meal in kid.kid_meals.all %}
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
+
+                                            <div class="form-group">
+                                                <label for="meals">Plan zywieniowy:</label>
+                                                <input class="form-control" name="meals" type="text"
+                                                       value="{{ meal.name }}">
+
+                                            </div>
+                                        </div>
+                                        </div>
+                                    {% endfor %}
+
+                            </div>
 
                         </div>
 
                     </div>
 
                 </div>
-
-            </div>
-            <div class="row gutters mt-3 text-light">
-                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                    <h6 class="mb-3 text-primary">Parents</h6>
-                </div>
-                {% for parent in kid.parents.all %}
-                    <a href="#">Profil Rodzica</a>
-                    <div class="card h-90">
-                        <div class="card-body">
-                            <div class="row gutters mt-3 text-light">
-                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                    <div class="form-group">
-                                        <label for="Street">First name:</label>
-                                        <input type="text" class="form-control" id="Street"
-                                               value="{{ parent.first_name }}" readonly>
+                <div class="row gutters mt-3 text-light">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                        <h6 class="mb-3 text-primary">Parents</h6>
+                    </div>
+                    {% for parent in kid.parents.all %}
+                        <a href="#">Profil Rodzica</a>
+                        <div class="card h-90">
+                            <div class="card-body">
+                                <div class="row gutters mt-3 text-light">
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label for="Street">First name:</label>
+                                            <input type="text" class="form-control" id="Street"
+                                                   value="{{ parent.first_name }}" readonly>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                    <div class="form-group">
-                                        <label for="parent_last_name">Last name:</label>
-                                        <input type="text" class="form-control" id="parent_last_name"
-                                               value="{{ parent.last_name }}" readonly>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                        <div class="form-group">
+                                            <label for="parent_last_name">Last name:</label>
+                                            <input type="text" class="form-control" id="parent_last_name"
+                                                   value="{{ parent.last_name }}" readonly>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
-                                    <div class="form-group">
-                                        <label for="sTate">Email:</label>
-                                        <input type="text" class="form-control" id="sTate"
-                                               value="{{ parent.user.email }}" readonly>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
+                                        <div class="form-group">
+                                            <label for="sTate">Email:</label>
+                                            <input type="text" class="form-control" id="sTate"
+                                                   value="{{ parent.user.email }}" readonly>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+
+
+        </form>
+    {% else %}
+        <div class="alert alert-danger">
+            Nie ma takiego dziecka
+        <div class="col mb-4">
+            <div class="d-flex justify-content-end noPadding">
+                <a href="{% url 'list_kids' %}"
+                   class="btn btn-danger rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
             </div>
         </div>
+        </div>
 
-
-    </form>
+    {% endif %}
 {% endblock %}

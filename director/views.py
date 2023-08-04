@@ -1,11 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .forms import KidAddForm, PaymentPlanForm, MealsForm, GroupsForm
 from .models import Kid, Groups, PaymentPlan, Director, Meals
 from teacher.models import Teacher
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.core.mail import EmailMultiAlternatives
 from MarchewkaDjango.settings import EMAIL_HOST_USER
 from django.template.loader import render_to_string
@@ -106,12 +106,20 @@ class GroupsListView(PermissionRequiredMixin, ListView):
         return context
 
 
-class AddKidView(PermissionRequiredMixin, CreateView):
+class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, CreateView):
     permission_required = "director.is_director"
     model = Kid
     template_name = 'director-add-kid.html'
     form_class = KidAddForm
     success_url = reverse_lazy('list_kids')
+
+    def get_form_kwargs(self, **kwargs):
+        """ Passes the request object to the form class.
+         This is necessary to only display members that belong to a given user"""
+
+        kwargs = super(AddKidView, self).get_form_kwargs()
+        kwargs.update({'current_user': self.request.user})
+        return kwargs
 
     def get_form(self, form_class=None):
         form = super(AddKidView, self).get_form(form_class)
@@ -119,9 +127,32 @@ class AddKidView(PermissionRequiredMixin, CreateView):
         return form
 
     def form_valid(self, form):
-        form.instance.save()
+        form.instance.save(commit=False)
         Director.objects.get(user=self.request.user.id).kids.add(form.instance)
+        form.instance.save()
         return super().form_valid(form)
+
+    def test_func(self):
+        director = Director.objects.get(user=self.request.user.id)
+        if director.groups.all():
+            if director.meals.all():
+                if director.payment_plan.all():
+                    return True
+        return False
+
+    def handle_no_permission(self):
+        director = Director.objects.get(user=self.request.user.id)
+        if not director.groups.all():
+            messages.error(self.request, 'Dodaj najpierw jakas grupe')
+            return redirect('add_group')
+        if not director.meals.all():
+            messages.error(self.request, 'Dodaj najpierw jakis posilke')
+            return redirect('add_meal')
+        if not director.payment_plan.alL():
+            messages.error(self.request, 'Dodaj najpierw jakis plan platniczy')
+            return redirect('add_payment_plans')
+
+        return redirect('add_meal')
 
 
 class KidsListView(PermissionRequiredMixin, ListView):
@@ -135,7 +166,27 @@ class KidsListView(PermissionRequiredMixin, ListView):
         return context
 
 
-class ChangeKidInfoView(PermissionRequiredMixin, View):
+class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
+    permission_required = "director.is_director"
+    model = Kid
+    template_name = 'director-kid-details.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context["kid"] = get_object_or_404(Director, user=self.request.user.id).kids.get(id=context['kid'].id)
+        except Exception:
+            context["kid"] = None
+        return context
+
+    def test_func(self):
+        kid = self.get_object()
+        if self.request.user == kid.director_set.first().user:
+            return True
+        return False
+
+
+class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, UpdateView):
     permission_required = "director.is_director"
 
     def get(self, request, pk):
@@ -221,16 +272,6 @@ class InviteParentView(PermissionRequiredMixin, View):
 
         else:
             return render(request, 'director-invite-parent.html', {'kid': kid})
-
-
-class DetailsKidView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
-    def get(self, request, pk):
-        user = Director.objects.get(user=request.user.id)
-        kid = user.kids.get(id=int(pk))
-
-        return render(request, 'director-kid-details.html', {'kid': kid})
 
 
 class TeachersListView(PermissionRequiredMixin, View):

@@ -4,14 +4,17 @@ from .models import Kid, Groups, Director, PaymentPlan, Meals
 
 class KidAddForm(forms.ModelForm):
 
-    def __init__(self, *args, user=None, **kwargs):
+    def __init__(self, *args, current_user=None, **kwargs):
         super().__init__(*args, **kwargs)
-        if user is not None:
-            self.fields['group'].queryset = Director.objects.filter(user=user).first().groups.all()
+        if current_user is not None:
+            self.fields['group'].queryset = Director.objects.get(user=current_user.id).groups.all()
+            self.fields['kid_meals'].queryset = Director.objects.get(user=current_user.id).meals.all()
+            self.fields['payment_plan'].queryset = Director.objects.get(user=current_user.id).payment_plan.all()
 
     class Meta:
         model = Kid
         fields = ['first_name', 'last_name', 'group', 'gender', 'start', 'end', 'payment_plan', 'kid_meals']
+
         widgets = {
             'start': forms.DateInput(attrs={'type': 'date'}),
             'end': forms.DateInput(attrs={'type': 'date'}),
