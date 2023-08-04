@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
 {% block content %}
     <form method="post" action="#">
         {% csrf_token %}
@@ -15,87 +17,103 @@
                                 </div>
                                 <div class="col-xl-6">
                                     <div class="card-body p-md-5 text-black">
-                                        <h3 class="mb-5 text-uppercase">Zmien informacje</h3>
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                <div class="alert alert-danger">
+                                                    {{ message }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                        <div class="row">
+                                            <div class="col mb-4">
+                                                <h3 class="text-uppercase d-flex justify-content-start">Dodaj
+                                                    Dziecko</h3>
+                                            </div>
+                                            <div class="col mb-4">
+                                                <div class="d-flex justify-content-end noPadding">
+                                                    <a href="{% url 'list_kids' %}"
+                                                       class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
+                                                </div>
+                                            </div>
+
+                                        </div>
 
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
                                                 <div class="form-outline">
-                                                    <input type="text" id="form3Example1m"
-                                                           class="form-control form-control-lg" name="first_name"
-                                                           placeholder="{{ kid.first_name }}"/>
-                                                    <label class="form-label" for="form3Example1m">Imię</label>
+                                                    {{ form.first_name|as_crispy_field }}
+
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-4">
                                                 <div class="form-outline">
-                                                    <input type="text" id="form3Example1n"
-                                                           class="form-control form-control-lg" name="last_name"
-                                                           placeholder="{{ kid.last_name }}"/>
-                                                    <label class="form-label" for="form3Example1n">Nazwisko</label>
+                                                    {{ form.last_name|as_crispy_field }}
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="d-md-flex justify-content-start align-items-center mb-4 py-2">
+
+
+                                            {{ form.gender|as_crispy_field }}
+
+
+
+                                        </div>
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
-                                                <label class="mr-2">Zmien grupe:</label><br>
-                                                <select class="select ml-3" name="group">
-                                                    {% for group in groups %}
-                                                        {% if group.name == kid.group.name %}
-                                                            <option value="{{ group.id }}">{{ group.name }}</option>
-                                                        {% else %}
-                                                            <option value="{{ group.id }}">{{ group.name }}</option>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                </select>
+                                                {% if form.group %}
+                                                {{ form.group|as_crispy_field }}
+                                                {% endif %}
 
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
-                                                 <label class="mr-2">Posilki:</label><br>
+                                                {{ form.kid_meals|as_crispy_field }}
 
-
-                                                    {% for meal in meals %}
-                                                        <input type="checkbox" name="meals" value="{{ meal.id }}">{{ meal.name }}
-                                                    {% endfor %}
 
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="form-outline mb-4">
+                                        <div class="form-outline mb-4">
+                                           {{ form.start|as_crispy_field }}
+                                            <div>
+                                                <label class="form-check-label mb-0 me-4" for="mySwitch">Umowa na czas
+                                                    nieokteślony:</label>
 
+                                                <div class="form-check form-switch">
+
+                                                    <input class="form-check-input" type="checkbox" id="mySwitch"
+                                                           onclick="myFunction()"
+                                                           name="indefinite" value="yes" checked>
+
+                                                </div>
+                                            </div>
+                                            <div id="end">
+                                                {{ form.end|as_crispy_field }}
+                                            </div>
 
                                         </div>
-                                    <div class="row">
-                                        <div class="col-md-6 mb-4">
-                                            <label class="mr-2">Plan płatnosci:</label><br>
-                                            <select class="select ml-3" name="plan">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4">
+                                                {{ form.payment_plan|as_crispy_field }}
 
-                                                {% for plan in plans %}
-                                                    {% if plan.name == kid.payment_plan.name %}
-                                                        <option value="{{ plan.id }}">{{ plan.name }}</option>
-                                                    {% else %}
-                                                        <option value="{{ plan.id }}">{{ plan.name }}</option>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </select>
-
+                                            </div>
                                         </div>
+
+
+                                        <div class="d-flex justify-content-end pt-3">
+                                            <button type="submit" class="btn btn-warning btn-lg ms-2">Add
+                                            </button>
+                                        </div>
+
                                     </div>
-
-
-                                    <div class="d-flex justify-content-end pt-3">
-                                        <button type="submit" class="btn btn-warning btn-lg ms-2">Change
-                                        </button>
-                                    </div>
-
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            </div>
         </section>
     </form>
+    <script src="{% static 'checkbox.js' %}"></script>
 {% endblock %}

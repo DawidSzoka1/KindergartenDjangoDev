@@ -186,42 +186,58 @@ class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
         return False
 
 
+class DetailsParentView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
+    permission_required = "director.is_director"
+    model = ParentA
+    template_name = 'director-details-parent.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context["parent"] = get_object_or_404(Director, user=self.request.user.id).parent_profiles.get(
+                id=context['parent'].id)
+        except Exception:
+            context["parent"] = None
+        return context
+
+    def test_func(self):
+        parent = self.get_object()
+        if self.request.user == parent.director_set.first().user:
+            return True
+        return False
+
+
 class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, UpdateView):
     permission_required = "director.is_director"
+    model = Kid
+    template_name = 'director-change-kid-info.html'
+    form_class = KidAddForm
+    success_url = reverse_lazy('list_kids')
 
-    def get(self, request, pk):
-        user = Director.objects.get(user=request.user.id)
-        plans = user.payment_plan.all()
-        groups = user.groups.all()
-        meals = user.meals.all()
-        kid = user.kids.get(id=int(pk))
-        return render(request, 'director-change-kid-info.html',
-                      {"plans": plans, "groups": groups, 'kid': kid, 'meals': meals})
+    def get_form_kwargs(self, **kwargs):
+        """ Passes the request object to the form class.
+         This is necessary to only display members that belong to a given user"""
 
-    def post(self, request):
-        user = Director.objects.get(user=request.user.id)
-        plans = user.payment_plan.all()
-        groups = user.groups.all()
-        meals = user.meals.all()
-        kid_id = request.GET.get('kid_id')
-        kid = user.kids.get(id=int(kid_id))
-        plan = int(request.POST.get("plan"))
-        group = int(request.POST.get('group'))
-        meals_to_change = request.POST.getlist('meals')
+        kwargs = super(ChangeKidInfoView, self).get_form_kwargs()
+        kwargs.update({'current_user': self.request.user})
+        return kwargs
 
-        plan = user.payment_plan.get(id=plan)
-        group = user.groups.get(id=group)
-        if plan and group and meals_to_change:
-            kid.kid_meals.clear()
-            for meal in meals_to_change:
-                objec = user.meals.get(id=int(meal))
-                kid.kid_meals.add(objec)
-            kid.group = group
-            kid.payment_plan = plan
-            kid.save()
-            return redirect('list_kids')
-        return render(request, 'director-change-kid-info.html',
-                      {"plans": plans, "groups": groups, 'kid': kid, 'meals': meals})
+    def form_valid(self, form):
+        form.instance.save()
+        Director.objects.get(user=self.request.user.id).kids.add(form.instance)
+
+        return super().form_valid(form)
+
+    def get_form(self, form_class=None):
+        form = super(ChangeKidInfoView, self).get_form(form_class)
+        form.fields['end'].required = False
+        return form
+
+    def test_func(self):
+        kid = self.get_object()
+        if self.request.user == kid.director_set.first().user:
+            return True
+        return False
 
 
 class InviteParentView(PermissionRequiredMixin, View):

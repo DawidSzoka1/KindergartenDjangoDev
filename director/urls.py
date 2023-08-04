@@ -18,5 +18,6 @@ urlpatterns = [
     path('director/change/kid/info/<int:pk>/', views.ChangeKidInfoView.as_view(), name='change_kid_info'),
     path('director/invite/parent/<int:pk>/', views.InviteParentView.as_view(), name='invite_parent'),
     path('director/kid/details/<int:pk>/', views.DetailsKidView.as_view(), name='kid_details'),
+    path('director/parent/details/<int:pk>/', views.DetailsParentView.as_view(), name='parent_details'),
 
 ]

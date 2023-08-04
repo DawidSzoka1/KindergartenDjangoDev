@@ -17,8 +17,10 @@
                                             <img src="https://bootdey.com/img/Content/avatar/avatar1.png"
                                                  alt="Maxwell Admin">
                                         </div>
-                                        <h5 class="user-name">{{ kid.first_name }}</h5>
-                                        <h6 class="user-email">{{ kid.last_name }}</h6>
+                                        <label for="user-name">Imie:</label>
+                                        <h5 class="user-name" id="user-name">{{ kid.first_name }}</h5>
+                                        <label class="" for="user-surname">Nazwisko:</label>
+                                        <h6 class="user-email" id="user-surname">{{ kid.last_name }}</h6>
                                     </div>
                                     <div class="about">
                                         <h5 class="mb-2 text-primary">Info</h5>
@@ -129,7 +131,7 @@
                         <h6 class="mb-3 text-primary">Parents</h6>
                     </div>
                     {% for parent in kid.parents.all %}
-                        <a href="#">Profil Rodzica</a>
+                        <a href="{% url 'parent_details' pk=parent.id %}">Profil Rodzica</a>
                         <div class="card h-90">
                             <div class="card-body">
                                 <div class="row gutters mt-3 text-light">
@@ -153,6 +155,13 @@
                                             <label for="sTate">Email:</label>
                                             <input type="text" class="form-control" id="sTate"
                                                    value="{{ parent.user.email }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
+                                        <div class="form-group">
+                                            <label for="tel">Numer telefonu:</label>
+                                            <input type="text" class="form-control" id="tel"
+                                                   value="{{ parent.phone }}" readonly>
                                         </div>
                                     </div>
                                 </div>
