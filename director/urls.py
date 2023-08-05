@@ -14,6 +14,7 @@ urlpatterns = [
     path('director/list/payments/plans/', views.PaymentPlansListView.as_view(), name='list_payments_plans'),
     path('director/list/meals/', views.MealsListView.as_view(), name='list_meals'),
     path('director/list/teachers/', views.TeachersListView.as_view(), name='list_teachers'),
+    path('director/list/parents/', views.ParentListView.as_view(), name='list_parent'),
 
     path('director/change/kid/info/<int:pk>/', views.ChangeKidInfoView.as_view(), name='change_kid_info'),
     path('director/invite/parent/<int:pk>/', views.InviteParentView.as_view(), name='invite_parent'),

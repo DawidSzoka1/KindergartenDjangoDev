@@ -186,27 +186,6 @@ class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
         return False
 
 
-class DetailsParentView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
-    permission_required = "director.is_director"
-    model = ParentA
-    template_name = 'director-details-parent.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        try:
-            context["parent"] = get_object_or_404(Director, user=self.request.user.id).parent_profiles.get(
-                id=context['parent'].id)
-        except Exception:
-            context["parent"] = None
-        return context
-
-    def test_func(self):
-        parent = self.get_object()
-        if self.request.user == parent.director_set.first().user:
-            return True
-        return False
-
-
 class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, UpdateView):
     permission_required = "director.is_director"
     model = Kid
@@ -288,6 +267,38 @@ class InviteParentView(PermissionRequiredMixin, View):
 
         else:
             return render(request, 'director-invite-parent.html', {'kid': kid})
+
+
+class ParentListView(PermissionRequiredMixin, ListView):
+    permission_required = "director.is_director"
+    model = ParentA
+    template_name = 'director-list-parents.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["parents"] = Director.objects.get(user=self.request.user.id).parent_profiles.all()
+        return context
+
+
+class DetailsParentView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
+    permission_required = "director.is_director"
+    model = ParentA
+    template_name = 'director-details-parent.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context["parent"] = get_object_or_404(Director, user=self.request.user.id).parent_profiles.get(
+                id=context['parent'].id)
+        except Exception:
+            context["parent"] = None
+        return context
+
+    def test_func(self):
+        parent = self.get_object()
+        if self.request.user == parent.director_set.first().user:
+            return True
+        return False
 
 
 class TeachersListView(PermissionRequiredMixin, View):

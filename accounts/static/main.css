@@ -23,6 +23,8 @@ html {
 body {
   font-family: "Open Sans", sans-serif;
   font-weight: 400;
+  color: #bcd0f7;
+    background: #1A233A;
 }
 
 p {
@@ -30,7 +32,8 @@ p {
 }
 
 .bg-light {
-background: #EAEAEA;
+color: #bcd0f7;
+    background: #1A233A;
 }
 
 .noPadding {
@@ -43,8 +46,8 @@ background: #EAEAEA;
   text-align: center;
 }
 .btn-color {
-  background-color: var(--link-color);
-  color: var(--light-link-color);
+color: #bcd0f7;
+    background: #1A233A;
   font-weight: 600;
   font-size: 20px;
   padding: 8px 18px;
@@ -159,4 +162,12 @@ margin: 0 auto !important;
 
 .main-logo span {
   color: var(--link-color);
+}
+
+.account-settings .user-profile .user-avatar img {
+    width: 90px;
+    height: 90px;
+    -webkit-border-radius: 100px;
+    -moz-border-radius: 100px;
+    border-radius: 100px;
 }

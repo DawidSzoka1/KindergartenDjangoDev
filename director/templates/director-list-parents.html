@@ -1,10 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <link rel="stylesheet" href="{% static 'kids.css' %}">
+    <div class="container mt-3 mb-4 center">
+        <div class="col-lg-9 mt-4 mt-lg-0">
+            <div class="col d-flex justify-content-end mb-2 noPadding">
+                <a href="{% url 'director_profile' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Lista Rodzicow</h5>
+                        </div>
+                        <table class="table manage-candidates-top mb-0">
+                            <thead>
+                            <tr>
+                                <th class="text-left">Imię i Nazwisko Rodzica</th>
+                                <th class="text-center">Email</th>
+                                <th class="action text-right">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for parent in parents %}
 
-</body>
-</html>
+
+
+
+                                <tr class="candidates-list">
+                                    <td class="title">
+                                        <div class="thumb">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
+                                                 fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="candidate-list-details">
+                                            <div class="candidate-list-info">
+                                                <div class="candidate-list-title text-left">
+                                                    <h5 class="mb-0">
+                                                        {% if parent.first_name and parent.last_name %}
+                                                            <a href="#">{{ parent.first_name }} {{ parent.last_name }}</a>
+                                                        {% else %}
+
+                                                            <h6 class="text-muted">Ten rodzic jeszcze nie wypelnil
+                                                                danych</h6>
+                                                        {% endif %}
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="candidate-list-favourite-time text-center">
+
+                                        <h5 class="mb-0">
+                                            {{ parent.user.email }}
+                                        </h5>
+
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="drodown">
+                                            <a class="dropdown-toggle d-flex align-items-right hidden-arrow"
+                                               href="#"
+                                               id="navbarDropdownMenuAvatar"
+                                               role="button"
+                                               data-bs-toggle="dropdown"
+                                               aria-expanded="false">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                                     fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                                                </svg>
+                                            </a>
+                                            <ul
+                                                    class="dropdown-menu dropdown-menu-end"
+                                                    aria-labelledby="navbarDropdownMenuAvatar"
+                                            >
+                                                <li>
+                                                    <a href="{% url 'parent_details'  pk=parent.id %}"
+                                                       class="dropdown-item">View detail</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            {% endfor %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
