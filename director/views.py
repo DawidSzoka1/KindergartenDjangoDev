@@ -359,3 +359,22 @@ class AddTeacherView(PermissionRequiredMixin, View):
         else:
             messages.error(request, 'wypelnij wszystkie pola')
             return redirect('add_teacher')
+
+
+class TeacherDetailsView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
+    permission_required = "director.is_director"
+    model = Teacher
+    template_name = 'director-details-teacher.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["teacher"] = get_object_or_404(Director, user=self.request.user.id).teachers.get(
+                id=context['teacher'].id)
+        return context
+
+    def test_func(self):
+        teacher = self.get_object()
+        if self.request.user == teacher.director_set.first().user:
+            return True
+        return False

@@ -93,15 +93,10 @@
                                                     class="dropdown-menu dropdown-menu-end"
                                                     aria-labelledby="navbarDropdownMenuAvatar"
                                             >
-                                                {#                                                <li>#}
-                                                {#                                                    <a href="{% url 'teachers_details'  pk=teachers.id %}"#}
-                                                {#                                                       class="dropdown-item">View detail</a>#}
-                                                {#                                                </li>#}
-                                                {#                                                <li>#}
-                                                {#                                                    <a href="{% url 'change_teachers_info'  pk=teachers.id %}"#}
-                                                {#                                                       class="dropdown-item">Change#}
-                                                {#                                                        info</a>#}
-                                                {#                                                </li>#}
+                                                <li>
+                                                    <a href="{% url 'teacher_details' pk=teacher.id %}"
+                                                       class="dropdown-item">View detail</a>
+                                                </li>
                                             </ul>
                                         </div>
                                     </td>

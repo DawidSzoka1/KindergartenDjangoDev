@@ -20,5 +20,6 @@ urlpatterns = [
     path('director/invite/parent/<int:pk>/', views.InviteParentView.as_view(), name='invite_parent'),
     path('director/kid/details/<int:pk>/', views.DetailsKidView.as_view(), name='kid_details'),
     path('director/parent/details/<int:pk>/', views.DetailsParentView.as_view(), name='parent_details'),
+    path('director/teacher/details/<int:pk>/', views.TeacherDetailsView.as_view(), name='teacher_details'),
 
 ]

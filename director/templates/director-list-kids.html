@@ -5,8 +5,8 @@
     <div class="container mt-3 mb-4 center">
         <div class="col-lg-9 mt-4 mt-lg-0">
             <div class="col d-flex justify-content-end mb-2 noPadding">
-                    <a href="{% url 'director_profile' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
-                </div>
+                <a href="{% url 'director_profile' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
+            </div>
             <div class="row">
                 <div class="col-md-12">
                     <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
@@ -84,13 +84,9 @@
 
                                         </td>
                                     {% endif %}
-                                    {#                                    <td class="candidate-list-favourite-time text-center">#}
-                                    {#                                        <a class="candidate-list-favourite order-2 text-danger" href="#"><i#}
-                                    {#                                                class="fas fa-heart"></i></a>#}
-                                    {#                                        <span class="candidate-list-time order-1">Czy ma podpietego rodzica</span>#}
-                                    {#                                    </td>#}
                                     <td>
                                         <div class="drodown">
+
                                             <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
                                                href="#"
                                                id="navbarDropdownMenuAvatar"
@@ -119,7 +115,8 @@
                                                         info</a>
                                                 </li>
                                                 <li>
-                                                    <a href="{% url 'calendar' kid.id %}" class="dropdown-item">Calendar</a>
+                                                    <a href="{% url 'calendar' kid.id %}"
+                                                       class="dropdown-item">Calendar</a>
                                                 </li>
                                             </ul>
                                         </div>
