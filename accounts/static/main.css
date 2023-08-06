@@ -23,8 +23,7 @@ html {
 body {
   font-family: "Open Sans", sans-serif;
   font-weight: 400;
-  color: #bcd0f7;
-    background: #1A233A;
+
 }
 
 p {
@@ -32,8 +31,7 @@ p {
 }
 
 .bg-light {
-color: #bcd0f7;
-    background: #1A233A;
+background: #EAEAEA;
 }
 
 .noPadding {
@@ -46,8 +44,8 @@ color: #bcd0f7;
   text-align: center;
 }
 .btn-color {
-color: #bcd0f7;
-    background: #1A233A;
+  background-color: var(--link-color);
+  color: var(--light-link-color);
   font-weight: 600;
   font-size: 20px;
   padding: 8px 18px;
