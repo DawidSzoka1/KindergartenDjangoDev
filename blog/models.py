@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import User
-from director.models import Groups, Director
+from director.models import Director
+from children.models import Groups
 from PIL import Image
 from django.utils import timezone
 from django.urls import reverse

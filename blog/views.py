@@ -3,7 +3,7 @@ from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
 from .models import Post
 from parent.models import ParentA
-from director.models import Kid
+from children.models import Kid
 from django.contrib.auth.models import Permission
 import calendar
 from django.utils import timezone

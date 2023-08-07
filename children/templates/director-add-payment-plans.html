@@ -25,11 +25,11 @@
                                         {% endif %}
                                         <div class="row">
                                             <div class="col mb-4">
-                                                <h3 class="text-uppercase d-flex justify-content-start">Dodaj Posilek</h3>
+                                                <h3 class="text-uppercase d-flex justify-content-start">Dodaj Plan platniczy</h3>
                                             </div>
                                             <div class="col mb-4">
                                                 <div class="d-flex justify-content-end noPadding">
-                                                    <a href="{% url 'list_meals' %}"
+                                                    <a href="{% url 'list_payments_plans' %}"
                                                        class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
                                                 </div>
                                             </div>
@@ -38,14 +38,16 @@
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
                                                 <div class="form-outline">
-                                                    {{ form.name|as_crispy_field }}
+                                                   {{ form.name|as_crispy_field }}
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-4">
                                                 <div class="form-outline">
-                                                    {{ form.description|as_crispy_field }}
+                                                   {{ form.price|as_crispy_field }}
                                                 </div>
                                             </div>
+                                            {{ form.principal }}
+
                                         </div>
                                         <div class="d-flex justify-content-end pt-3">
                                             <button type="submit" class="btn btn-warning btn-lg ms-2">Add

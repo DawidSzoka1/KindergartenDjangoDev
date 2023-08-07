@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "parent",
     "director",
     "teacher",
+    "children",
     'django_bootstrap_icons',
 ]
 

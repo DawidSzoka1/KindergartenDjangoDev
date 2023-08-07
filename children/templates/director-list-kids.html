@@ -32,6 +32,7 @@
                             </tr>
                             </thead>
                             <tbody>
+
                             {% for kid in kids %}
 
 
@@ -64,7 +65,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    {% if kid.parents.all %}
+                                    {% if kid.parenta_set.all %}
                                         <td class="candidate-list-favourite-time text-center"
                                             style="color:green;">
                                             &#9745;<br>

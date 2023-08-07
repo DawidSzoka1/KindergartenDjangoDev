@@ -1,10 +1,106 @@
-from django.shortcuts import render, redirect
-from django.views import View
-from director.models import Director
 from .forms import ParentUpdateForm, UserUpdateForm
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views import View
+from django.contrib import messages
+from director.models import Director
+from django.core.mail import EmailMultiAlternatives
+from MarchewkaDjango.settings import EMAIL_HOST_USER
+from django.template.loader import render_to_string
+from accounts.models import User
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from .models import ParentA
-from django.contrib.auth.mixins import LoginRequiredMixin
-# Create your views here.
+from children.models import Kid
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView
+)
+
+
+class InviteParentView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request, pk):
+        user = Director.objects.get(user=request.user.id)
+        kid = user.kid_set.get(id=int(pk))
+        return render(request, 'director-invite-parent.html', {'kid': kid})
+
+    def post(self, request, pk):
+        user = Director.objects.get(user=request.user.id)
+        kid = user.kid_set.get(id=int(pk))
+        parent_email = request.POST.get('email')
+
+        if parent_email:
+            try:
+                test = User.objects.get(email=parent_email)
+            except User.DoesNotExist:
+                test = None
+            if test:
+                messages.error(request, 'Ten rodzic juz istnieje')
+                return redirect('invite_parent')
+            try:
+                password = User.objects.make_random_password()
+                parent_user = User.objects.create_user(email=parent_email, password=password)
+                content_type = ContentType.objects.get_for_model(ParentA)
+                permission = Permission.objects.get(content_type=content_type, codename='is_parent')
+                par_user = ParentA.objects.create(user=parent_user)
+                par_user.principal.add(user)
+                par_user.kids.add(kid)
+                par_user.user.user_permissions.clear()
+                par_user.user.user_permissions.add(permission)
+                parent_user.parenta.save()
+            except Exception as e:
+                User.objects.filter(email=parent_email).first().delete()
+                messages.error(request, f'Wystąpił blad {e}')
+                return redirect('invite_parent')
+
+            subject = f"Zaproszenie na konto przedszkola dla rodzica {kid.first_name}"
+            from_email = EMAIL_HOST_USER
+            text_content = "Marchewka zaprasza do korzystania z konto do ubslugi dzieci"
+            html_content = render_to_string('email_to_parent.html', {'password': password, 'email': parent_email})
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [parent_email])
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            return redirect('list_kids')
+
+        else:
+            return render(request, 'director-invite-parent.html', {'kid': kid})
+
+
+class ParentListView(PermissionRequiredMixin, ListView):
+    permission_required = "director.is_director"
+    model = ParentA
+    template_name = 'director-list-parents.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["parents"] = Director.objects.get(user=self.request.user.id).parenta_set.all()
+        return context
+
+
+class DetailsParentView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
+    permission_required = "director.is_director"
+    model = ParentA
+    template_name = 'director-details-parent.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            context["parent"] = get_object_or_404(Director, user=self.request.user.id).parenta_set.get(
+                id=context['parent'].id)
+        except Exception:
+            context["parent"] = None
+        return context
+
+    def test_func(self):
+        parenta = self.get_object()
+        if self.request.user == parenta.principal.first().user:
+            return True
+        return False
 
 
 class ParentProfileView(LoginRequiredMixin, View):

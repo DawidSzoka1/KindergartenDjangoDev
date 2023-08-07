@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 {% block content %}
     <form method="post" action="#">
         {% csrf_token %}
@@ -24,12 +25,11 @@
                                         {% endif %}
                                         <div class="row">
                                             <div class="col mb-4">
-                                                <h3 class="text-uppercase d-flex justify-content-start">Dodaj
-                                                    nauczyciela</h3>
+                                                <h3 class="text-uppercase d-flex justify-content-start">Dodaj Posilek</h3>
                                             </div>
                                             <div class="col mb-4">
                                                 <div class="d-flex justify-content-end noPadding">
-                                                    <a href="{% url 'list_teachers' %}"
+                                                    <a href="{% url 'list_meals' %}"
                                                        class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
                                                 </div>
                                             </div>
@@ -37,38 +37,24 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
-
-                                                    <label class="form-label" for="form3Example1n">Email
-                                                        nauczyciela:</label>
-                                                    <input type="email" id="form3Example1n"
-                                                           class="form-control form-control-lg" name="email"/>
-
-
-
-
+                                                <div class="form-outline">
+                                                    {{ form.name|as_crispy_field }}
+                                                </div>
                                             </div>
-
                                             <div class="col-md-6 mb-4">
-                                                <label class="mr-2 mb-2">Wybierz grupe dla nauczyciela:</label><br>
-                                                <select class="form-select form-select-lg" name="group">
-                                                    {% for group in groups %}
-                                                        <option value="{{ group.id }}">{{ group.name }}</option>
-                                                    {% endfor %}
-                                                </select>
-
+                                                <div class="form-outline">
+                                                    {{ form.description|as_crispy_field }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    {{ form.principal }}
+                                                </div>
                                             </div>
 
                                         </div>
-
-
                                         <div class="d-flex justify-content-end pt-3">
-                                            <button type="submit" class="btn btn-warning btn-lg ms-2">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                     fill="currentColor" class="bi bi-envelope-fill"
-                                                     viewBox="0 0 16 16">
-                                                    <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"/>
-                                                </svg>
-                                                <i class="bi bi-envelope-fill"></i>Send
+                                            <button type="submit" class="btn btn-warning btn-lg ms-2">Add
                                             </button>
                                         </div>
 
