@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    {{ contact }}
+    {{ contact.phone }}
     <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'contact-update' %}'">
             Zmien info
         </button>
