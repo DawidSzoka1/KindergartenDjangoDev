@@ -4,7 +4,7 @@ from children.models import Groups
 from django.views import View
 from django.contrib import messages
 from director.models import Director
-from .models import Teacher, roles
+from .models import Employee, roles
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.core.mail import EmailMultiAlternatives
 from MarchewkaDjango.settings import EMAIL_HOST_USER
@@ -53,9 +53,9 @@ class AddTeacherView(PermissionRequiredMixin, View):
             try:
                 password = User.objects.make_random_password()
                 teacher_user = User.objects.create_user(email=teacher_email, password=password)
-                content_type = ContentType.objects.get_for_model(Teacher)
+                content_type = ContentType.objects.get_for_model(Employee)
                 permission = Permission.objects.get(content_type=content_type, codename='is_teacher')
-                teacher_object = Teacher.objects.create(user=teacher_user, role=role, salary=float(salary))
+                teacher_object = Employee.objects.create(user=teacher_user, role=role, salary=float(salary))
                 user.teacher_set.add(teacher_object)
                 if group:
                     group.teachers.add(teacher_object)
@@ -83,7 +83,7 @@ class AddTeacherView(PermissionRequiredMixin, View):
 
 class TeacherDetailsView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
     permission_required = "director.is_director"
-    model = Teacher
+    model = Employee
     template_name = 'director-details-teacher.html'
 
     def get_context_data(self, **kwargs):
@@ -104,7 +104,7 @@ class TeacherUpdateView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request, pk):
-        form = Teacher.objects.get(id=pk)
+        form = Employee.objects.get(id=pk)
         user = Director.objects.get(user=request.user.id)
         groups = user.groups_set.all()
         if form.principal.all().first() == user:
@@ -118,7 +118,7 @@ class TeacherUpdateView(PermissionRequiredMixin, View):
         role = int(request.POST.get('role'))
         salary = request.POST.get('salary')
         group = request.POST.get('group')
-        teacher = Teacher.objects.get(id=pk)
+        teacher = Employee.objects.get(id=pk)
         teacher.group.clear()
         if role == 2:
             if group and salary:

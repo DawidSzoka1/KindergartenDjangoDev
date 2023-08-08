@@ -12,7 +12,7 @@ roles = (
 )
 
 
-class Teacher(models.Model):
+class Employee(models.Model):
     first_name = models.CharField(max_length=128, null=True)
     last_name = models.CharField(max_length=128, null=True)
     role = models.IntegerField(choices=roles, default=3)

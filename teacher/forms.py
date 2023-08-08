@@ -1,5 +1,5 @@
 from django import forms
-from .models import Teacher
+from .models import Employee
 from director.models import Director
 
 
