@@ -218,3 +218,17 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, UpdateView
         if self.request.user == kid.principal.user:
             return True
         return False
+
+
+class KidSearchView(View):
+    def get(self, request):
+
+        return redirect('list_kids')
+
+    def post(self, request):
+        search = request.POST.get('search')
+        if search:
+            kids = Kid.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(first_name__icontains=search)
+            return render(request, 'director-list-kids.html', {'kids': kids})
+        messages.error(request, 'wypelnij poprawnie pole')
+        return redirect('list_kids')

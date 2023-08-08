@@ -12,6 +12,7 @@ urlpatterns = [
     path('director/list/meals/', views.MealsListView.as_view(), name='list_meals'),
     path('director/change/kid/info/<int:pk>/', views.ChangeKidInfoView.as_view(), name='change_kid_info'),
     path('director/kid/details/<int:pk>/', views.DetailsKidView.as_view(), name='kid_details'),
+    path('director/kid/search/', views.KidSearchView.as_view(), name='kid-search'),
 
 
 ]
