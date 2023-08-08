@@ -13,7 +13,8 @@ class KidAddForm(forms.ModelForm):
 
     class Meta:
         model = Kid
-        fields = ['first_name', 'last_name', 'group', 'gender', 'start', 'end', 'payment_plan', 'kid_meals', 'principal']
+        fields = ['first_name', 'last_name', 'group', 'gender', 'start', 'end', 'payment_plan', 'kid_meals',
+                  'principal']
 
         widgets = {
             'start': forms.DateInput(attrs={'type': 'date'}),
@@ -45,7 +46,6 @@ class PaymentPlanForm(forms.ModelForm):
 
 
 class MealsForm(forms.ModelForm):
-
     class Meta:
         model = Meals
         fields = '__all__'
@@ -53,9 +53,7 @@ class MealsForm(forms.ModelForm):
 
 
 class GroupsForm(forms.ModelForm):
-
     class Meta:
         model = Groups
         fields = ['name', 'principal']
         widgets = {'principal': forms.HiddenInput}
-

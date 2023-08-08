@@ -1,4 +1,6 @@
+from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
+from children.models import Groups
 from django.views import View
 from django.contrib import messages
 from director.models import Director
@@ -10,7 +12,7 @@ from django.template.loader import render_to_string
 from accounts.models import User
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.views.generic import DetailView
+from django.views.generic import DetailView, UpdateView
 
 
 class TeachersListView(PermissionRequiredMixin, View):
@@ -88,7 +90,7 @@ class TeacherDetailsView(PermissionRequiredMixin, UserPassesTestMixin, DetailVie
         context = super().get_context_data(**kwargs)
 
         context["teacher"] = get_object_or_404(Director, user=self.request.user.id).teacher_set.get(
-                id=context['teacher'].id)
+            id=context['teacher'].id)
         return context
 
     def test_func(self):
@@ -96,3 +98,47 @@ class TeacherDetailsView(PermissionRequiredMixin, UserPassesTestMixin, DetailVie
         if self.request.user == teacher.principal.first().user:
             return True
         return False
+
+
+class TeacherUpdateView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request, pk):
+        form = Teacher.objects.get(id=pk)
+        user = Director.objects.get(user=request.user.id)
+        groups = user.groups_set.all()
+        if form.principal.all().first() == user:
+
+            return render(request, 'director-update-teacher.html', {'form': form, 'roles': roles, 'groups': groups})
+        else:
+            messages.error(request, 'Nie masz na to zgody')
+            return redirect('home_page')
+
+    def post(self, request, pk):
+        role = int(request.POST.get('role'))
+        salary = request.POST.get('salary')
+        group = request.POST.get('group')
+        teacher = Teacher.objects.get(id=pk)
+        teacher.group.clear()
+        if role == 2:
+            if group and salary:
+                teacher.salary = float(salary)
+                group_obj = Groups.objects.get(id=int(group))
+                teacher.group.add(group_obj)
+                teacher.role = role
+                teacher.save()
+                messages.success(request, 'Udalo sie zmienic informacje')
+                return redirect('teacher_details', pk=pk)
+        else:
+            if salary and role:
+
+                teacher.salary = float(salary)
+                teacher.role = role
+                teacher.save()
+                messages.success(request, 'Udalo sie zmienic informacje')
+                return redirect('teacher_details', pk=pk)
+        messages.error(request, "Wypełnij poprawnie wszytkie pola")
+        return redirect('teacher_update', args=(pk,))
+
+
+

@@ -1,7 +1,8 @@
 addEventListener("DOMContentLoaded", function () {
-   const role = document.getElementById('role')
+   const role = document.getElementById('id_role')
    const group = document.getElementById('group')
    role.addEventListener('change', function (){
+
       if (this.value === '2'){
           group.style.display = "block";
       }

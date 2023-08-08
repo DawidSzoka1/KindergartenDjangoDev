@@ -206,18 +206,15 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, UpdateView
 
     def form_valid(self, form):
         form.instance.save()
-        Director.objects.get(user=self.request.user.id).kid_set.add(form.instance)
-
         return super().form_valid(form)
 
     def get_form(self, form_class=None):
         form = super(ChangeKidInfoView, self).get_form(form_class)
         form.fields['end'].required = False
-        form.fields['principal'] = Director.objects.get(user=self.request.user.id)
         return form
 
     def test_func(self):
         kid = self.get_object()
-        if self.request.user == kid.director_set.first().user:
+        if self.request.user == kid.principal.user:
             return True
         return False

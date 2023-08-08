@@ -4,6 +4,13 @@
 {% block content %}
     <form method="post" action="#">
         {% csrf_token %}
+     {% if messages %}
+                                            {% for message in messages %}
+                                                <div class="alert alert-{{ message.tags }}">
+                                                    {{ message }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
         <div class="container mt-4 text-color-darker">
             <div class="row gutters">
                 <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
@@ -37,32 +44,84 @@
                         <div class="card-body">
                             <div class="row gutters">
                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-2 d-flex justify-content-between">
+
                                     <div class="">
-                                        <h6 class="mb-3 text-primary">Personal Details</h6>
+                                    <h6 class="mb-3 text-primary">Personal Details</h6>
+                                    </div>
+                                    <div class="">
+                                    <button type="button" class="btn btn-primary" onclick="location.href='{% url 'teacher_update' pk=teacher.id %}'">
+                                        Zmien informacje
+                                    </button>
                                     </div>
 
                                 </div>
                                 <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                     <div class="form-group">
                                         <label for="address">Adres zamieszkania</label>
-                                        <input readonly class="form-control" name="address" type="text"
-                                               value="do zrobienia">
+                                        {% if teacher.address %}
+                                            <input readonly class="form-control" name="phone" type="text"
+                                                   value="{{ teacher.address }}">
+                                        {% else %}
+                                            <input readonly class="form-control" name="phone" type="text"
+                                                   value="Nie zostal podany">
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-
                                     <div class="form-group">
-                                        <label for="phone">Numer telefonu</label>
-                                        <input readonly class="form-control" name="phone" type="text"
-                                               value="{{ teacher.phone }}">
+                                        <label for="address">Kod pocztowy</label>
+                                        {% if teacher.zip_code %}
+                                            <input readonly class="form-control" name="phone" type="text"
+                                                   value="{{ teacher.zip_code }}">
+                                        {% else %}
+                                            <input readonly class="form-control" name="phone" type="text"
+                                                   value="Nie zostaly podany">
+                                        {% endif %}
                                     </div>
                                 </div>
+
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-3">
+                                    <div class="form-group">
+                                        <label for="phone">Miasto zamieszkania</label>
+                                        {% if teacher.city %}
+                                            <input readonly class="form-control" name="phone" type="text"
+                                                   value="{{ teacher.city }}">
+                                        {% else %}
+                                            <input readonly class="form-control" name="phone" type="text"
+                                                   value="Nie zostalo podane">
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-3">
+                                    <div class="form-group">
+                                        <label for="phone">Numer telefonu</label>
+                                        {% if teacher.phone %}
+                                            <input readonly class="form-control" name="phone" type="text"
+                                                   value="{{ teacher.phone }}">
+                                        {% else %}
+                                            <input readonly class="form-control" name="phone" type="text"
+                                                   value="Nie zostal podany">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-3">
+                                    <div class="form-group">
+                                        <label for="phone">Posada</label>
+
+                                            <input readonly class="form-control" name="phone" type="text"
+                                                   value="{{ teacher.get_role_display }}">
+
+
+                                    </div>
+                                </div>
+
                                 {% if teacher.group.all %}
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-3">
 
                                         <div class="form-group">
                                             <label for="group">Grupa nauczyciela</label>
-                                            {% for group in teacher.groups_set.all %}
+                                            {% for group in teacher.group.all %}
                                                 <input readonly class="form-control" name="group" type="text"
                                                        value="{{ group.name }}">
                                             {% endfor %}
