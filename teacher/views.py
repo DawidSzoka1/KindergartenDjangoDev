@@ -20,7 +20,7 @@ class TeachersListView(PermissionRequiredMixin, View):
 
     def get(self, request):
         user = Director.objects.get(user=request.user.id)
-        teachers = user.teacher_set.all()
+        teachers = user.employee_set.all()
         return render(request, 'director-list-teachers.html', {'teachers': teachers})
 
 
@@ -56,12 +56,12 @@ class AddTeacherView(PermissionRequiredMixin, View):
                 content_type = ContentType.objects.get_for_model(Employee)
                 permission = Permission.objects.get(content_type=content_type, codename='is_teacher')
                 teacher_object = Employee.objects.create(user=teacher_user, role=role, salary=float(salary))
-                user.teacher_set.add(teacher_object)
+                user.employee_set.add(teacher_object)
                 if group:
                     group.teachers.add(teacher_object)
                 teacher_object.user.user_permissions.clear()
                 teacher_object.user.user_permissions.add(permission)
-                teacher_user.teacher.save()
+                teacher_user.employee.save()
             except Exception as e:
                 User.objects.filter(email=teacher_email).first().delete()
 
@@ -89,7 +89,7 @@ class TeacherDetailsView(PermissionRequiredMixin, UserPassesTestMixin, DetailVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["teacher"] = get_object_or_404(Director, user=self.request.user.id).teacher_set.get(
+        context["teacher"] = get_object_or_404(Director, user=self.request.user.id).employee_set.get(
             id=context['teacher'].id)
         return context
 
@@ -131,7 +131,6 @@ class TeacherUpdateView(PermissionRequiredMixin, View):
                 return redirect('teacher_details', pk=pk)
         else:
             if salary and role:
-
                 teacher.salary = float(salary)
                 teacher.role = role
                 teacher.save()
@@ -141,4 +140,16 @@ class TeacherUpdateView(PermissionRequiredMixin, View):
         return redirect('teacher_update', args=(pk,))
 
 
+class TeacherSearchView(View):
+    def get(self, request):
+        return redirect('list_teachers')
 
+    def post(self, request):
+        search = request.POST.get('search')
+        if search:
+            teachers = Employee.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
+                user__email__icontains=search
+            )
+            return render(request, 'director-list-teachers.html', {'teachers': teachers})
+        messages.error(request, 'wypelnij poprawnie pole')
+        return redirect('list_teachers')
