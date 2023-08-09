@@ -40,5 +40,5 @@ class ProfilePasswordUpdate(LoginRequiredMixin, View):
             update_session_auth_hash(request, user)
 
             return redirect('home_page')
-        messages.add_message(request, messages.error, 'wypelnij poprawnie formularz')
+        messages.error(request, 'wypelnij poprawnie formularz')
         return redirect('password_change')

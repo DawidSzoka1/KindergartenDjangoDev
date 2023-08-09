@@ -8,5 +8,13 @@ class TeacherUpdateForm(forms.ModelForm):
         model = Employee
         fields = '__all__'
 
+        labels = {
+            'first_name': "Imie:",
+            'last_name': "Nazwisko:",
+            'city': 'Miasto:',
+            'address': 'Adres:',
+            'zip_code': 'Kod pocztowy:',
+            'phone': 'Numer telefonu:'
+                  }
 
 

@@ -37,9 +37,18 @@
                 </button>
 
             </div>
-        {% endif %}
-    {% elif perms.teacher.is_teacher %}
 
+        {% elif perms.teacher.is_teacher %}
+
+            {% if user.employee.role == 2 %}
+                <div class="text-center mt-5">
+                    <button type="button" class="btn btn-primary me-3"
+                            onclick="location.href='{% url 'director_profile' %}'">
+                        Grupa
+                    </button>
+                </div>
+            {% endif %}
+        {% endif %}
 
     {% endif %}
 {% endblock %}

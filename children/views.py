@@ -17,7 +17,7 @@ from django.views.generic import (
 class AddPaymentsPlanView(PermissionRequiredMixin, CreateView):
     permission_required = "director.is_director"
     model = PaymentPlan
-    template_name = 'director-add-payment-plans.html'
+    template_name = 'payment-plan-add.html'
     form_class = PaymentPlanForm
     success_url = reverse_lazy('list_payments_plans')
 
@@ -35,7 +35,7 @@ class AddPaymentsPlanView(PermissionRequiredMixin, CreateView):
 class PaymentPlansListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
     model = PaymentPlan
-    template_name = 'director-list-payments-plans.html'
+    template_name = 'payments-plans-list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -46,7 +46,7 @@ class PaymentPlansListView(PermissionRequiredMixin, ListView):
 class AddMealView(PermissionRequiredMixin, CreateView):
     permission_required = "director.is_director"
     model = Meals
-    template_name = 'director-add-meal.html'
+    template_name = 'meal-add.html'
     form_class = MealsForm
     success_url = reverse_lazy('list_meals')
 
@@ -64,7 +64,7 @@ class AddMealView(PermissionRequiredMixin, CreateView):
 class MealsListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
     model = Meals
-    template_name = 'director-list-meals.html'
+    template_name = 'meals-list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -75,7 +75,7 @@ class MealsListView(PermissionRequiredMixin, ListView):
 class AddGroupView(PermissionRequiredMixin, CreateView):
     permission_required = "director.is_director"
     model = Groups
-    template_name = 'director-add-group.html'
+    template_name = 'group-add.html'
     form_class = GroupsForm
     success_url = reverse_lazy('list_groups')
 
@@ -97,7 +97,7 @@ class AddGroupView(PermissionRequiredMixin, CreateView):
 class GroupsListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
     model = Groups
-    template_name = 'director-list-groups.html'
+    template_name = 'groups-list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -108,7 +108,7 @@ class GroupsListView(PermissionRequiredMixin, ListView):
 class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, CreateView):
     permission_required = "director.is_director"
     model = Kid
-    template_name = 'director-add-kid.html'
+    template_name = 'kid-add.html'
     form_class = KidAddForm
     success_url = reverse_lazy('list_kids')
 
@@ -161,7 +161,7 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, CreateView):
 class KidsListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
     model = Kid
-    template_name = 'director-list-kids.html'
+    template_name = 'kids-list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -172,7 +172,7 @@ class KidsListView(PermissionRequiredMixin, ListView):
 class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
     permission_required = "director.is_director"
     model = Kid
-    template_name = 'director-kid-details.html'
+    template_name = 'kid-details.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -192,7 +192,7 @@ class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
 class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, UpdateView):
     permission_required = "director.is_director"
     model = Kid
-    template_name = 'director-change-kid-info.html'
+    template_name = 'kid-update-info.html'
     form_class = KidAddForm
     success_url = reverse_lazy('list_kids')
 
@@ -229,5 +229,5 @@ class KidSearchView(LoginRequiredMixin, View):
         search = request.POST.get('search')
         if search:
             kids = Kid.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(first_name__icontains=search)
-            return render(request, 'director-list-kids.html', {'kids': kids})
+            return render(request, 'kids-list.html', {'kids': kids})
         return redirect('list_kids')
