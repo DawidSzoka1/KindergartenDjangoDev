@@ -267,5 +267,12 @@ class GroupUpdateView(PermissionRequiredMixin, View):
         return redirect('list_groups')
 
     def post(self, request, pk):
-        pass
+        group = Groups.objects.get(id=int(pk))
+        director = Director.objects.get(user=request.user.id)
+        if director == group.principal:
+            form = GroupsForm(request.POST, instance=group)
+            if form.is_valid():
+                form.save()
+                return redirect('group_details', pk=group.id)
+        return redirect('group_update', pk=pk)
 
