@@ -25,14 +25,7 @@ class EmployeeProfileView(PermissionRequiredMixin, View):
                       {'employee': employee})
 
 
-class EmployeeUpdateView(PermissionRequiredMixin, View):
-    permission_required = "teacher.is_teacher"
-
-    def get(self, request):
-        employee = Employee.objects.get(user=self.request.user.id)
-
-
-class TeachersListView(PermissionRequiredMixin, LoginRequiredMixin, View):
+class EmployeesListView(PermissionRequiredMixin, LoginRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
@@ -41,7 +34,7 @@ class TeachersListView(PermissionRequiredMixin, LoginRequiredMixin, View):
         return render(request, 'employees-list.html', {'teachers': teachers})
 
 
-class AddTeacherView(PermissionRequiredMixin, View):
+class EmployeeAddView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
@@ -98,7 +91,7 @@ class AddTeacherView(PermissionRequiredMixin, View):
             return redirect('add_teacher')
 
 
-class TeacherDetailsView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
+class EmployeeDetailsView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
     permission_required = "director.is_director"
     model = Employee
     template_name = 'employee-details.html'
@@ -117,7 +110,7 @@ class TeacherDetailsView(PermissionRequiredMixin, UserPassesTestMixin, DetailVie
         return False
 
 
-class TeacherUpdateView(LoginRequiredMixin, View):
+class EmployeeUpdateView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
         form = Employee.objects.get(id=pk)
