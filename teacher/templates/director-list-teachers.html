@@ -12,13 +12,13 @@
     </form>
         <div class="col-lg-9 mt-4 mt-lg-0">
             <div class="col d-flex justify-content-end mb-2 noPadding">
-                <a href="{% url 'director_profile' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
+                <a href="{% url 'home_page' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
             </div>
             <div class="row">
                 <div class="col-md-12">
                     <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
                         <div class="card-header d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Lista nauczycieli</h5>
+                            <h5 class="mb-0">Lista pracownikow</h5>
                             <a href="{% url 'add_teacher' %}" class="btn btn-light btn-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                      class="bi bi-person-plus-fill" viewBox="0 0 16 16">
@@ -33,7 +33,7 @@
                         <table class="table manage-candidates-top mb-0">
                             <thead>
                             <tr>
-                                <th>Imię i Nazwisko Nauczyciela</th>
+                                <th>Email Pracownika</th>
                                 <th class="text-center">Grupa</th>
                                 <th class="action text-right">Action</th>
                             </tr>

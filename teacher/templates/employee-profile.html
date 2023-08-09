@@ -25,14 +25,19 @@
                                             <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
                                         </svg>
                                     </div>
-                                    <label for="user-name">Imie:</label>
-                                    <h5 class="user-name" id="user-name">{{ employee.first_name }}</h5>
-                                    <label class="user-email" for="user-surname">Nazwisko:</label>
-                                    <h5 class="user-email" id="user-surname">{{ employee.last_name }}</h5>
+                                    <div class="form-group">
+                                        <label for="user-name">Imie:</label>
+                                        <input class="form-control" id="user-name" name="user-name" value="{{ employee.first_name }}">
+                                    </div>
+                                    <div class="form-group mt-2 mb-2">
+                                        <label class="user-email" for="user-surname">Nazwisko:</label>
+                                        <input class="form-control" id="user-surname" name="user-surname" value="{{ employee.last_name }}">
+                                    </div>
                                 </div>
                                 <div class="about">
                                     <h5 class="mb-2 text-primary">Info</h5>
-                                    <p>This is your account as a employee </p>
+                                    <p>Jezeli zmieniles jakas informacje to po kliknieciu przycisku 'zmien info' zostana
+                                        te zmieny zapisane </p>
                                 </div>
                             </div>
                         </div>
@@ -60,10 +65,10 @@
                                     <div class="form-group">
                                         <label for="address">Adres zamieszkania</label>
                                         {% if employee.address %}
-                                            <input readonly class="form-control" name="phone" type="text"
+                                            <input class="form-control" name="address" type="text"
                                                    value="{{ employee.address }}">
                                         {% else %}
-                                            <input readonly class="form-control" name="phone" type="text"
+                                            <input class="form-control" name="address" type="text"
                                                    value="Nie zostal podany">
                                         {% endif %}
                                     </div>
@@ -72,10 +77,10 @@
                                     <div class="form-group">
                                         <label for="address">Kod pocztowy</label>
                                         {% if employee.zip_code %}
-                                            <input readonly class="form-control" name="phone" type="text"
+                                            <input class="form-control" name="zip_code" type="text"
                                                    value="{{ employee.zip_code }}">
                                         {% else %}
-                                            <input readonly class="form-control" name="phone" type="text"
+                                            <input class="form-control" name="zip_code" type="text"
                                                    value="Nie zostaly podany">
                                         {% endif %}
                                     </div>
@@ -85,10 +90,10 @@
                                     <div class="form-group">
                                         <label for="phone">Miasto zamieszkania</label>
                                         {% if employee.city %}
-                                            <input readonly class="form-control" name="phone" type="text"
+                                            <input class="form-control" name="city" type="text"
                                                    value="{{ employee.city }}">
                                         {% else %}
-                                            <input readonly class="form-control" name="phone" type="text"
+                                            <input class="form-control" name="city" type="text"
                                                    value="Nie zostalo podane">
                                         {% endif %}
                                     </div>
@@ -98,10 +103,10 @@
                                     <div class="form-group">
                                         <label for="phone">Numer telefonu</label>
                                         {% if employee.phone %}
-                                            <input readonly class="form-control" name="phone" type="text"
+                                            <input class="form-control" name="phone" type="text"
                                                    value="{{ employee.phone }}">
                                         {% else %}
-                                            <input readonly class="form-control" name="phone" type="text"
+                                            <input class="form-control" name="phone" type="text"
                                                    value="Nie zostal podany">
                                         {% endif %}
                                     </div>
@@ -134,7 +139,7 @@
 
                                     <div class="form-group">
                                         <label for="email">Adres email</label>
-                                        <input readonly class="form-control" name="email" type="text"
+                                        <input class="form-control" name="email" type="text"
                                                value="{{ employee.user.email }}">
                                     </div>
                                 </div>

@@ -1,3 +1,45 @@
 {% extends "base.html" %}
 {% block content %}
+    {% if user.is_authenticated %}
+        {% if perms.director.is_director %}
+            <div class="text-center mt-5">
+
+                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_kids' %}'">
+                    Dzieci
+                </button>
+
+
+                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_groups' %}'">
+                    Grupy
+                </button>
+
+
+                <button type="button" class="btn btn-primary me-3"
+                        onclick="location.href='{% url 'list_payments_plans' %}'">
+                    Plany platnicze
+                </button>
+
+
+                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_meals' %}'">
+                    Posilki
+                </button>
+                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_teachers' %}'">
+                    Pracownicy
+                </button>
+
+                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_parent' %}'">
+                    Rodzice
+                </button>
+
+                <button type="button" class="btn btn-primary me-3"
+                        onclick="location.href='{% url 'director_profile' %}'">
+                    Profil
+                </button>
+
+            </div>
+        {% endif %}
+    {% elif perms.teacher.is_teacher %}
+
+
+    {% endif %}
 {% endblock %}

@@ -24,10 +24,15 @@
                                                 </div>
                                             {% endfor %}
                                         {% endif %}
-                                         <div class="row">
+                                        <div class="row">
                                             <div class="col mb-4">
-                                                <h3 class="text-uppercase d-flex justify-content-start">Dodaj
-                                                    nauczyciela</h3>
+                                                {% if valid %}
+                                                    <h3 class="text-uppercase d-flex justify-content-start">Zmien
+                                                        swoje informacje lub je wypelnij</h3>
+                                                {% else %}
+                                                    <h3 class="text-uppercase d-flex justify-content-start">Zmien
+                                                        Informacje pracownikowi</h3>
+                                                {% endif %}
                                             </div>
                                             <div class="col mb-4">
                                                 <div class="d-flex justify-content-end noPadding">
@@ -37,44 +42,93 @@
                                             </div>
 
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
+                                        {% if valid %}
+                                            {{ form.group.as_hidden }}
+                                            {{ form.salary.as_hidden }}
+                                            {{ form.principal.as_hidden }}
+                                            {{ form.role.as_hidden }}
+                                            {{ form.user.as_hidden }}
+                                            <div class="row">
+                                                <div class="col-md-6 mb-4">
 
-                                                <label class="form-label" for="role">Posada:</label>
-                                                <select class="form-select form-select-lg" name="role" id="id_role">
-                                                    {% for role in roles %}
-                                                        <option value="{{ role.0 }}">{{ role.1 }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6 mb-4">
+                                                    {{ form.first_name|as_crispy_field }}
+                                                </div>
+                                                <div class="col-md-6 mb-4">
 
-                                                <label class="form-label" for="salary">Miesieczne wynagrodzenie:</label>
-                                                <input type="number" id="salary" min="1"
-                                                       class="form-control form-control-lg" name="salary"/>
-                                            </div>
-
-                                        </div>
-
-                                        <div class="row">
-
-
-
-
-                                            <div class="col-md-6 mb-4" id="group" style="display: none">
-                                                <label class="mr-2 mb-2">Wybierz grupe:</label><br>
-                                                <select class="form-select form-select-lg" name="group">
-                                                    {% for group in groups %}
-                                                        <option value="{{ group.id }}">{{ group.name }}</option>
-                                                    {% endfor %}
-                                                </select>
+                                                    {{ form.last_name|as_crispy_field }}
+                                                </div>
 
                                             </div>
-                                        </div>
-                                        <div class="d-flex justify-content-end pt-3 mr-3">
-                                            <button type="submit" class="btn btn-warning btn-lg ms-2">Zmien informacje
-                                            </button>
-                                        </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-4">
+
+                                                    {{ form.city|as_crispy_field }}
+                                                </div>
+                                                <div class="col-md-6 mb-4">
+                                                    {{ form.address|as_crispy_field }}
+                                                </div>
+
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6 mb-4">
+                                                    {{ form.zip_code|as_crispy_field }}
+                                                </div>
+                                                <div class="col-md-6 mb-4">
+
+                                                    {{ form.phone|as_crispy_field }}
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="d-flex justify-content-end pt-3 mr-3">
+                                                <button type="submit" class="btn btn-warning btn-lg ms-2">Zmien
+                                                    informacje
+                                                </button>
+                                            </div>
+
+                                        {% else %}
+                                            <div class="row">
+                                                <div class="col-md-6 mb-4">
+
+                                                    <label class="form-label" for="role">Posada:</label>
+                                                    <select class="form-select form-select-lg" name="role" id="id_role">
+                                                        {% for role in roles %}
+                                                            <option value="{{ role.0 }}">{{ role.1 }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 mb-4">
+
+                                                    <label class="form-label" for="salary">Miesieczne
+                                                        wynagrodzenie:</label>
+                                                    <input type="number" id="salary" min="1"
+                                                           class="form-control form-control-lg" name="salary"/>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="row">
+
+
+                                                <div class="col-md-6 mb-4" id="group" style="display: none">
+                                                    <label class="mr-2 mb-2">Wybierz grupe:</label><br>
+                                                    <select class="form-select form-select-lg" name="group">
+                                                        {% for group in groups %}
+                                                            <option value="{{ group.id }}">{{ group.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-end pt-3 mr-3">
+                                                <button type="submit" class="btn btn-warning btn-lg ms-2">Zmien
+                                                    informacje
+                                                </button>
+                                            </div>
+                                        {% endif %}
+
 
                                     </div>
                                 </div>
