@@ -51,16 +51,17 @@
 
                     {% if user.is_authenticated %}
                         <li class="nav-item">
+                            <a class="nav-link" href="{% url 'home_page' %}">Home</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="{% url 'post_list_view' %}">Wydarzenia</a>
                         </li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="#">Kalendarz obecnosci</a>
                         </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'home_page' %}">Home</a>
-                        </li>
+
+
                     {% endif %}
                 </ul>
                 <!-- Left links -->
@@ -98,8 +99,9 @@
                                 </li>
                             {% elif perms.teacher.is_teacher %}
                                 <li>
-                                    <a class="dropdown-item" href="#">My profile</a>
+                                    <a class="dropdown-item" href="{% url 'teacher-profile' %}">My profile</a>
                                 </li>
+
                             {% endif %}
                             <li>
 
@@ -119,6 +121,7 @@
                 </ul>
                 <!-- Right elements -->
             {% else %}
+
                 <div class="d-flex align-items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                          class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
