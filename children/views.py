@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from .forms import KidAddForm, PaymentPlanForm, MealsForm, GroupsForm
 from .models import Kid, Groups, PaymentPlan, Director, Meals
-from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
 from django.views.generic import (
     ListView,
     DetailView,
@@ -184,7 +184,7 @@ class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
 
     def test_func(self):
         kid = self.get_object()
-        if self.request.user == kid.director_set.first().user:
+        if self.request.user == kid.principal.user:
             return True
         return False
 
@@ -220,7 +220,7 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, UpdateView
         return False
 
 
-class KidSearchView(View):
+class KidSearchView(LoginRequiredMixin, View):
     def get(self, request):
 
         return redirect('list_kids')
@@ -230,5 +230,4 @@ class KidSearchView(View):
         if search:
             kids = Kid.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(first_name__icontains=search)
             return render(request, 'director-list-kids.html', {'kids': kids})
-        messages.error(request, 'wypelnij poprawnie pole')
         return redirect('list_kids')

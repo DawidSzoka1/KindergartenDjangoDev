@@ -5,7 +5,8 @@ from django.views import View
 from django.contrib import messages
 from director.models import Director
 from .models import Employee, roles
-from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from .forms import TeacherUpdateForm
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
 from django.core.mail import EmailMultiAlternatives
 from MarchewkaDjango.settings import EMAIL_HOST_USER
 from django.template.loader import render_to_string
@@ -15,7 +16,23 @@ from django.contrib.contenttypes.models import ContentType
 from django.views.generic import DetailView, UpdateView
 
 
-class TeachersListView(PermissionRequiredMixin, View):
+class EmployeeProfileView(PermissionRequiredMixin, View):
+    permission_required = "teacher.is_teacher"
+
+    def get(self, request):
+        employee = Employee.objects.get(user=self.request.user.id)
+        return render(request, 'employee-profile.html',
+                      {'employee': employee})
+
+
+class EmployeeUpdateView(PermissionRequiredMixin, View):
+    permission_required = "teacher.is_teacher"
+
+    def get(self, request):
+        employee = Employee.objects.get(user=self.request.user.id)
+
+
+class TeachersListView(PermissionRequiredMixin, LoginRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
@@ -58,7 +75,7 @@ class AddTeacherView(PermissionRequiredMixin, View):
                 teacher_object = Employee.objects.create(user=teacher_user, role=role, salary=float(salary))
                 user.employee_set.add(teacher_object)
                 if group:
-                    group.teachers.add(teacher_object)
+                    teacher_object.group.add(group)
                 teacher_object.user.user_permissions.clear()
                 teacher_object.user.user_permissions.add(permission)
                 teacher_user.employee.save()
@@ -89,8 +106,8 @@ class TeacherDetailsView(PermissionRequiredMixin, UserPassesTestMixin, DetailVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["teacher"] = get_object_or_404(Director, user=self.request.user.id).employee_set.get(
-            id=context['teacher'].id)
+        context["employee"] = get_object_or_404(Director, user=self.request.user.id).employee_set.get(
+            id=context['employee'].id)
         return context
 
     def test_func(self):
@@ -100,47 +117,66 @@ class TeacherDetailsView(PermissionRequiredMixin, UserPassesTestMixin, DetailVie
         return False
 
 
-class TeacherUpdateView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
+class TeacherUpdateView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
         form = Employee.objects.get(id=pk)
-        user = Director.objects.get(user=request.user.id)
-        groups = user.groups_set.all()
-        if form.principal.all().first() == user:
+        if request.user.get_user_permissions() == {'teacher.is_teacher'}:
+            valid = Employee.objects.get(user=request.user.id)
+            if form == valid:
+                form = TeacherUpdateForm(instance=form)
+                return render(request, 'director-update-teacher.html',
+                              {'form': form, 'valid': valid})
 
-            return render(request, 'director-update-teacher.html', {'form': form, 'roles': roles, 'groups': groups})
-        else:
-            messages.error(request, 'Nie masz na to zgody')
-            return redirect('home_page')
+        elif request.user.get_user_permissions() == {'director.is_director'}:
+            user = Director.objects.get(user=request.user.id)
+            groups = user.groups_set.all()
+            if form.principal == user:
+                return render(request, 'director-update-teacher.html', {'form': form, 'roles': roles, 'groups': groups})
+
+        messages.error(request, 'Nie masz na to zgody')
+        return redirect('home_page')
 
     def post(self, request, pk):
-        role = int(request.POST.get('role'))
-        salary = request.POST.get('salary')
-        group = request.POST.get('group')
-        teacher = Employee.objects.get(id=pk)
-        teacher.group.clear()
-        if role == 2:
-            if group and salary:
-                teacher.salary = float(salary)
-                group_obj = Groups.objects.get(id=int(group))
-                teacher.group.add(group_obj)
-                teacher.role = role
-                teacher.save()
-                messages.success(request, 'Udalo sie zmienic informacje')
-                return redirect('teacher_details', pk=pk)
-        else:
-            if salary and role:
-                teacher.salary = float(salary)
-                teacher.role = role
-                teacher.save()
-                messages.success(request, 'Udalo sie zmienic informacje')
-                return redirect('teacher_details', pk=pk)
-        messages.error(request, "Wypełnij poprawnie wszytkie pola")
-        return redirect('teacher_update', args=(pk,))
+        if request.user.get_user_permissions() == {'teacher.is_teacher'}:
+            employee = Employee.objects.get(id=int(pk))
+            if Employee.objects.get(user=self.request.user.id) == employee:
+                form = TeacherUpdateForm(request.POST, instance=employee)
+                if form.is_valid():
+                    form.save()
+                    messages.success(request, f'Udalo sie zmienic dane')
+                    return redirect('teacher-profile')
+                messages.success(request, f'{form}')
+                return redirect('teacher_update', pk=pk)
+        elif request.user.get_user_permissions() == {'director.is_director'}:
+            role = int(request.POST.get('role'))
+            salary = request.POST.get('salary')
+            group = request.POST.get('group')
+            teacher = Employee.objects.get(id=pk)
+            teacher.group.clear()
+            if role == 2:
+                if group and salary:
+                    teacher.salary = float(salary)
+                    group_obj = Groups.objects.get(id=int(group))
+                    teacher.group.add(group_obj)
+                    teacher.role = role
+                    teacher.save()
+                    messages.success(request, 'Udalo sie zmienic informacje')
+                    return redirect('teacher_details', pk=pk)
+            else:
+                if salary and role:
+                    teacher.salary = float(salary)
+                    teacher.role = role
+                    teacher.save()
+                    messages.success(request, 'Udalo sie zmienic informacje')
+                    return redirect('teacher_details', pk=pk)
+            messages.error(request, "test")
+            return redirect('teacher_update', pk=pk)
+        messages.error(request, 'Nie masz na to zezwolenia')
+        return redirect('home_page')
 
 
-class TeacherSearchView(View):
+class TeacherSearchView(LoginRequiredMixin, View):
     def get(self, request):
         return redirect('list_teachers')
 
@@ -151,5 +187,4 @@ class TeacherSearchView(View):
                 user__email__icontains=search
             )
             return render(request, 'director-list-teachers.html', {'teachers': teachers})
-        messages.error(request, 'wypelnij poprawnie pole')
         return redirect('list_teachers')

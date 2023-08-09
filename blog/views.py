@@ -56,7 +56,7 @@ class PostDetailView(DetailView):
 
 
 class PostCreateView(PermissionRequiredMixin, CreateView):
-    permission_required = "director.is_director"
+    permission_required = ("director.is_director", 'teacher.is_teacher')
     model = Post
     fields = ['title', 'content', 'image']
     template_name = 'post_form.html'
@@ -72,7 +72,7 @@ class PostCreateView(PermissionRequiredMixin, CreateView):
 
 
 class PostUpdateView(PermissionRequiredMixin, UserPassesTestMixin, UpdateView):
-    permission_required = "director.is_director"
+    permission_required = ("director.is_director", 'teacher.is_teacher')
     model = Post
     fields = ['title', 'content', 'image']
     template_name = 'post_form.html'

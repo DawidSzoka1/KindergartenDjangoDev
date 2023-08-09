@@ -129,7 +129,7 @@ class ParentProfileView(LoginRequiredMixin, View):
             return redirect('parent_profile')
 
 
-class ParentSearchView(View):
+class ParentSearchView(LoginRequiredMixin, View):
     def get(self, request):
         return redirect('list_parent')
 

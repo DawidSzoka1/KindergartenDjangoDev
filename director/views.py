@@ -11,7 +11,14 @@ class DirectorProfileView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
-        return render(request, 'director-profile.html')
+        director = Director.objects.get(user=self.request.user.id)
+        return render(request, 'director-profile.html', {'director': director})
+
+    def post(self, request):
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        director = Director.objects.get(user=self.request.user.id)
 
 
 class ContactView(View):
