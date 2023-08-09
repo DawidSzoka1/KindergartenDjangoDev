@@ -27,7 +27,7 @@ class InviteParentView(PermissionRequiredMixin, View):
     def get(self, request, pk):
         user = Director.objects.get(user=request.user.id)
         kid = user.kid_set.get(id=int(pk))
-        return render(request, 'director-invite-parent.html', {'kid': kid})
+        return render(request, 'parent-invite.html', {'kid': kid})
 
     def post(self, request, pk):
         user = Director.objects.get(user=request.user.id)
@@ -68,13 +68,13 @@ class InviteParentView(PermissionRequiredMixin, View):
             return redirect('list_kids')
 
         else:
-            return render(request, 'director-invite-parent.html', {'kid': kid})
+            return render(request, 'parent-invite.html', {'kid': kid})
 
 
 class ParentListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
     model = ParentA
-    template_name = 'director-list-parents.html'
+    template_name = 'parents-list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -85,7 +85,7 @@ class ParentListView(PermissionRequiredMixin, ListView):
 class DetailsParentView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
     permission_required = "director.is_director"
     model = ParentA
-    template_name = 'director-details-parent.html'
+    template_name = 'parent-details.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -139,5 +139,5 @@ class ParentSearchView(LoginRequiredMixin, View):
             parents = ParentA.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
                 user__email__icontains=search
             )
-            return render(request, 'director-list-parents.html', {'parents': parents})
+            return render(request, 'parents-list.html', {'parents': parents})
         return redirect('list_teachers')
