@@ -2,9 +2,39 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from .models import ContactModel, Director
+from .models import ContactModel, Director, MealPhotos, GroupPhotos
 from teacher.models import Employee
 from parent.models import ParentA
+
+
+class PhotosListView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request):
+        group_photos = GroupPhotos.objects.filter(principal=request.user.director)
+        meal_photos = MealPhotos.objects.filter(principal=request.user.director)
+        return render(request, 'photos-list.html', {'group_photos': group_photos, 'meal_photos': meal_photos})
+
+
+class PhotosAddView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request):
+        return render(request, 'photo-add.html', )
+
+    def post(self, request):
+        photo_type = request.POST.get('type')
+        file = request.FILES.get('file')
+        if file and photo_type:
+            if photo_type == 'group':
+                GroupPhotos.objects.create(group_photos=file, principal=request.user.director)
+            if photo_type == 'meal':
+                MealPhotos.objects.create(meal_photos=file, principal=request.user.director)
+            messages.success(request, 'udalo sie')
+            return redirect('photos_list')
+
+        messages.error(request, 'blad')
+        return redirect('photo_add')
 
 
 class DirectorProfileView(PermissionRequiredMixin, View):
@@ -13,12 +43,6 @@ class DirectorProfileView(PermissionRequiredMixin, View):
     def get(self, request):
         director = Director.objects.get(user=self.request.user.id)
         return render(request, 'director-profile.html', {'director': director})
-
-    def post(self, request):
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
-        director = Director.objects.get(user=self.request.user.id)
 
 
 class ContactView(View):

@@ -11,11 +11,30 @@ class Director(models.Model):
     class Meta:
         permissions = [
             ("is_director", "Is the director of kindergarten")
-            ]
+        ]
 
     def __str__(self):
         return f"{self.user.email}"
 
+
+def user_group_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/group/<filename>
+    return "director_{0}/group/{1}".format(instance.principal.user.id, filename)
+
+
+def user_meal_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/meal/<filename>
+    return "director_{0}/meal/{1}".format(instance.principal.user.id, filename)
+
+
+class GroupPhotos(models.Model):
+    group_photos = models.ImageField(null=True, upload_to=user_group_path)
+    principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
+
+
+class MealPhotos(models.Model):
+    meal_photos = models.ImageField(null=True, upload_to=user_meal_path)
+    principal = models.OneToOneField(Director, on_delete=models.CASCADE, null=True)
 
 class ContactModel(models.Model):
     director = models.OneToOneField(Director, on_delete=models.CASCADE)

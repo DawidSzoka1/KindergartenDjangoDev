@@ -35,6 +35,10 @@
                         onclick="location.href='{% url 'director_profile' %}'">
                     Profil
                 </button>
+                <button type="button" class="btn btn-primary me-3"
+                        onclick="location.href='{% url 'photos_list' %}'">
+                    Icons
+                </button>
 
             </div>
 
@@ -44,7 +48,7 @@
 
                 <div class="text-center mt-5">
                     <button type="button" class="btn btn-primary me-3"
-                    onclick="location.href='{% url 'group_details' pk=user.employee.group.first.id%}'">
+                            onclick="location.href='{% url 'group_details' pk=user.employee.group.first.id %}'">
                         Grupa
                     </button>
                 </div>

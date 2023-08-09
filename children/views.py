@@ -274,5 +274,9 @@ class GroupUpdateView(PermissionRequiredMixin, View):
             if form.is_valid():
                 form.save()
                 return redirect('group_details', pk=group.id)
-        return redirect('group_update', pk=pk)
+
+            messages.error(request, f'{form.errors}')
+            return redirect('group_update', pk=pk)
+
+        return redirect('home_page')
 
