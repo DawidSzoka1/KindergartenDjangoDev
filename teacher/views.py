@@ -38,7 +38,7 @@ class TeachersListView(PermissionRequiredMixin, LoginRequiredMixin, View):
     def get(self, request):
         user = Director.objects.get(user=request.user.id)
         teachers = user.employee_set.all()
-        return render(request, 'director-list-teachers.html', {'teachers': teachers})
+        return render(request, 'employees-list.html', {'teachers': teachers})
 
 
 class AddTeacherView(PermissionRequiredMixin, View):
@@ -48,7 +48,7 @@ class AddTeacherView(PermissionRequiredMixin, View):
         user = Director.objects.get(user=request.user.id)
         groups = user.groups_set.all()
 
-        return render(request, 'director-add-teacher.html', {'groups': groups, 'roles': roles})
+        return render(request, 'employee-add.html', {'groups': groups, 'roles': roles})
 
     def post(self, request):
         user = Director.objects.get(user=request.user.id)
@@ -101,7 +101,7 @@ class AddTeacherView(PermissionRequiredMixin, View):
 class TeacherDetailsView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
     permission_required = "director.is_director"
     model = Employee
-    template_name = 'director-details-teacher.html'
+    template_name = 'employee-details.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -125,14 +125,14 @@ class TeacherUpdateView(LoginRequiredMixin, View):
             valid = Employee.objects.get(user=request.user.id)
             if form == valid:
                 form = TeacherUpdateForm(instance=form)
-                return render(request, 'director-update-teacher.html',
+                return render(request, 'employee-update.html',
                               {'form': form, 'valid': valid})
 
         elif request.user.get_user_permissions() == {'director.is_director'}:
             user = Director.objects.get(user=request.user.id)
             groups = user.groups_set.all()
             if form.principal == user:
-                return render(request, 'director-update-teacher.html', {'form': form, 'roles': roles, 'groups': groups})
+                return render(request, 'employee-update.html', {'form': form, 'roles': roles, 'groups': groups})
 
         messages.error(request, 'Nie masz na to zgody')
         return redirect('home_page')
@@ -186,5 +186,5 @@ class TeacherSearchView(LoginRequiredMixin, View):
             teachers = Employee.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
                 user__email__icontains=search
             )
-            return render(request, 'director-list-teachers.html', {'teachers': teachers})
+            return render(request, 'employees-list.html', {'teachers': teachers})
         return redirect('list_teachers')
