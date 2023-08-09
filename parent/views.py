@@ -127,3 +127,17 @@ class ParentProfileView(LoginRequiredMixin, View):
             p_form.save()
             u_form.save()
             return redirect('parent_profile')
+
+
+class ParentSearchView(View):
+    def get(self, request):
+        return redirect('list_parent')
+
+    def post(self, request):
+        search = request.POST.get('search')
+        if search:
+            parents = ParentA.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
+                user__email__icontains=search
+            )
+            return render(request, 'director-list-parents.html', {'parents': parents})
+        return redirect('list_teachers')
