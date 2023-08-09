@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from director.models import Director
+from django.core.validators import MinValueValidator
 # Create your models here.
 
 
@@ -19,6 +20,8 @@ class PaymentPlan(models.Model):
 class Groups(models.Model):
     name = models.CharField(max_length=128)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
+    capacity = models.IntegerField(null=True, validators=[MinValueValidator(limit_value=1)])
+
     def __str__(self):
         """
         String representation
