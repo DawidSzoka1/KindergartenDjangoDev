@@ -30,6 +30,8 @@
                                             </button>
                                             <a href="{% url 'add_kid' %}" class="btn btn-light btn-sm text-right">Dodaj
                                                 dziecko</a>
+                                            <a href="{% url 'group_details' pk=group.id %}" class="btn btn-light btn-sm text-right">Szczegoly
+                                                grupy</a>
                                         </h5>
                                     </div>
 
@@ -92,11 +94,6 @@
 
                                                         </td>
                                                     {% endif %}
-                                                    {#                                    <td class="candidate-list-favourite-time text-center">#}
-                                                    {#                                        <a class="candidate-list-favourite order-2 text-danger" href="#"><i#}
-                                                    {#                                                class="fas fa-heart"></i></a>#}
-                                                    {#                                        <span class="candidate-list-time order-1">Czy ma podpietego rodzica</span>#}
-                                                    {#                                    </td>#}
                                                     <td>
                                                         <div class="drodown">
                                                             <a class="dropdown-toggle d-flex align-items-center hidden-arrow"

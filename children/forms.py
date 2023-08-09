@@ -55,5 +55,5 @@ class MealsForm(forms.ModelForm):
 class GroupsForm(forms.ModelForm):
     class Meta:
         model = Groups
-        fields = ['name', 'principal']
+        fields = ['name', 'principal', 'capacity']
         widgets = {'principal': forms.HiddenInput}

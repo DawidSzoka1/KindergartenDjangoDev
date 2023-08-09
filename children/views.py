@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.urls import reverse_lazy
 from django.contrib import messages
+from teacher.models import Employee
 from .forms import KidAddForm, PaymentPlanForm, MealsForm, GroupsForm
 from .models import Kid, Groups, PaymentPlan, Director, Meals
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
@@ -231,3 +232,25 @@ class KidSearchView(LoginRequiredMixin, View):
             kids = Kid.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(first_name__icontains=search)
             return render(request, 'kids-list.html', {'kids': kids})
         return redirect('list_kids')
+
+
+class GroupDetailsView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        group = Groups.objects.get(id=int(pk))
+        teachers = list(group.employee_set.values_list("user__email", flat=True))
+        kids = group.kid_set.all()
+
+        if request.user.get_user_permissions() == {'teacher.is_teacher'}:
+            teacher_email = Employee.objects.get(user=request.user.id).user.email
+            if teacher_email in teachers:
+                return render(request, 'group-details.html',
+                              {'group': group, 'teachers': teachers, 'kids': kids})
+        elif request.user.get_user_permissions() == {'director.is_director'}:
+            director = Director.objects.get(user=request.user.id)
+            if director == group.principal:
+                return render(request, 'group-details.html',
+                              {'group': group, 'teachers': teachers, 'kids': kids})
+
+        messages.error(request, 'Nie masz pozwolenia')
+        return redirect('home_page')
+

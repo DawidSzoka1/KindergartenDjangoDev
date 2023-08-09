@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+    {% for teacher in teachers %}
+        <label>Nauczyciel</label>
+        <input class="form-control" readonly type="text" value="{{ teacher }}">
+
+    {% endfor %}
+
+    <label>Stan dzieci</label>
+    <input class="form-control" readonly type="text" value="{{ kids.count }}">
+     <label>Liczba miejsc</label>
+    <input class="form-control" readonly type="text" value="{{ group.capacity }}">
+
+{% endblock %}
