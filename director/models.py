@@ -13,6 +13,9 @@ class Director(models.Model):
             ("is_director", "Is the director of kindergarten")
             ]
 
+    def __str__(self):
+        return f"{self.user.email}"
+
 
 class ContactModel(models.Model):
     director = models.OneToOneField(Director, on_delete=models.CASCADE)
