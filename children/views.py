@@ -223,13 +223,13 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, UpdateView
 
 class KidSearchView(LoginRequiredMixin, View):
     def get(self, request):
-
         return redirect('list_kids')
 
     def post(self, request):
         search = request.POST.get('search')
         if search:
-            kids = Kid.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(first_name__icontains=search)
+            kids = Kid.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
+                first_name__icontains=search)
             return render(request, 'kids-list.html', {'kids': kids})
         return redirect('list_kids')
 
@@ -253,4 +253,19 @@ class GroupDetailsView(LoginRequiredMixin, View):
 
         messages.error(request, 'Nie masz pozwolenia')
         return redirect('home_page')
+
+
+class GroupUpdateView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request, pk):
+        group = Groups.objects.get(id=int(pk))
+        director = Director.objects.get(user=request.user.id)
+        if director == group.principal:
+            form = GroupsForm(instance=group)
+            return render(request, 'group-update.html', {'form': form})
+        return redirect('list_groups')
+
+    def post(self, request, pk):
+        pass
 
