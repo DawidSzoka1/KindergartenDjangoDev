@@ -99,7 +99,7 @@
                                 </li>
                             {% elif perms.teacher.is_teacher %}
                                 <li>
-                                    <a class="dropdown-item" href="{% url 'teacher-profile' %}">My profile</a>
+                                    <a class="dropdown-item" href="{% url 'teacher-profile' pk=user.employee.id %}">My profile</a>
                                 </li>
 
                             {% endif %}
