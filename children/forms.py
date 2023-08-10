@@ -49,11 +49,27 @@ class MealsForm(forms.ModelForm):
     class Meta:
         model = Meals
         fields = '__all__'
-        widgets = {'principal': forms.HiddenInput}
+        widgets = {
+            'principal': forms.HiddenInput,
+        }
+
+    def __init__(self, *args, current_user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if current_user is not None:
+            self.fields['photo'] = forms.ModelChoiceField(
+                queryset=Director.objects.get(user=current_user.id).mealphotos_set.all())
 
 
 class GroupsForm(forms.ModelForm):
     class Meta:
         model = Groups
-        fields = ['name', 'principal', 'capacity', 'image']
-        widgets = {'principal': forms.HiddenInput}
+        fields = '__all__'
+        widgets = {
+            'principal': forms.HiddenInput,
+        }
+
+    def __init__(self, *args, current_user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if current_user is not None:
+            self.fields['photo'] = forms.ModelChoiceField(
+                queryset=Director.objects.get(user=current_user.id).groupphotos_set.all())

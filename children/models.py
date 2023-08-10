@@ -1,28 +1,15 @@
 from django.db import models
 from django.utils import timezone
-from director.models import Director
+from director.models import Director, GroupPhotos, MealPhotos
 from django.core.validators import MinValueValidator
-from PIL import Image
+
+
 # Create your models here.
-
-
-class PaymentPlan(models.Model):
-    name = models.TextField()
-    price = models.DecimalField(max_digits=7, decimal_places=2, default=500)
-    principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
-
-    def __str__(self):
-        """
-        String representation
-        """
-        return f'{self.name}'
-
-
 class Groups(models.Model):
     name = models.CharField(max_length=128)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     capacity = models.IntegerField(null=True, validators=[MinValueValidator(limit_value=1)])
-    image = models.ImageField(null=True, upload_to='groups_foto')
+    photo = models.ManyToManyField(GroupPhotos)
 
     def __str__(self):
         """
@@ -34,6 +21,19 @@ class Groups(models.Model):
 class Meals(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField(null=True)
+    principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
+    photo = models.ManyToManyField(MealPhotos)
+
+    def __str__(self):
+        """
+        String representation
+        """
+        return f'{self.name}'
+
+
+class PaymentPlan(models.Model):
+    name = models.TextField()
+    price = models.DecimalField(max_digits=7, decimal_places=2, default=500)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
@@ -55,4 +55,3 @@ class Kid(models.Model):
     amount = models.DecimalField(max_digits=20, decimal_places=2, null=True)
     kid_meals = models.ManyToManyField(Meals)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
-

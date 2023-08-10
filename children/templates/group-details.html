@@ -11,4 +11,7 @@
      <label>Liczba miejsc</label>
     <input class="form-control" readonly type="text" value="{{ group.capacity }}">
 
+    iconka grupy:<br>
+    <img alt="iconka grupy" src="{{ group.photo.first.group_photos.url }}">
+
 {% endblock %}

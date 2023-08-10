@@ -4,7 +4,8 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from teacher.models import Employee
 from .forms import KidAddForm, PaymentPlanForm, MealsForm, GroupsForm
-from .models import Kid, Groups, PaymentPlan, Director, Meals
+from .models import Kid, Groups, PaymentPlan, Meals
+from director.models import Director, MealPhotos, GroupPhotos
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
 from django.views.generic import (
     ListView,
@@ -44,12 +45,54 @@ class PaymentPlansListView(PermissionRequiredMixin, ListView):
         return context
 
 
+class MealAddView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request):
+        director = request.user.director
+        photos = director.mealphotos_set.all()
+        return render(request, 'meal-add.html', {'photos': photos})
+
+    def post(self, request):
+        director = request.user.director
+        photo_id = request.POST.get('photo')
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        image = MealPhotos.objects.get(id=int(photo_id))
+        if image and name and description:
+            new_meal = Meals.objects.create(name=name, description=description, principal=director)
+            new_meal.photo.add(image)
+        elif image and name:
+            new_meal = Meals.objects.create(name=name, principal=director)
+            new_meal.photo.add(image)
+
+        else:
+            messages.error(request, 'Wszystkie pola musza byc wypelnione')
+            return redirect('add_meal')
+
+        messages.success(request, f'poprawnie dodano posilek o nazwie {new_meal.name}')
+        return redirect('list_meals')
+
+
 class AddMealView(PermissionRequiredMixin, CreateView):
     permission_required = "director.is_director"
     model = Meals
     template_name = 'meal-add.html'
     form_class = MealsForm
     success_url = reverse_lazy('list_meals')
+
+    def get_form_kwargs(self, **kwargs):
+        """ Passes the request object to the form class.
+         This is necessary to only display members that belong to a given user"""
+
+        kwargs = super(AddMealView, self).get_form_kwargs()
+        kwargs.update({'current_user': self.request.user})
+        return kwargs
+
+    def get_form(self, form_class=None):
+        form = super(AddMealView, self).get_form(form_class)
+        form.fields['photo'].required = False
+        return form
 
     def get_initial(self):
         initial = super(AddMealView, self).get_initial()
@@ -73,26 +116,31 @@ class MealsListView(PermissionRequiredMixin, ListView):
         return context
 
 
-class AddGroupView(PermissionRequiredMixin, CreateView):
+class GroupAddView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
-    model = Groups
-    template_name = 'group-add.html'
-    form_class = GroupsForm
-    success_url = reverse_lazy('list_groups')
 
-    def get_initial(self):
-        initial = super(AddGroupView, self).get_initial()
-        initial = initial.copy()
-        initial['principal'] = Director.objects.get(user=self.request.user.id)
-        return initial
+    def get(self, request):
+        director = request.user.director
+        photos = director.groupphotos_set.all()
+        return render(request, 'group-add.html', {'photos': photos})
 
-    def get_form(self, form_class=None):
-        form = super(AddGroupView, self).get_form(form_class)
-        return form
-
-    def form_valid(self, form):
-        form.instance.save()
-        return super().form_valid(form)
+    def post(self, request):
+        director = request.user.director
+        photo_id = request.POST.get('photo')
+        name = request.POST.get('name')
+        capacity = request.POST.get('capacity')
+        if photo_id and name and capacity:
+            if '-' in capacity:
+                messages.error(request, 'pojemnosc nie moze byc ujemna')
+                return redirect('add_group')
+            else:
+                image = GroupPhotos.objects.get(id=int(photo_id))
+                new_group = Groups.objects.create(name=name, capacity=int(capacity), principal=director)
+                new_group.photo.add(image)
+                messages.success(request, f'poprawnie dodano grupe o nazwie {new_group.name}')
+                return redirect('list_groups')
+        messages.error(request, 'Wszystkie pola musza byc wypelnione')
+        return redirect('add_group')
 
 
 class GroupsListView(PermissionRequiredMixin, ListView):
@@ -279,4 +327,3 @@ class GroupUpdateView(PermissionRequiredMixin, View):
             return redirect('group_update', pk=pk)
 
         return redirect('home_page')
-

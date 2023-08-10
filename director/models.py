@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import User
 from django.core.validators import RegexValidator
+from django.utils.html import format_html
 
 
 class Director(models.Model):
@@ -30,11 +31,20 @@ def user_meal_path(instance, filename):
 class GroupPhotos(models.Model):
     group_photos = models.ImageField(null=True, upload_to=user_group_path)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=64, null=True)
+
+    def __str__(self):
+        return f'{self.group_photos.url}'
 
 
 class MealPhotos(models.Model):
     meal_photos = models.ImageField(null=True, upload_to=user_meal_path)
-    principal = models.OneToOneField(Director, on_delete=models.CASCADE, null=True)
+    principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=64, null=True)
+
+    def __str__(self):
+        return f'{self.meal_photos.url}'
+
 
 class ContactModel(models.Model):
     director = models.OneToOneField(Director, on_delete=models.CASCADE)
