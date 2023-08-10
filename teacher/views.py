@@ -20,13 +20,13 @@ class EmployeeProfileView(LoginRequiredMixin, View):
     def get(self, request, pk):
         employee = Employee.objects.get(id=int(pk))
         user = self.request.user
-        if user.director:
+        if user.get_user_permissions() == {'director.is_director'}:
             if employee.principal.first() == user.director:
                 return render(request, 'employee-details.html',
                               {'employee': employee})
             messages.error(request, f"Nie masz na to pozwolenia")
             return redirect('list_teachers')
-        if user.employee:
+        elif user.get_user_permissions() == {'teacher.is_teacher'}:
             if user.employee == employee:
                 return render(request, 'employee-profile.html',
                               {'employee': employee})
@@ -103,13 +103,13 @@ class EmployeeAddView(PermissionRequiredMixin, View):
 class EmployeeUpdateView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
-        form = Employee.objects.get(id=pk)
+        employee = Employee.objects.get(id=pk)
         if request.user.get_user_permissions() == {'teacher.is_teacher'}:
             valid = Employee.objects.get(user=request.user.id)
-            if form == valid:
-                form = TeacherUpdateForm(instance=form)
+            if employee == valid:
+                form = TeacherUpdateForm(instance=employee)
                 return render(request, 'employee-update.html',
-                              {'form': form, 'valid': valid})
+                              {'form': form, 'valid': valid, 'employee': employee})
 
         elif request.user.get_user_permissions() == {'director.is_director'}:
             user = Director.objects.get(user=request.user.id)

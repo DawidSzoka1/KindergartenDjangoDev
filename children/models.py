@@ -57,13 +57,15 @@ class Kid(models.Model):
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
 
 
+presenceChoices = (
+    (1, 'Nieobeconsc'),
+    (2, 'Obecnosc'),
+    (3, 'Planowana nieobecnosc'),
+    (4, 'dzien wolny')
+)
+
+
 class PresenceModel(models.Model):
-    presenceChoices = (
-        (1, 'Nieobeconsc'),
-        (2, 'Obecnosc'),
-        (3, 'Planowana nieobecnosc'),
-        (4, 'dzien wolny')
-    )
     day = models.DateField(default=timezone.now())
     kid = models.ForeignKey(Kid, on_delete=models.CASCADE)
     presenceType = models.IntegerField(choices=presenceChoices)
