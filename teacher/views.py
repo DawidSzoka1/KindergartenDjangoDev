@@ -114,8 +114,9 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
         elif request.user.get_user_permissions() == {'director.is_director'}:
             user = Director.objects.get(user=request.user.id)
             groups = user.groups_set.all()
-            if form.principal.first() == user:
-                return render(request, 'employee-update.html', {'form': form, 'roles': roles, 'groups': groups})
+            if employee.principal.first() == user:
+                return render(request, 'employee-update.html',
+                              {'form': employee, 'roles': roles, 'groups': groups, 'employee': employee})
 
         messages.error(request, 'Nie masz na to zgody')
         return redirect('home_page')

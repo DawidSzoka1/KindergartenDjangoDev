@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import User
 from django.core.validators import RegexValidator
+from PIL import Image
 from django.utils.html import format_html
 
 
@@ -33,6 +34,16 @@ class GroupPhotos(models.Model):
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=64, null=True)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.group_photos:
+            img = Image.open(self.group_photos.path)
+
+            if img.height > 300 or img.width > 300:
+                output_size = (300, 300)
+                img.thumbnail(output_size)
+                img.save(self.group_photos.path)
+
     def __str__(self):
         return f'{self.group_photos.url}'
 
@@ -41,6 +52,16 @@ class MealPhotos(models.Model):
     meal_photos = models.ImageField(null=True, upload_to=user_meal_path)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=64, null=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.meal_photos:
+            img = Image.open(self.meal_photos.path)
+
+            if img.height > 300 or img.width > 300:
+                output_size = (300, 300)
+                img.thumbnail(output_size)
+                img.save(self.meal_photos.path)
 
     def __str__(self):
         return f'{self.meal_photos.url}'
