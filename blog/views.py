@@ -2,9 +2,10 @@ from django.shortcuts import render, HttpResponse
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
 from .models import Post
-from parent.models import ParentA
-from children.models import Kid
+from director.models import FreeDaysModel
+from children.models import PresenceModel, Kid
 from django.contrib.auth.models import Permission
+from django.utils.safestring import mark_safe
 import calendar
 from django.utils import timezone
 from calendar import HTMLCalendar
@@ -17,26 +18,83 @@ from django.views.generic import (
 )
 
 
+# class Calendar(HTMLCalendar):
+#     def __init__(self, year=None, month=None, kid=None):
+#         self.year = year
+#         self.month = month
+#         self.kid = kid
+#         super(Calendar, self).__init__()
+#
+#     # formats a day as a td
+#     # filter events by day
+#     def formatday(self, day, events):
+#         presences = PresenceModel.objects.filter(kid=self.kid)
+#         if day != 0:
+#             for presence in presences:
+#                 if presence.presenceType == 1:
+#                     return f"<td><span class='date table-danger'>{day}</span></td>"
+#                 elif presence.presenceType == 2:
+#                     return f"<td><span class='date table-success'>{day}</span></td>"
+#                 elif presence.presenceType == 3:
+#                     return f"<td><span class='date table-info'>{day}</span></td>"
+#         return f"<td><span class='date table-dark'>{day}</span></td>"
+
+
+class Calendar(HTMLCalendar):
+    def __init__(self, year=None, month=None, director=None, kid=None):
+        self.year = year
+        self.month = month
+        self.director = director
+        self.kid = kid
+        super(Calendar, self).__init__()
+
+    # formats a day as a td
+    # filter events by day
+    def formatday(self, day, events):
+        events_per_day = events.filter(start_time__day=day)
+        d = ''
+        for event in events_per_day:
+            d += f'<li> {event.title} </li>'
+
+        if day != 0:
+            return f"<td><span class='date'>{day}</span><ul> {d} </ul></td>"
+        return '<td></td>'
+
+    # formats a week as a tr
+    def formatweek(self, theweek, events):
+        week = ''
+        for d, weekday in theweek:
+            week += self.formatday(d, events)
+        return f'<tr> {week} </tr>'
+
+    # formats a month as a table
+    # filter events by year and month
+    def formatmonth(self, withyear=True):
+        events = FreeDaysModel.objects.filter(principal=self.director).filter(start_time__year=self.year, start_time__month=self.month)
+
+        cal = f'<table border="0" cellpadding="0" cellspacing="0" class="calendar">\n'
+        cal += f'{self.formatmonthname(self.year, self.month, withyear=withyear)}\n'
+        cal += f'{self.formatweekheader()}\n'
+        for week in self.monthdays2calendar(self.year, self.month):
+            cal += f'{self.formatweek(week, events)}\n'
+        return cal
+
+
 class CalendarKid(LoginRequiredMixin, View):
     def get(self, request, pk):
         permissions = Permission.objects.filter(user=request.user.id)
         month_number = int(timezone.now().month)
         year = int(timezone.now().year)
-        cal = HTMLCalendar().formatyear(year, month_number)
+        kid = Kid.objects.get(id=int(pk))
+        days = kid.presencemodel_set.values_list('day', flat=True)
+        event = kid.presencemodel_set.values_list('presenceType', flat=True)
+        cal = Calendar(year=year, month=month_number, director=request.user.director, kid=kid).formatmonth(withyear=True)
 
-        if permissions[0].name == 'Is the director of kindergarten':
-            kid = Kid.objects.get(id=pk)
-            return render(request, 'calendar.html', {'kid': kid})
-        elif permissions[0].name == 'parent permission':
-            parent = ParentA.objects.get(user=request.user.id)
-            kids = parent.kid_set.all()
-            return render(request, 'calendar.html', {'kids': kids, 'cal': cal})
-        return HttpResponse(permissions[0].name)
+        return render(request, 'calendar.html', {'cal': mark_safe(cal)})
 
 
 class Home(View):
     def get(self, request):
-
         # users = User.objects.get(email=f"{request.user.email}"
         return render(request, 'home.html')
 

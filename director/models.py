@@ -46,6 +46,14 @@ class MealPhotos(models.Model):
         return f'{self.meal_photos.url}'
 
 
+class FreeDaysModel(models.Model):
+    principal = models.ForeignKey(Director, on_delete=models.CASCADE)
+    title = models.CharField(max_length=128)
+    description = models.TextField(null=True)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+
+
 class ContactModel(models.Model):
     director = models.OneToOneField(Director, on_delete=models.CASCADE)
     email_address = models.EmailField(null=True)
