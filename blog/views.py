@@ -1,11 +1,14 @@
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
 from .models import Post
 from director.models import FreeDaysModel
-from children.models import PresenceModel, Kid
+from children.models import PresenceModel, Kid, presenceChoices
 from django.contrib.auth.models import Permission
 from django.utils.safestring import mark_safe
+from django.contrib import messages
+
+from datetime import datetime
 import calendar
 from django.utils import timezone
 from calendar import HTMLCalendar
@@ -56,8 +59,19 @@ class Calendar(HTMLCalendar):
         for event in events_per_day:
             d += f'<li> {event.title} </li>'
 
+        presences = PresenceModel.objects.filter(kid=self.kid)
+
         if day != 0:
-            return f"<td><span class='date'>{day}</span><ul> {d} </ul></td>"
+
+            for presence in presences:
+                if day == presence.day.day:
+                    if presence.presenceType == 1:
+                        return f"<td id='days' style='background-color: red'><span class='date'>{day}</span></td>"
+                    elif presence.presenceType == 2:
+                        return f"<td id='days' style='background-color: green'><span class='date'>{day}</span></td>"
+                    elif presence.presenceType == 3:
+                        return f"<td id='days' style='background-color: grey'><span class='date table-info'>{day}</span></td>"
+            return f"<td id='days'><span class='date'>{day}</span></td>"
         return '<td></td>'
 
     # formats a week as a tr
@@ -70,7 +84,8 @@ class Calendar(HTMLCalendar):
     # formats a month as a table
     # filter events by year and month
     def formatmonth(self, withyear=True):
-        events = FreeDaysModel.objects.filter(principal=self.director).filter(start_time__year=self.year, start_time__month=self.month)
+        events = FreeDaysModel.objects.filter(principal=self.director).filter(start_time__year=self.year,
+                                                                              start_time__month=self.month)
 
         cal = f'<table border="0" cellpadding="0" cellspacing="0" class="calendar">\n'
         cal += f'{self.formatmonthname(self.year, self.month, withyear=withyear)}\n'
@@ -82,15 +97,34 @@ class Calendar(HTMLCalendar):
 
 class CalendarKid(LoginRequiredMixin, View):
     def get(self, request, pk):
-        permissions = Permission.objects.filter(user=request.user.id)
+        permissions = request.user.get_user_permissions()
         month_number = int(timezone.now().month)
         year = int(timezone.now().year)
         kid = Kid.objects.get(id=int(pk))
-        days = kid.presencemodel_set.values_list('day', flat=True)
-        event = kid.presencemodel_set.values_list('presenceType', flat=True)
-        cal = Calendar(year=year, month=month_number, director=request.user.director, kid=kid).formatmonth(withyear=True)
-
+        cal = Calendar(year=year, month=month_number, director=request.user.director, kid=kid).formatmonth(
+            withyear=True)
+        messages.info(request,f'{permissions}')
         return render(request, 'calendar.html', {'cal': mark_safe(cal)})
+
+    def post(self, request, pk):
+        presence = request.POST.get('presence')
+        presence = presence.split(' ')
+        presence_type = presence.pop(-1)
+        month_name = presence[1]
+        month_number = datetime.strptime(month_name, '%B').month
+        presence[1] = f'{month_number}'
+        presence.reverse()
+        presence = '-'.join(presence)
+        presence_type = presenceChoices[int(presence_type)][0]
+        kid = Kid.objects.get(id=int(pk))
+        test = PresenceModel.objects.filter(kid=kid).filter(day=presence).first()
+        if test:
+            test.presenceType = presence_type
+            test.save()
+        else:
+            PresenceModel.objects.create(day=presence, kid=Kid.objects.get(id=int(pk)), presenceType=presence_type)
+        messages.success(request, f"Zmieniono obecnosc")
+        return redirect('calendar', pk=pk)
 
 
 class Home(View):
