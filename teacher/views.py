@@ -6,23 +6,32 @@ from django.contrib import messages
 from director.models import Director
 from .models import Employee, roles
 from .forms import TeacherUpdateForm
-from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.core.mail import EmailMultiAlternatives
 from MarchewkaDjango.settings import EMAIL_HOST_USER
 from django.template.loader import render_to_string
 from accounts.models import User
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.views.generic import DetailView, UpdateView
 
 
-class EmployeeProfileView(PermissionRequiredMixin, View):
-    permission_required = "teacher.is_teacher"
+class EmployeeProfileView(LoginRequiredMixin, View):
 
-    def get(self, request):
-        employee = Employee.objects.get(user=self.request.user.id)
-        return render(request, 'employee-profile.html',
-                      {'employee': employee})
+    def get(self, request, pk):
+        employee = Employee.objects.get(id=int(pk))
+        user = self.request.user
+        if user.director:
+            if employee.principal.first() == user.director:
+                return render(request, 'employee-details.html',
+                              {'employee': employee})
+            messages.error(request, f"Nie masz na to pozwolenia")
+            return redirect('list_teachers')
+        if user.employee:
+            if user.employee == employee:
+                return render(request, 'employee-profile.html',
+                              {'employee': employee})
+        messages.error(request, f"{user.director}")
+        return redirect('home_page')
 
 
 class EmployeesListView(PermissionRequiredMixin, LoginRequiredMixin, View):
@@ -40,7 +49,6 @@ class EmployeeAddView(PermissionRequiredMixin, View):
     def get(self, request):
         user = Director.objects.get(user=request.user.id)
         groups = user.groups_set.all()
-
         return render(request, 'employee-add.html', {'groups': groups, 'roles': roles})
 
     def post(self, request):
@@ -84,30 +92,12 @@ class EmployeeAddView(PermissionRequiredMixin, View):
             msg = EmailMultiAlternatives(subject, text_content, from_email, [teacher_email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
+            messages.success(request, f"Udalo sie zaprosic nauczyciela o emailu {teacher_email}")
             return redirect('list_teachers')
 
         else:
             messages.error(request, 'wypelnij wszystkie pola')
             return redirect('add_teacher')
-
-
-class EmployeeDetailsView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
-    permission_required = "director.is_director"
-    model = Employee
-    template_name = 'employee-details.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context["employee"] = get_object_or_404(Director, user=self.request.user.id).employee_set.get(
-            id=context['employee'].id)
-        return context
-
-    def test_func(self):
-        teacher = self.get_object()
-        if self.request.user == teacher.principal.first().user:
-            return True
-        return False
 
 
 class EmployeeUpdateView(LoginRequiredMixin, View):
@@ -124,7 +114,7 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
         elif request.user.get_user_permissions() == {'director.is_director'}:
             user = Director.objects.get(user=request.user.id)
             groups = user.groups_set.all()
-            if form.principal == user:
+            if form.principal.first() == user:
                 return render(request, 'employee-update.html', {'form': form, 'roles': roles, 'groups': groups})
 
         messages.error(request, 'Nie masz na to zgody')
@@ -138,7 +128,7 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
                 if form.is_valid():
                     form.save()
                     messages.success(request, f'Udalo sie zmienic dane')
-                    return redirect('teacher-profile')
+                    return redirect('teacher-profile', pk=pk)
                 messages.success(request, f'{form.errors}')
                 return redirect('teacher_update', pk=pk)
         elif request.user.get_user_permissions() == {'director.is_director'}:
@@ -155,16 +145,16 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
                     teacher.role = role
                     teacher.save()
                     messages.success(request, 'Udalo sie zmienic informacje')
-                    return redirect('teacher_details', pk=pk)
-            else:
+                    return redirect('teacher-profile', pk=pk)
+            elif role != 2:
                 if salary and role:
                     teacher.salary = float(salary)
                     teacher.role = role
                     teacher.save()
                     messages.success(request, 'Udalo sie zmienic informacje')
-                    return redirect('teacher_details', pk=pk)
-            messages.error(request, "test")
-            return redirect('teacher_update', pk=pk)
+                    return redirect('teacher-profile', pk=pk)
+            messages.error(request, "cos poszlo nie tak")
+            return redirect('list_teachers')
         messages.error(request, 'Nie masz na to zezwolenia')
         return redirect('home_page')
 

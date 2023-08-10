@@ -41,7 +41,7 @@ class InviteParentView(PermissionRequiredMixin, View):
                 test = None
             if test:
                 messages.error(request, 'Ten rodzic juz istnieje')
-                return redirect('invite_parent')
+                return redirect('invite_parent', pk=pk)
             try:
                 password = User.objects.make_random_password()
                 parent_user = User.objects.create_user(email=parent_email, password=password)
@@ -56,7 +56,7 @@ class InviteParentView(PermissionRequiredMixin, View):
             except Exception as e:
                 User.objects.filter(email=parent_email).first().delete()
                 messages.error(request, f'Wystąpił blad {e}')
-                return redirect('invite_parent')
+                return redirect('invite_parent', pk=pk)
 
             subject = f"Zaproszenie na konto przedszkola dla rodzica {kid.first_name}"
             from_email = EMAIL_HOST_USER
@@ -65,10 +65,12 @@ class InviteParentView(PermissionRequiredMixin, View):
             msg = EmailMultiAlternatives(subject, text_content, from_email, [parent_email])
             msg.attach_alternative(html_content, "text/html")
             msg.send()
+            messages.success(request, f"Udalo sie zaprosic rodzica o emailu {parent_email} ")
             return redirect('list_kids')
 
         else:
-            return render(request, 'parent-invite.html', {'kid': kid})
+            messages.error(request, 'wypelnij formularz')
+            return redirect('invite_parent', pk=pk)
 
 
 class ParentListView(PermissionRequiredMixin, ListView):

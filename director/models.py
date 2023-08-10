@@ -29,7 +29,7 @@ def user_meal_path(instance, filename):
 
 
 class GroupPhotos(models.Model):
-    group_photos = models.ImageField(null=True, upload_to=user_group_path)
+    group_photos = models.ImageField(null=True, upload_to=user_group_path, unique=True)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=64, null=True)
 

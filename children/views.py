@@ -3,6 +3,7 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.contrib import messages
 from teacher.models import Employee
+from django.contrib.messages.views import SuccessMessageMixin
 from .forms import KidAddForm, PaymentPlanForm, MealsForm, GroupsForm
 from .models import Kid, Groups, PaymentPlan, Meals
 from director.models import Director, MealPhotos, GroupPhotos
@@ -16,12 +17,13 @@ from django.views.generic import (
 
 
 # Create your views here.
-class AddPaymentsPlanView(PermissionRequiredMixin, CreateView):
+class AddPaymentsPlanView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     permission_required = "director.is_director"
     model = PaymentPlan
     template_name = 'payment-plan-add.html'
     form_class = PaymentPlanForm
     success_url = reverse_lazy('list_payments_plans')
+    success_message = "Plan platnicz dodany porpawnie"
 
     def get_initial(self):
         initial = super(AddPaymentsPlanView, self).get_initial()
@@ -74,37 +76,6 @@ class MealAddView(PermissionRequiredMixin, View):
         return redirect('list_meals')
 
 
-class AddMealView(PermissionRequiredMixin, CreateView):
-    permission_required = "director.is_director"
-    model = Meals
-    template_name = 'meal-add.html'
-    form_class = MealsForm
-    success_url = reverse_lazy('list_meals')
-
-    def get_form_kwargs(self, **kwargs):
-        """ Passes the request object to the form class.
-         This is necessary to only display members that belong to a given user"""
-
-        kwargs = super(AddMealView, self).get_form_kwargs()
-        kwargs.update({'current_user': self.request.user})
-        return kwargs
-
-    def get_form(self, form_class=None):
-        form = super(AddMealView, self).get_form(form_class)
-        form.fields['photo'].required = False
-        return form
-
-    def get_initial(self):
-        initial = super(AddMealView, self).get_initial()
-        initial = initial.copy()
-        initial['principal'] = Director.objects.get(user=self.request.user.id)
-        return initial
-
-    def form_valid(self, form):
-        form.instance.save()
-        return super().form_valid(form)
-
-
 class MealsListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
     model = Meals
@@ -154,12 +125,13 @@ class GroupsListView(PermissionRequiredMixin, ListView):
         return context
 
 
-class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, CreateView):
+class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
     permission_required = "director.is_director"
     model = Kid
     template_name = 'kid-add.html'
     form_class = KidAddForm
     success_url = reverse_lazy('list_kids')
+    success_message = "Dodano poprawni dziecko"
 
     def get_initial(self):
         initial = super(AddKidView, self).get_initial()
@@ -238,12 +210,13 @@ class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
         return False
 
 
-class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, UpdateView):
+class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin,SuccessMessageMixin, UpdateView):
     permission_required = "director.is_director"
     model = Kid
     template_name = 'kid-update-info.html'
     form_class = KidAddForm
     success_url = reverse_lazy('list_kids')
+    success_message = "poprawni zmieniono informacje"
 
     def get_form_kwargs(self, **kwargs):
         """ Passes the request object to the form class.
