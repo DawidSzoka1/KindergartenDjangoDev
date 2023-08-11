@@ -15,6 +15,7 @@ urlpatterns = [
 
     path('add/payments/plans/', views.AddPaymentsPlanView.as_view(), name='add_payment_plans'),
     path('list/payments/plans/', views.PaymentPlansListView.as_view(), name='list_payments_plans'),
+    path('update/payments/plans/', views.PaymentPlanUpdateView.as_view(), name='payment_plan_update'),
 
     path('add/meal/', views.MealAddView.as_view(), name='add_meal'),
     path('list/meals/', views.MealsListView.as_view(), name='list_meals'),

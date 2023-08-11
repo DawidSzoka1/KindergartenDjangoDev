@@ -108,7 +108,7 @@
 
                                         </div>
                                     </div>
-                                    {% for meal in kid.kid_meals.all %}
+                                    {% for meal in meals %}
                                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
 
                                             <div class="form-group">
@@ -132,7 +132,7 @@
                     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                         <h6 class="mb-3 text-primary">Parents</h6>
                     </div>
-                    {% for parent in kid.parenta_set.all %}
+                    {% for parent in parents %}
                         <a href="{% url 'parent_details' pk=parent.id %}">Profil Rodzica</a>
                         <div class="card h-90">
                             <div class="card-body">

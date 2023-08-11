@@ -48,6 +48,16 @@ class PaymentPlansListView(PermissionRequiredMixin, ListView):
         return context
 
 
+class PaymentPlanUpdateView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request, pk):
+        return render(request, 'payment-plan-update.html')
+
+    def post(self, request, pk):
+        pass
+
+
 class MealAddView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
@@ -169,6 +179,55 @@ class GroupsListView(PermissionRequiredMixin, ListView):
         return context
 
 
+class GroupDetailsView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        group = Groups.objects.get(id=int(pk))
+        teachers = list(group.employee_set.filter(is_active=True).values_list("user__email", flat=True))
+        kids = group.kid_set.filter(is_active=True)
+
+        if request.user.get_user_permissions() == {'teacher.is_teacher'}:
+            teacher_email = Employee.objects.get(user=request.user.id).user.email
+            if teacher_email in teachers:
+                return render(request, 'group-details.html',
+                              {'group': group, 'teachers': teachers, 'kids': kids})
+        elif request.user.get_user_permissions() == {'director.is_director'}:
+            director = Director.objects.get(user=request.user.id)
+            if director == group.principal:
+                return render(request, 'group-details.html',
+                              {'group': group, 'teachers': teachers, 'kids': kids})
+
+        raise PermissionDenied
+
+
+class GroupUpdateView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request, pk):
+        group = Groups.objects.get(id=int(pk))
+        director = Director.objects.get(user=request.user.id)
+        group.photo.filter(is_active=True).first()
+        if director == group.principal:
+            form = GroupsForm(instance=group)
+            photos = director.groupphotos_set.filter(is_active=True)
+            return render(request, 'group-update.html',
+                          {'form': form, 'photos': photos, 'group_photo': group.photo.first()})
+        raise PermissionDenied
+
+    def post(self, request, pk):
+        group = Groups.objects.get(id=int(pk))
+        director = Director.objects.get(user=request.user.id)
+        if director == group.principal:
+            form = GroupsForm(request.POST, instance=group)
+            if form.is_valid():
+                form.save()
+                return redirect('group_details', pk=group.id)
+
+            messages.error(request, f'{form.errors}')
+            return redirect('group_update', pk=pk)
+
+        raise PermissionDenied
+
+
 class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
     permission_required = "director.is_director"
     model = Kid
@@ -244,8 +303,10 @@ class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
         try:
             context["kid"] = get_object_or_404(Director, user=self.request.user.id).kid_set.filter(
                 is_active=True).filter(id=context['kid'].id).first()
+            context["meals"] = context['kid'].kid_meals.filter(is_active=True)
+            context["parents"] = context['kid'].parenta_set.filter(is_active=True)
         except Exception:
-            context["kid"] = None
+            raise PermissionDenied
         return context
 
     def test_func(self):
@@ -299,52 +360,3 @@ class KidSearchView(LoginRequiredMixin, View):
                 first_name__icontains=search)
             return render(request, 'kids-list.html', {'kids': kids})
         return redirect('list_kids')
-
-
-class GroupDetailsView(LoginRequiredMixin, View):
-    def get(self, request, pk):
-        group = Groups.objects.get(id=int(pk))
-        teachers = list(group.employee_set.filter(is_active=True).values_list("user__email", flat=True))
-        kids = group.kid_set.filter(is_active=True)
-
-        if request.user.get_user_permissions() == {'teacher.is_teacher'}:
-            teacher_email = Employee.objects.get(user=request.user.id).user.email
-            if teacher_email in teachers:
-                return render(request, 'group-details.html',
-                              {'group': group, 'teachers': teachers, 'kids': kids})
-        elif request.user.get_user_permissions() == {'director.is_director'}:
-            director = Director.objects.get(user=request.user.id)
-            if director == group.principal:
-                return render(request, 'group-details.html',
-                              {'group': group, 'teachers': teachers, 'kids': kids})
-
-        raise PermissionDenied
-
-
-class GroupUpdateView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
-    def get(self, request, pk):
-        group = Groups.objects.get(id=int(pk))
-        director = Director.objects.get(user=request.user.id)
-        group.photo.filter(is_active=True).first()
-        if director == group.principal:
-            form = GroupsForm(instance=group)
-            photos = director.groupphotos_set.filter(is_active=True)
-            return render(request, 'group-update.html',
-                          {'form': form, 'photos': photos, 'group_photo': group.photo.first()})
-        raise PermissionDenied
-
-    def post(self, request, pk):
-        group = Groups.objects.get(id=int(pk))
-        director = Director.objects.get(user=request.user.id)
-        if director == group.principal:
-            form = GroupsForm(request.POST, instance=group)
-            if form.is_valid():
-                form.save()
-                return redirect('group_details', pk=group.id)
-
-            messages.error(request, f'{form.errors}')
-            return redirect('group_update', pk=pk)
-
-        raise PermissionDenied
