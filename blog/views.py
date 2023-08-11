@@ -1,8 +1,10 @@
 from django.shortcuts import render, HttpResponse, redirect
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
+from parent.models import ParentA
+from teacher.models import Employee
 from .models import Post
-from director.models import FreeDaysModel
+from director.models import FreeDaysModel, Director
 from children.models import PresenceModel, Kid, presenceChoices
 from django.contrib.auth.models import Permission
 from django.utils.safestring import mark_safe
@@ -19,28 +21,6 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-
-
-# class Calendar(HTMLCalendar):
-#     def __init__(self, year=None, month=None, kid=None):
-#         self.year = year
-#         self.month = month
-#         self.kid = kid
-#         super(Calendar, self).__init__()
-#
-#     # formats a day as a td
-#     # filter events by day
-#     def formatday(self, day, events):
-#         presences = PresenceModel.objects.filter(kid=self.kid)
-#         if day != 0:
-#             for presence in presences:
-#                 if presence.presenceType == 1:
-#                     return f"<td><span class='date table-danger'>{day}</span></td>"
-#                 elif presence.presenceType == 2:
-#                     return f"<td><span class='date table-success'>{day}</span></td>"
-#                 elif presence.presenceType == 3:
-#                     return f"<td><span class='date table-info'>{day}</span></td>"
-#         return f"<td><span class='date table-dark'>{day}</span></td>"
 
 
 class Calendar(HTMLCalendar):
@@ -98,13 +78,31 @@ class Calendar(HTMLCalendar):
 class CalendarKid(LoginRequiredMixin, View):
     def get(self, request, pk):
         permissions = request.user.get_user_permissions()
+        kid = Kid.objects.filter(id=int(pk)).first()
         month_number = int(timezone.now().month)
         year = int(timezone.now().year)
-        kid = Kid.objects.get(id=int(pk))
-        cal = Calendar(year=year, month=month_number, director=request.user.director, kid=kid).formatmonth(
+        day_current = int(timezone.now().day)
+        cal = Calendar(year=year, month=month_number, kid=kid).formatmonth(
             withyear=True)
-        messages.info(request,f'{permissions}')
-        return render(request, 'calendar.html', {'cal': mark_safe(cal)})
+        if not kid:
+            messages.error(request, 'nie ma takiej strony')
+            return redirect('home_page')
+        elif permissions == {'director.is_director'}:
+            director = Director.objects.get(user=request.user.id)
+            if kid.principal == director:
+                return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
+        elif permissions == {'teacher.is_teacher'}:
+            teacher = Employee.objects.get(user=request.user.id)
+            kids = list(teacher.group.first().kid_set.all())
+            if kid in kids:
+                return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
+        elif permissions == {'parent.is_parent'}:
+            parent = ParentA.objects.get(user=request.user.id)
+            parent_kids = list(parent.kids.all())
+            if kid in parent_kids:
+                return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
+        messages.error(request, f'Nie ma takiej strony')
+        return redirect('home_page')
 
     def post(self, request, pk):
         presence = request.POST.get('presence')

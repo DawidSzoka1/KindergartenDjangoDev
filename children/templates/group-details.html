@@ -8,9 +8,12 @@
 
     <label>Stan dzieci</label>
     <input class="form-control" readonly type="text" value="{{ kids.count }}">
-     <label>Liczba miejsc</label>
+    <label>Liczba miejsc</label>
     <input class="form-control" readonly type="text" value="{{ group.capacity }}">
 
+    {% for kid in kids %}
+    {{ kid.id }}
+    {% endfor %}
     iconka grupy:<br>
     <img alt="iconka grupy" src="{{ group.photo.first.group_photos.url }}">
 

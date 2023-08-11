@@ -2,6 +2,7 @@
 {% load static %}
 {% block content %}
     <form method="POST" action="">
+        <h1>Kalendarz dziecka {{ kid.first_name }} {{ kid.last_name }}</h1>
         {% csrf_token %}
         {{ cal }}
 
@@ -92,7 +93,7 @@
                 </div>
             {% endif %}
             <div class="form-group">
-
+                <input type="hidden" value="{{ day_current }}" id="currentDay">
             </div>
             <div class="d-flex justify-content-end pt-3">
                 <button type="submit" class="btn btn-warning btn-lg ms-2">Ustaw
@@ -100,7 +101,7 @@
             </div>
 
             </div>
-        </div>
+            </div>
         </div>
 
 
