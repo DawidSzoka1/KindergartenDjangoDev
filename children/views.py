@@ -88,6 +88,20 @@ class MealsListView(PermissionRequiredMixin, ListView):
         return context
 
 
+class MealsUpdateView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request, pk):
+        director = Director.objects.get(user=request.user.id)
+        meal = Meals.objects.filter(id=int(pk)).filter(principal=director).first()
+        if meal:
+            return render(request, 'meal-update.html')
+        raise PermissionDenied
+
+    def post(self, request, pk):
+        pass
+
+
 class GroupAddView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
@@ -288,7 +302,7 @@ class GroupUpdateView(PermissionRequiredMixin, View):
             photos = director.groupphotos_set.all()
             return render(request, 'group-update.html',
                           {'form': form, 'photos': photos, 'group_photo': group.photo.first()})
-        return redirect('list_groups')
+        raise PermissionDenied
 
     def post(self, request, pk):
         group = Groups.objects.get(id=int(pk))
@@ -302,4 +316,4 @@ class GroupUpdateView(PermissionRequiredMixin, View):
             messages.error(request, f'{form.errors}')
             return redirect('group_update', pk=pk)
 
-        return redirect('home_page')
+        raise PermissionDenied

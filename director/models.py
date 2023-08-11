@@ -33,6 +33,7 @@ class GroupPhotos(models.Model):
     group_photos = models.ImageField(null=True, upload_to=user_group_path, unique=True)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=64, null=True)
+    is_active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -52,6 +53,7 @@ class MealPhotos(models.Model):
     meal_photos = models.ImageField(null=True, upload_to=user_meal_path)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=64, null=True)
+    is_active = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -73,6 +75,7 @@ class FreeDaysModel(models.Model):
     description = models.TextField(null=True)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
 
 
 class ContactModel(models.Model):

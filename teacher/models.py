@@ -33,6 +33,7 @@ class Employee(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     principal = models.ManyToManyField(Director)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         permissions = [
