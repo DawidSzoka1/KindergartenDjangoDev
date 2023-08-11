@@ -45,6 +45,7 @@ class PaymentPlanForm(forms.ModelForm):
         widgets = {'principal': forms.HiddenInput}
 
 
+
 class GroupsForm(forms.ModelForm):
     class Meta:
         model = Groups

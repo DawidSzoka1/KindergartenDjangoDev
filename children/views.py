@@ -52,21 +52,26 @@ class MealAddView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
-        director = request.user.director
+        director = Director.objects.get(user=request.user.id)
         photos = director.mealphotos_set.all()
-        return render(request, 'meal-add.html', {'photos': photos})
+        if photos:
+            return render(request, 'meal-add.html', {'photos': photos})
+        messages.info(request, 'Najpierwsz musisz dodac jakas iconke')
+        return redirect('photo_add')
 
     def post(self, request):
         director = request.user.director
         photo_id = request.POST.get('photo')
+        per_day = request.POST.get('per_day')
         name = request.POST.get('name')
         description = request.POST.get('description')
         image = MealPhotos.objects.get(id=int(photo_id))
-        if image and name and description:
-            new_meal = Meals.objects.create(name=name, description=description, principal=director)
+        if image and name and description and per_day:
+            new_meal = Meals.objects.create(name=name, description=description, principal=director,
+                                            per_day=float(per_day))
             new_meal.photo.add(image)
-        elif image and name:
-            new_meal = Meals.objects.create(name=name, principal=director)
+        elif image and name and per_day:
+            new_meal = Meals.objects.create(name=name, principal=director, per_day=float(per_day))
             new_meal.photo.add(image)
 
         else:
@@ -95,11 +100,34 @@ class MealsUpdateView(PermissionRequiredMixin, View):
         director = Director.objects.get(user=request.user.id)
         meal = Meals.objects.filter(id=int(pk)).filter(principal=director).first()
         if meal:
-            return render(request, 'meal-update.html')
+            current_photo = meal.photo.first()
+            photos = director.mealphotos_set.all()
+            return render(request, 'meal-update.html',
+                          {
+                              'meal': meal,
+                              'current_photo': current_photo,
+                              'photos': photos
+                          })
         raise PermissionDenied
 
     def post(self, request, pk):
-        pass
+        name = request.POST.get("name")
+        description = request.POST.get("description")
+        per_day = request.POST.get("per_day")
+        photo = request.POST.get("photo")
+        meal = Meals.objects.filter(is_active=True).filter(id=int(pk)).first()
+        if meal:
+            if name and description and per_day and photo:
+                meal.name = name
+                meal.description = description
+                meal.per_day = per_day
+                meal.photo = photo
+                meal.save()
+                return redirect('list_meals')
+            messages.error(request, "Wypelnij wszystkie pola")
+            return redirect('meals_update', pk=pk)
+        raise PermissionDenied
+
 
 
 class GroupAddView(PermissionRequiredMixin, View):
