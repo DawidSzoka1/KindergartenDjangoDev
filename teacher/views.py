@@ -1,4 +1,3 @@
-from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect, get_object_or_404
 from children.models import Groups
 from django.views import View
@@ -11,6 +10,7 @@ from django.core.mail import EmailMultiAlternatives
 from MarchewkaDjango.settings import EMAIL_HOST_USER
 from django.template.loader import render_to_string
 from accounts.models import User
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
@@ -30,8 +30,7 @@ class EmployeeProfileView(LoginRequiredMixin, View):
             if user.employee == employee:
                 return render(request, 'employee-profile.html',
                               {'employee': employee})
-        messages.error(request, f"{user.director}")
-        return redirect('home_page')
+        raise PermissionDenied
 
 
 class EmployeesListView(PermissionRequiredMixin, LoginRequiredMixin, View):
@@ -118,8 +117,7 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
                 return render(request, 'employee-update.html',
                               {'form': employee, 'roles': roles, 'groups': groups, 'employee': employee})
 
-        messages.error(request, 'Nie masz na to zgody')
-        return redirect('home_page')
+        raise PermissionDenied
 
     def post(self, request, pk):
         if request.user.get_user_permissions() == {'teacher.is_teacher'}:
@@ -156,8 +154,7 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
                     return redirect('teacher-profile', pk=pk)
             messages.error(request, "cos poszlo nie tak")
             return redirect('list_teachers')
-        messages.error(request, 'Nie masz na to zezwolenia')
-        return redirect('home_page')
+        raise PermissionDenied
 
 
 class TeacherSearchView(LoginRequiredMixin, View):

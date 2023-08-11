@@ -4,8 +4,9 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from teacher.models import Employee
 from django.contrib.messages.views import SuccessMessageMixin
-from .forms import KidAddForm, PaymentPlanForm, MealsForm, GroupsForm
+from .forms import KidAddForm, PaymentPlanForm, GroupsForm
 from .models import Kid, Groups, PaymentPlan, Meals
+from django.core.exceptions import PermissionDenied
 from director.models import Director, MealPhotos, GroupPhotos
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
 from django.views.generic import (
@@ -272,8 +273,7 @@ class GroupDetailsView(LoginRequiredMixin, View):
                 return render(request, 'group-details.html',
                               {'group': group, 'teachers': teachers, 'kids': kids})
 
-        messages.error(request, 'Nie masz pozwolenia')
-        return redirect('home_page')
+        raise PermissionDenied
 
 
 class GroupUpdateView(PermissionRequiredMixin, View):

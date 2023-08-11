@@ -6,12 +6,10 @@ from teacher.models import Employee
 from .models import Post
 from director.models import FreeDaysModel, Director
 from children.models import PresenceModel, Kid, presenceChoices
-from django.contrib.auth.models import Permission
 from django.utils.safestring import mark_safe
 from django.contrib import messages
-
 from datetime import datetime
-import calendar
+from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from calendar import HTMLCalendar
 from django.views.generic import (
@@ -85,8 +83,7 @@ class CalendarKid(LoginRequiredMixin, View):
         cal = Calendar(year=year, month=month_number, kid=kid).formatmonth(
             withyear=True)
         if not kid:
-            messages.error(request, 'nie ma takiej strony')
-            return redirect('home_page')
+            raise PermissionDenied
         elif permissions == {'director.is_director'}:
             director = Director.objects.get(user=request.user.id)
             if kid.principal == director:
@@ -101,8 +98,7 @@ class CalendarKid(LoginRequiredMixin, View):
             parent_kids = list(parent.kids.all())
             if kid in parent_kids:
                 return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
-        messages.error(request, f'Nie ma takiej strony')
-        return redirect('home_page')
+        raise PermissionDenied
 
     def post(self, request, pk):
         presence = request.POST.get('presence')
@@ -127,7 +123,6 @@ class CalendarKid(LoginRequiredMixin, View):
 
 class Home(View):
     def get(self, request):
-        # users = User.objects.get(email=f"{request.user.email}"
         return render(request, 'home.html')
 
 

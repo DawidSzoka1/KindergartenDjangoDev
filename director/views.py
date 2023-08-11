@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views import View
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from .models import ContactModel, Director, MealPhotos, GroupPhotos
 from teacher.models import Employee
 from parent.models import ParentA
+from django.core.exceptions import PermissionDenied
 
 
 class PhotosListView(PermissionRequiredMixin, View):
@@ -45,7 +46,7 @@ class DirectorProfileView(PermissionRequiredMixin, View):
         return render(request, 'director-profile.html', {'director': director})
 
 
-class ContactView(View):
+class ContactView(LoginRequiredMixin,View):
     def get(self, request):
         user = request.user
         if user.get_all_permissions() == {'director.is_director'}:

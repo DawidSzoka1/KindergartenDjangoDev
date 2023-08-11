@@ -11,6 +11,7 @@ from accounts.models import User
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from .models import ParentA
+from django.core.exceptions import PermissionDenied
 from children.models import Kid
 from django.views.generic import (
     ListView,
@@ -107,19 +108,21 @@ class DetailsParentView(PermissionRequiredMixin, UserPassesTestMixin, DetailView
 
 class ParentProfileView(LoginRequiredMixin, View):
     def get(self, request):
-        p_form = ParentUpdateForm(instance=request.user.parenta)
-        u_form = UserUpdateForm(instance=request.user)
-        parent_logged = ParentA.objects.get(user=request.user.id)
-        parent_kids = parent_logged.kid_set.all()
+        if request.user.get_user_permissions() == {'parent.is_parent'}:
+            p_form = ParentUpdateForm(instance=request.user.parenta)
+            u_form = UserUpdateForm(instance=request.user)
+            parent_logged = ParentA.objects.get(user=request.user.id)
+            parent_kids = parent_logged.kid_set.all()
 
-        context = {
-            'p_form': p_form,
-            'u_form': u_form,
-            'parent_logged': parent_logged,
-            'parent_kids': parent_kids,
+            context = {
+                'p_form': p_form,
+                'u_form': u_form,
+                'parent_logged': parent_logged,
+                'parent_kids': parent_kids,
 
-        }
-        return render(request, 'parent_profile.html', context)
+            }
+            return render(request, 'parent_profile.html', context)
+        raise PermissionDenied
 
     def post(self, request):
         p_form = ParentUpdateForm(request.POST, instance=request.user.parenta)
