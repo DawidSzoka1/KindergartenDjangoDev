@@ -146,7 +146,9 @@ class GroupAddView(PermissionRequiredMixin, View):
     def get(self, request):
         director = Director.objects.get(user=request.user.id)
         photos = director.groupphotos_set.filter(is_active=True)
-        return render(request, 'group-add.html', {'photos': photos})
+        if photos:
+            return render(request, 'group-add.html', {'photos': photos})
+        return redirect('photo_add')
 
     def post(self, request):
         director = Director.objects.get(user=request.user.id)
