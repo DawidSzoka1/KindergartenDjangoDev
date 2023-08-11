@@ -38,7 +38,7 @@ class EmployeesListView(PermissionRequiredMixin, LoginRequiredMixin, View):
 
     def get(self, request):
         user = Director.objects.get(user=request.user.id)
-        teachers = user.employee_set.all()
+        teachers = user.employee_set.filter(is_active=True)
         return render(request, 'employees-list.html', {'teachers': teachers})
 
 
@@ -47,7 +47,7 @@ class EmployeeAddView(PermissionRequiredMixin, View):
 
     def get(self, request):
         user = Director.objects.get(user=request.user.id)
-        groups = user.groups_set.all()
+        groups = user.groups_set.filter(is_active=True)
         return render(request, 'employee-add.html', {'groups': groups, 'roles': roles})
 
     def post(self, request):
@@ -112,7 +112,7 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
 
         elif request.user.get_user_permissions() == {'director.is_director'}:
             user = Director.objects.get(user=request.user.id)
-            groups = user.groups_set.all()
+            groups = user.groups_set.filter(is_active=True)
             if employee.principal.first() == user:
                 return render(request, 'employee-update.html',
                               {'form': employee, 'roles': roles, 'groups': groups, 'employee': employee})

@@ -81,7 +81,7 @@ class ParentListView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["parents"] = Director.objects.get(user=self.request.user.id).parenta_set.all()
+        context["parents"] = Director.objects.get(user=self.request.user.id).parenta_set.filter(is_active=True)
         return context
 
 
@@ -112,7 +112,7 @@ class ParentProfileView(LoginRequiredMixin, View):
             p_form = ParentUpdateForm(instance=request.user.parenta)
             u_form = UserUpdateForm(instance=request.user)
             parent_logged = ParentA.objects.get(user=request.user.id)
-            parent_kids = parent_logged.kid_set.all()
+            parent_kids = parent_logged.kid_set.filter(is_active=True)
 
             context = {
                 'p_form': p_form,

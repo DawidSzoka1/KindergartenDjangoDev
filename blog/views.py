@@ -76,7 +76,7 @@ class Calendar(HTMLCalendar):
 class CalendarKid(LoginRequiredMixin, View):
     def get(self, request, pk):
         permissions = request.user.get_user_permissions()
-        kid = Kid.objects.filter(id=int(pk)).first()
+        kid = Kid.objects.filter(is_active=True).filter(id=int(pk)).first()
         month_number = int(timezone.now().month)
         year = int(timezone.now().year)
         day_current = int(timezone.now().day)
@@ -90,12 +90,12 @@ class CalendarKid(LoginRequiredMixin, View):
                 return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
         elif permissions == {'teacher.is_teacher'}:
             teacher = Employee.objects.get(user=request.user.id)
-            kids = list(teacher.group.first().kid_set.all())
+            kids = list(teacher.group.first().kid_set.filter(is_active=True))
             if kid in kids:
                 return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
         elif permissions == {'parent.is_parent'}:
             parent = ParentA.objects.get(user=request.user.id)
-            parent_kids = list(parent.kids.all())
+            parent_kids = list(parent.kids.filter(is_active=True))
             if kid in parent_kids:
                 return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
         raise PermissionDenied

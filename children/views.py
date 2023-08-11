@@ -101,7 +101,7 @@ class MealsUpdateView(PermissionRequiredMixin, View):
         meal = Meals.objects.filter(is_active=True).filter(id=int(pk)).filter(principal=director).first()
         if meal:
             current_photo = meal.photo.first()
-            photos = director.mealphotos_set.all()
+            photos = director.mealphotos_set.filter(is_active=True)
             return render(request, 'meal-update.html',
                           {
                               'meal': meal,
@@ -294,7 +294,8 @@ class KidSearchView(LoginRequiredMixin, View):
     def post(self, request):
         search = request.POST.get('search')
         if search:
-            kids = Kid.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(is_active=True).filter(
+            kids = Kid.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
+                is_active=True).filter(
                 first_name__icontains=search)
             return render(request, 'kids-list.html', {'kids': kids})
         return redirect('list_kids')

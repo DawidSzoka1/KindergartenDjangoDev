@@ -60,4 +60,4 @@ class GroupsForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if current_user is not None:
             self.fields['photo'] = forms.ModelChoiceField(
-                queryset=Director.objects.get(user=current_user.id).groupphotos_set.all())
+                queryset=Director.objects.get(user=current_user.id).groupphotos_set.filter(is_active=True))
