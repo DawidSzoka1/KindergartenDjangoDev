@@ -44,7 +44,7 @@ class PaymentPlansListView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plans"] = Director.objects.get(user=self.request.user.id).paymentplan_set.all()
+        context["plans"] = Director.objects.get(user=self.request.user.id).paymentplan_set.filter(is_active=True)
         return context
 
 
@@ -53,7 +53,7 @@ class MealAddView(PermissionRequiredMixin, View):
 
     def get(self, request):
         director = Director.objects.get(user=request.user.id)
-        photos = director.mealphotos_set.all()
+        photos = director.mealphotos_set.filter(is_active=True)
         if photos:
             return render(request, 'meal-add.html', {'photos': photos})
         messages.info(request, 'Najpierwsz musisz dodac jakas iconke')
@@ -89,7 +89,7 @@ class MealsListView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["meals"] = Director.objects.get(user=self.request.user.id).meals_set.all()
+        context["meals"] = Director.objects.get(user=self.request.user.id).meals_set.filter(is_active=True)
         return context
 
 
@@ -98,7 +98,7 @@ class MealsUpdateView(PermissionRequiredMixin, View):
 
     def get(self, request, pk):
         director = Director.objects.get(user=request.user.id)
-        meal = Meals.objects.filter(id=int(pk)).filter(principal=director).first()
+        meal = Meals.objects.filter(is_active=True).filter(id=int(pk)).filter(principal=director).first()
         if meal:
             current_photo = meal.photo.first()
             photos = director.mealphotos_set.all()
@@ -121,7 +121,8 @@ class MealsUpdateView(PermissionRequiredMixin, View):
                 meal.name = name
                 meal.description = description
                 meal.per_day = per_day
-                meal.photo = photo
+                meal.photo.clear()
+                meal.photo.add(photo)
                 meal.save()
                 return redirect('list_meals')
             messages.error(request, "Wypelnij wszystkie pola")
@@ -129,17 +130,16 @@ class MealsUpdateView(PermissionRequiredMixin, View):
         raise PermissionDenied
 
 
-
 class GroupAddView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
-        director = request.user.director
-        photos = director.groupphotos_set.all()
+        director = Director.objects.get(user=request.user.id)
+        photos = director.groupphotos_set.filter(is_active=True)
         return render(request, 'group-add.html', {'photos': photos})
 
     def post(self, request):
-        director = request.user.director
+        director = Director.objects.get(user=request.user.id)
         photo_id = request.POST.get('photo')
         name = request.POST.get('name')
         capacity = request.POST.get('capacity')
@@ -164,7 +164,8 @@ class GroupsListView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["groups"] = Groups.objects.filter(principal=Director.objects.get(user=self.request.user.id)).all()
+        context["groups"] = Groups.objects.filter(principal=Director.objects.get(user=self.request.user.id)).filter(
+            is_active=True)
         return context
 
 
@@ -201,21 +202,21 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMix
 
     def test_func(self):
         director = Director.objects.get(user=self.request.user.id)
-        if director.groups_set.all():
-            if director.meals_set.all():
-                if director.paymentplan_set.all():
+        if director.groups_set.filter(is_active=True):
+            if director.meals_set.filter(is_active=True):
+                if director.paymentplan_set.filter(is_active=True):
                     return True
         return False
 
     def handle_no_permission(self):
         director = Director.objects.get(user=self.request.user.id)
-        if not director.groups_set.all():
+        if not director.groups_set.filter(is_active=True):
             messages.error(self.request, 'Dodaj najpierw jakas grupe')
             return redirect('add_group')
-        if not director.meals_set.all():
+        if not director.meals_set.filter(is_active=True):
             messages.error(self.request, 'Dodaj najpierw jakis posilke')
             return redirect('add_meal')
-        if not director.paymentplan_set.alL():
+        if not director.paymentplan_set.filter(is_active=True):
             messages.error(self.request, 'Dodaj najpierw jakis plan platniczy')
             return redirect('add_payment_plans')
 
@@ -229,7 +230,7 @@ class KidsListView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["kids"] = Director.objects.get(user=self.request.user.id).kid_set.all()
+        context["kids"] = Director.objects.get(user=self.request.user.id).kid_set.filter(is_active=True)
         return context
 
 
@@ -241,7 +242,8 @@ class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            context["kid"] = get_object_or_404(Director, user=self.request.user.id).kid_set.get(id=context['kid'].id)
+            context["kid"] = get_object_or_404(Director, user=self.request.user.id).kid_set.filter(
+                is_active=True).filter(id=context['kid'].id).first()
         except Exception:
             context["kid"] = None
         return context
@@ -292,7 +294,7 @@ class KidSearchView(LoginRequiredMixin, View):
     def post(self, request):
         search = request.POST.get('search')
         if search:
-            kids = Kid.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
+            kids = Kid.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(is_active=True).filter(
                 first_name__icontains=search)
             return render(request, 'kids-list.html', {'kids': kids})
         return redirect('list_kids')
@@ -301,8 +303,8 @@ class KidSearchView(LoginRequiredMixin, View):
 class GroupDetailsView(LoginRequiredMixin, View):
     def get(self, request, pk):
         group = Groups.objects.get(id=int(pk))
-        teachers = list(group.employee_set.values_list("user__email", flat=True))
-        kids = group.kid_set.all()
+        teachers = list(group.employee_set.filter(is_active=True).values_list("user__email", flat=True))
+        kids = group.kid_set.filter(is_active=True)
 
         if request.user.get_user_permissions() == {'teacher.is_teacher'}:
             teacher_email = Employee.objects.get(user=request.user.id).user.email
@@ -324,10 +326,10 @@ class GroupUpdateView(PermissionRequiredMixin, View):
     def get(self, request, pk):
         group = Groups.objects.get(id=int(pk))
         director = Director.objects.get(user=request.user.id)
-        group.photo.first()
+        group.photo.filter(is_active=True).first()
         if director == group.principal:
             form = GroupsForm(instance=group)
-            photos = director.groupphotos_set.all()
+            photos = director.groupphotos_set.filter(is_active=True)
             return render(request, 'group-update.html',
                           {'form': form, 'photos': photos, 'group_photo': group.photo.first()})
         raise PermissionDenied
