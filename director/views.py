@@ -26,16 +26,22 @@ class PhotosAddView(PermissionRequiredMixin, View):
     def post(self, request):
         photo_type = request.POST.get('type')
         file = request.FILES.get('file')
-        if file and photo_type:
-            if photo_type == 'group':
-                GroupPhotos.objects.create(group_photos=file, principal=request.user.director)
-            if photo_type == 'meal':
-                MealPhotos.objects.create(meal_photos=file, principal=request.user.director)
-            messages.success(request, 'udalo sie')
-            return redirect('photos_list')
-
-        messages.error(request, 'blad')
-        return redirect('photo_add')
+        name = request.POST.get('name')
+        if not photo_type:
+            messages.error(request, 'Wybierz typ iconki')
+            return redirect('photo_add')
+        elif not file:
+            messages.error(request, 'Wybierz jakis plik')
+            return redirect('photo_add')
+        elif not name:
+            messages.error(request, 'Nazwa jest wymagana')
+            return redirect('photo_add')
+        if photo_type == 'group':
+            GroupPhotos.objects.create(group_photos=file, principal=request.user.director, name=name)
+        elif photo_type == 'meal':
+            MealPhotos.objects.create(meal_photos=file, principal=request.user.director, name=name)
+        messages.success(request, 'udalo sie')
+        return redirect('photos_list')
 
 
 class DirectorProfileView(PermissionRequiredMixin, View):
@@ -46,7 +52,7 @@ class DirectorProfileView(PermissionRequiredMixin, View):
         return render(request, 'director-profile.html', {'director': director})
 
 
-class ContactView(LoginRequiredMixin,View):
+class ContactView(LoginRequiredMixin, View):
     def get(self, request):
         user = request.user
         if user.get_all_permissions() == {'director.is_director'}:
