@@ -23,6 +23,7 @@ class Meals(models.Model):
     description = models.TextField(null=True)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     photo = models.ManyToManyField(MealPhotos)
+    per_day = models.DecimalField(max_digits=6, decimal_places=2, null=True)
 
     def __str__(self):
         """

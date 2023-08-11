@@ -211,7 +211,7 @@ class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
         return False
 
 
-class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin,SuccessMessageMixin, UpdateView):
+class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     permission_required = "director.is_director"
     model = Kid
     template_name = 'kid-update-info.html'
@@ -282,9 +282,12 @@ class GroupUpdateView(PermissionRequiredMixin, View):
     def get(self, request, pk):
         group = Groups.objects.get(id=int(pk))
         director = Director.objects.get(user=request.user.id)
+        group.photo.first()
         if director == group.principal:
             form = GroupsForm(instance=group)
-            return render(request, 'group-update.html', {'form': form})
+            photos = director.groupphotos_set.all()
+            return render(request, 'group-update.html',
+                          {'form': form, 'photos': photos, 'group_photo': group.photo.first()})
         return redirect('list_groups')
 
     def post(self, request, pk):
