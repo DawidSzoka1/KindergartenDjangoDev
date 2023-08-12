@@ -1,45 +1,81 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
     {% if user.is_authenticated %}
         {% if perms.director.is_director %}
-            <div class="text-center mt-5">
+            <div class="row">
+                <div class="row">
+                    <img style="width: 25%; position: absolute;
+                            left: 0px; bottom: 0px;"
+                         src="{% static '363862586_1034654530880137_1579384359482540064_n.jpg' %}" alt="zdjecie">
 
-                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_kids' %}'">
-                    Dzieci
-                </button>
+                </div>
+                <div class="row">
+                    <div class="text-center" style="margin-top: 4.5%">
+                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
+                            <button type="button" class="btn  me-3" onclick="location.href='{% url 'list_kids' %}'"
+                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px">
+                                <b>DZIECI</b>
+                            </button>
+                        </div>
+
+                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
+                            <button type="button" class="btn  me-3"
+                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px"
+                                    onclick="location.href='{% url 'list_groups' %}'">
+                                <b>GRUPY</b>
+                            </button>
+                        </div>
+                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
+                            <button type="button" class="btn  me-3"
+                                    onclick="location.href='{% url 'list_payments_plans' %}'"
+                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px">
+                                <b>PLANY PŁATNICZE</b>
+                            </button>
+                        </div>
+
+                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
+                            <button type="button" class="btn  me-3" onclick="location.href='{% url 'list_meals' %}'"
+                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px">
+                                <b>POSIŁKI</b>
+                            </button>
+                        </div>
+                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
+                            <button type="button" class="btn  me-3"
+                                    onclick="location.href='{% url 'list_teachers' %}'"
+                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px">
+                                <b>KADRA</b>
+                            </button>
+                        </div>
+                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
+                            <button type="button" class="btn me-3"
+                                    onclick="location.href='{% url 'list_parent' %}'"
+                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px"
+                            >
+                                <b>RODZICE</b>
+                            </button>
+                        </div>
+
+                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
+                            <button type="button" class="btn  me-3"
+                                    onclick="location.href='{% url 'photos_list' %}'"
+                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px">
+                                <b>IKONKI</b>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="row">
+                <img style="width: 30%; position: absolute;
+                            right: 0px; bottom: 0px;" src="{% static '363741324_298073572761425_7735044390012477660_n.jpg' %}" alt="zdjecie">
 
 
-                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_groups' %}'">
-                    Grupy
-                </button>
+            </div>
 
-
-                <button type="button" class="btn btn-primary me-3"
-                        onclick="location.href='{% url 'list_payments_plans' %}'">
-                    Plany platnicze
-                </button>
-
-
-                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_meals' %}'">
-                    Posilki
-                </button>
-                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_teachers' %}'">
-                    Pracownicy
-                </button>
-
-                <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'list_parent' %}'">
-                    Rodzice
-                </button>
-
-                <button type="button" class="btn btn-primary me-3"
-                        onclick="location.href='{% url 'director_profile' %}'">
-                    Profil
-                </button>
-                <button type="button" class="btn btn-primary me-3"
-                        onclick="location.href='{% url 'photos_list' %}'">
-                    Icons
-                </button>
-
+                </div>
             </div>
 
         {% elif perms.teacher.is_teacher %}
@@ -47,7 +83,7 @@
             {% if user.employee.role == 2 %}
 
                 <div class="text-center mt-5">
-                    <button type="button" class="btn btn-primary me-3"
+                    <button type="button" class="btn  me-3"
                             onclick="location.href='{% url 'group_details' pk=user.employee.group.first.id %}'">
                         Grupa
                     </button>
@@ -55,6 +91,55 @@
 
             {% endif %}
         {% endif %}
+    {% else %}
+        <section class="">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-6 vh-100 ml-3" style="background-color: #E6DCD3; color: #8D847B;">
+                        <h1 class="text-white text-center mt-5" style="font-size: 50px">CZYM JEST <b>DS</b>?</h1>
+                        <br><br>
+                        <div class="text-left ml-2" style="font-size: 35px">
+                            <b>DS</b> to<b> innowacyjna</b> aplikacja do zarządzania przedszkolami, stworzona w celu
+                            <b>ułatwienia</b> prowadzenia
+                            ww
+                            placówki
+                            oświatowej.
+                            <b>DS</b> przede wszystkim kładzie nacisk na <b>przejrzystość użytku</b> i <b>efektywność
+                            operacyjności</b>. Twórz zespoły i
+                            przydzielaj podopiecznych jako <b>dyrektor</b>, dziel się wydarzeniami jako
+                            <b>nauczyciel</b>
+                            lub
+                            sprawdzaj
+                            aktualności
+                            grupy, do której przypisane są <b>twoje pociechy</b>. Podane funkcje to tylko garstka
+                            możliwości
+                            jakie
+                            gwarantuje
+                            <b>DS</b>. Największym usprawnieniem ww aplikacji jest <b>interaktywny kalendarz
+                            obecności</b>,
+                            dzięki
+                            któremu rodzic
+                            ma możliwość zaznaczenia <b>poprzedzająco</b> nieobecności dziecka.
+                        </div>
+                    </div>
+                    <div class="col-lg-6 vh-100" style="background-color: white; ">
+                        <img style=" position: absolute; margin-left: 5%"
+                             src="{% static '364212157_969659007699021_4006858613897954353_n (1).jpg' %}"
+                             alt="zdjecie"
+                        >
+                        <img style="width: 50%; position: absolute;
+                            right: 0px; bottom: 0px;"
+                             src="{% static '364417276_938772220555437_8380212446515527340_n (1).jpg' %}"
+                             alt="zdjecie"
+                        >
+                    </div>
+                </div>
+            </div>
 
+        </section>
     {% endif %}
+
+
+
+    <link rel="stylesheet" href="{% static 'main.css' %}">
 {% endblock %}

@@ -18,47 +18,56 @@
 
 <header class="page-header">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg justify-content-around">
+    <nav class="navbar navbar-expand-lg justify-content-around" id="navbar" style="background-color: #BAB1AB">
         <!-- Container wrapper -->
         <div class="container-fluid">
-            <!-- Toggle button -->
-            <button
-                    class="navbar-toggler navbar-brand main-logo"
-                    type="button"
-                    data-mdb-toggle="collapse"
-                    data-mdb-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-            >
-                <i class="fas fa-bars"></i>
-            </button>
+            <div class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <!-- Toggle button -->
+                    <a href="{% url 'contact' %} " style="font-size: 20px; color: white; text-decoration:none ">KONTAKT &nbsp; &nbsp; &nbsp;
+                         </a>
 
+                {% endif %}
+            </div>
             <!-- Collapsible wrapper -->
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
                 <!-- Navbar brand -->
-                <a class="navbar-brand mt-2 mt-lg-0" href="#">
-                    <img
-                            src="{% static 'marchewk.jpeg' %}"
-                            height="30"
-                            alt="Logo"
-                            loading="lazy"
-                            style="margin-top: 2px;"
-                    />
-                </a>
                 <!-- Left links -->
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav mb-2 mb-lg-0" style="font-size: 25px; color: white">
 
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'home_page' %}">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'post_list_view' %}">Wydarzenia</a>
+                            <a class="nav-link" href="{% url 'post_list_view' %}">WYDARZENIA</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Kalendarz obecnosci</a>
+                            <a href="{% url 'home_page' %}"
+                               style="font-size: 25px; color: white; text-decoration:none ">| &nbsp;<b>DS</b>
+                                &nbsp;|</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'director_profile' %}">MÓJ PROFIL</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+
+                            <button type="button" class="btn btn-link px-3 me-2"
+                                    style="font-size: 20px; color: white; text-decoration:none "
+                                    onclick="location.href={% url 'login' %}">
+                                ZALOGUJ SIĘ
+                            </button>
+                        </li>
+                        <li class="nav-item mt-1">
+                            <a href="{% url 'home_page' %}"
+                               style="font-size: 25px; color: white; text-decoration:none ">| &nbsp;<b>DS</b>
+                                &nbsp;|</a>
+                        </li>
+                        <li class="nav-item">
+                            <button type="button" class="btn btn-link px-3 me-2"
+                                    style="font-size: 20px; color: white; text-decoration:none"
+                                    onclick="location.href={% url 'register' %}">
+                                ZAREJESTRUJ SIĘ
+                            </button>
                         </li>
 
 
@@ -71,74 +80,21 @@
             <!-- Right elements -->
 
             {% if user.is_authenticated %}
-                <ul class="navbar-nav d-flex flex-row me-1">
-                    <li class="nav-item me-3 me-lg-0">
-                        <a class="nav-link text-white" href="{% url 'contact' %}"><i class="fas fa-envelope mx-1"></i>
-                            Contact</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                 class="bi bi-person-circle" viewBox="0 0 16 16">
-                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-                                <path fill-rule="evenodd"
-                                      d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
-                            </svg>
-                            <i class="bi bi-person-circle"></i>
-                            Profile </a>
+                <ul class="navbar-nav d-flex flex-row me-auto">
+
+                    <li class="nav-item">
                         <!-- Dropdown menu -->
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            {% if perms.director.is_director %}
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'director_profile' %}">My profile</a>
-                                </li>
-                            {% elif perms.parent.is_parent %}
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'parent_profile' %}">My profile</a>
-                                </li>
-                            {% elif perms.teacher.is_teacher %}
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'teacher-profile' pk=user.employee.id %}">My profile</a>
-                                </li>
-
-                            {% endif %}
-                            <li>
-
-                                <a class="dropdown-item" href="{% url 'logout' %}">Logout<i
-                                        class="bi bi-box-arrow-right"></i>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                         class="bi bi-box-arrow-right" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd"
-                                              d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
-                                        <path fill-rule="evenodd"
-                                              d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
-                                    </svg>
-                                </a>
-                            </li>
-                        </ul>
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-link"
+                                style="font-size: 20px; color: white; text-decoration:none"
+                                onclick="location.href={% url 'logout' %}">
+                            <b>WYLOGUJ SIĘ</b>
+                        </button>
+                    </li>
                     </li>
                 </ul>
                 <!-- Right elements -->
             {% else %}
-
-                <div class="d-flex align-items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                         class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd"
-                              d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0v-2z"/>
-                        <path fill-rule="evenodd"
-                              d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
-                    </svg>
-                    <i class="bi bi-box-arrow-in-right"></i>
-                    <button type="button" class="btn btn-link px-3 me-2" onclick="location.href={% url 'login' %}">
-                        Login
-                    </button>
-                    <button type="button" class="btn btn-link px-3 me-2" onclick="location.href={% url 'register' %}">
-                        Sign up
-                    </button>
-
-                </div>
             {% endif %}
 
             <!-- Right elements -->
@@ -158,7 +114,8 @@
         {% endif %}
     </div>
 </div>
-        {% block content %}{% endblock %}
+
+{% block content %}{% endblock %}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"

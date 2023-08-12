@@ -313,6 +313,8 @@ class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
 
     def test_func(self):
         kid = self.get_object()
+        if not kid:
+            return False
         if self.request.user == kid.principal.user:
             return True
         return False
@@ -345,8 +347,12 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
 
     def test_func(self):
         kid = self.get_object()
-        if self.request.user == kid.principal.user:
-            return True
+
+        try:
+            if self.request.user == kid.principal.user:
+                return True
+        except Exception:
+            return False
         return False
 
 
