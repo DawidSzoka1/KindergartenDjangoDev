@@ -1,20 +1,253 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-    {% for teacher in teachers %}
-        <label>Nauczyciel</label>
-        <input class="form-control" readonly type="text" value="{{ teacher }}">
+    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+            <!-- Left links -->
+            <ul class="navbar-nav flex-row">
 
-    {% endfor %}
+                <li class="nav-item me-2 me-lg-0">
 
-    <label>Stan dzieci</label>
-    <input class="form-control" readonly type="text" value="{{ kids.count }}">
-    <label>Liczba miejsc</label>
-    <input class="form-control" readonly type="text" value="{{ group.capacity }}">
+                    <a href="{% url 'list_groups' %}" role="button"
+                       style="font-size: 25px; color: #75736B; text-decoration:none;">
 
-    {% for kid in kids %}
-    {{ kid.id }}
-    {% endfor %}
-    iconka grupy:<br>
-    <img alt="iconka grupy" src="{{ group.photo.first.group_photos.url }}">
+                        GRUPY
+                    </a>
+                </li>
 
+            </ul>
+            <!-- Left links -->
+
+
+            <ul class="navbar-nav d-flex flex-row me-1">
+                <li class="nav-item">
+                    <button class="btn" onclick="location.href='{% url 'group_update' pk=group.id %}'"
+                            style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
+                        EDYTUJ GRUPĘ
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <!-- Container wrapper -->
+    </nav>
+    <div class="row">
+        <div class="row">
+            <div class="row">
+                <figure>
+                    <img style="width: 15%; position: absolute;
+                            left: 12%; bottom: 40%;"
+                         src="{{ group.photo.first }}" alt="zdjecie">
+                    <figcaption style="position: absolute; font-size: 30px;
+                            left: 10%; bottom: 30%; color: #75736B;"><b>{{ group.name.upper }}</b></figcaption>
+                </figure>
+
+            </div>
+
+        </div>
+        <section class="vh-100" style="margin-left: 35%; width: 60%; margin-top: 5%;">
+            <div class="container h-100">
+                <div class="row d-flex justify-content-center align-items-center h-90">
+                    <div class="col-lg-12 col-xl-11">
+                        <div class="card text-white" style="border-radius: 25px; background-color: #BAB1AB">
+                            <div class="card-body p-md-5">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-10">
+
+                                        <p class="text-center"></p>
+
+                                        <form class="mx-1" method="POST">
+                                            {% csrf_token %}
+                                            <div class="row">
+                                                {% for teacher in teachers %}
+                                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                        <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
+
+                                                        <input readonly class="form-control" name="teacher" type="text"
+                                                               value="{{ teacher.first_name }} {{ teacher.last_name }}">
+                                                    </div>
+                                                {% empty %}
+                                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                        <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
+
+                                                        <input readonly class="form-control" name="teacher" type="text"
+                                                               value="Grupa jeszcze nie ma nauczyciela">
+                                                    </div>
+                                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                        <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
+
+                                                        <input readonly class="form-control" name="teacher" type="text"
+                                                               value="Grupa jeszcze nie ma nauczyciela">
+                                                    </div>
+                                                {% endfor %}
+
+                                            </div>
+                                            <div class="row  mt-3">
+                                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                    <label for="teacher">STAN DZIECI:</label>
+
+                                                    <input readonly class="form-control" name="teacher" type="text"
+                                                           value="{{ kids.count }}">
+                                                </div>
+                                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                    <label for="teacher">LICZBA MIEJSC:</label>
+
+                                                    <input readonly class="form-control" name="teacher" type="text"
+                                                           value="{{ group.capacity }}">
+                                                </div>
+
+                                            </div>
+                                            <div class="row mt-4">
+                                                <div class="col">
+                                                    <button class="btn " data-bs-toggle="collapse"
+                                                            style="background-color: #E6DCD3; color: white; width: 100%"
+                                                            aria-expanded="false" type="button"
+                                                            data-bs-target="#collapse"
+                                                            aria-controls="collapse">
+                                                        LISTA DZIECI
+                                                    </button>
+                                                    <div id="collapse" class="collapse"
+                                                         aria-labelledby="heading"
+                                                         data-bs-parent="#accordion">
+
+
+                                                        {% for kid in group.kid_set.all %}
+                                                            {% if kid.is_active == True %}
+
+
+
+                                                                <div class="container mb-1" style="background-color: white">
+                                                                    <div class="row" style="padding-top: 10px;">
+                                                                        <div class="col-xl-1 col-lg-6 col-md-6 col-sm-6 col-12"
+                                                                             style="justify-content: start">
+                                                                            {% if kid.gender == 2 %}
+                                                                                <img class="img"
+                                                                                     style="height: 65px;"
+                                                                                     src="{% static 'girl.jpg' %}"
+                                                                                     alt="">
+                                                                            {% else %}
+                                                                                <img class="img"
+                                                                                     style="height: 65px; margin-left: 3%; margin-right: 2%"
+                                                                                     src="{% static 'boy.jpg' %}"
+                                                                                     alt="">
+                                                                            {% endif %}
+                                                                        </div>
+                                                                        <div class="col-md-5 mt-3">
+
+                                                                            <a href="{% url 'kid_details' pk=kid.id %}"
+                                                                               style="font-size: 20px; text-decoration:none; color: #75736B ">{{ kid.first_name.title }} {{ kid.last_name.title }}</a>
+
+                                                                        </div>
+                                                                        <div class="col mt-3 ml-5">
+
+
+                                                                            {#                                                                        </td>#}
+                                                                            {#                                                                        <td class="justify-content-right"#}
+                                                                            {#                                                                            style="padding-top: 22px; padding-left: 270px; position: relative">#}
+                                                                            {% if kid.parents.all %}
+
+                                                                                <a style="font-size: 20px;  text-decoration:none; color: #75736B; margin-top: 20px "
+                                                                                   href="{% url 'invite_parent'  pk=kid.id %}">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                         width="16"
+                                                                                         height="16"
+                                                                                         fill="currentColor"
+                                                                                         class="bi bi-check2-square"
+                                                                                         viewBox="0 0 16 16">
+                                                                                        <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
+                                                                                        <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
+                                                                                    </svg>
+                                                                                    Dodaj rodzica</a>
+                                                                            {% else %}
+                                                                                <a style="font-size: 20px;  text-decoration:none; color: #75736B "
+                                                                                   href="{% url 'invite_parent'  pk=kid.id %}">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                                         width="16"
+                                                                                         height="16"
+                                                                                         fill="currentColor"
+                                                                                         class="bi bi-app"
+                                                                                         viewBox="0 0 16 16">
+                                                                                        <path d="M11 2a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3h6zM5 1a4 4 0 0 0-4 4v6a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4V5a4 4 0 0 0-4-4H5z"/>
+                                                                                    </svg>
+                                                                                    Dodaj rodzica</a>
+                                                                            {% endif %}
+
+                                                                        </div>
+                                                                        <div class="col-3 mt-3 ml-4"
+                                                                             style="margin-right: 1px">
+                                                                            {#                                                                        </td>#}
+                                                                            {#                                                                        <td style="padding-top: 22px;">#}
+                                                                            <div class="drodown">
+                                                                                <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
+                                                                                   href="#"
+                                                                                   id="navbarDropdownMenuAvatar"
+                                                                                   role="button"
+                                                                                   data-bs-toggle="dropdown"
+                                                                                   aria-expanded="false"
+                                                                                   style="font-size: 20px;  text-decoration:none; color: #75736B; ">
+                                                                                    | Opcje
+                                                                                </a>
+                                                                                <ul
+                                                                                        class="dropdown-menu dropdown-menu-end"
+                                                                                        aria-labelledby="navbarDropdownMenuAvatar"
+                                                                                >
+                                                                                    <li>
+                                                                                        <a href="{% url 'kid_details' pk=kid.id %}"
+                                                                                           class="dropdown-item">View
+                                                                                            detail</a>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <a href="{% url 'change_kid_info' pk=kid.id %}"
+                                                                                           class="dropdown-item">Change
+                                                                                            info</a>
+                                                                                    </li>
+                                                                                    <li>
+                                                                                        <a href="#!"
+                                                                                           class="dropdown-item">Delete
+                                                                                            user</a>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endfor %}
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-3">
+                                                <div class="col">
+                                                    <label for="teacher">ZAJĘCIA GRUPOWE:</label>
+
+                                                    <input readonly class="form-control" name="teacher" type="text"
+                                                           value="">
+                                                </div>
+                                            </div>
+                                            <div class="row mt-3">
+                                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                    <label for="teacher">ROCZNIK:</label>
+
+                                                    <input readonly class="form-control" name="teacher" type="text"
+                                                           value="">
+                                                </div>
+                                            </div>
+
+
+                                        </form>
+
+
+                                    </div>
+                                    <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
 {% endblock %}
