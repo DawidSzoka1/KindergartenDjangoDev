@@ -23,9 +23,21 @@
             <ul class="navbar-nav d-flex flex-row me-1">
                 <li class="nav-item">
                     <button class="btn" onclick="location.href='{% url 'group_update' pk=group.id %}'"
-                            style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
+                            style="font-size: 25px; margin-right: 2px; color: white; background-color: #75736B; text-decoration:none;">
                         EDYTUJ GRUPĘ
                     </button>
+                </li>
+                <li class="nav-item">
+                    <form method="POST" action="{% url 'group_delete' pk=group.id %}">
+                        {% csrf_token %}
+                        <button class="btn" type="submit" name="delete"
+                                value="Usuń"
+                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;"
+                                onclick="return confirm('Czy na pewno chcesz usnuac ta grupe? Jezli ja usuniesz wszystki dzieci w niej zostana bez grupy');"
+                        >USUŃ GRUPE
+                        </button>
+                    </form>
+
                 </li>
             </ul>
         </div>
@@ -60,12 +72,31 @@
                                             {% csrf_token %}
                                             <div class="row">
                                                 {% for teacher in teachers %}
-                                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
+                                                    {% if forloop.counter == 2 %}
+                                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                            <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
 
-                                                        <input readonly class="form-control" name="teacher" type="text"
-                                                               value="{{ teacher.first_name }} {{ teacher.last_name }}">
-                                                    </div>
+                                                            <input readonly class="form-control" name="teacher"
+                                                                   type="text"
+                                                                   value="{{ teacher.first_name }} {{ teacher.last_name }}">
+                                                        </div>
+                                                    {% elif forloop.counter == 1 %}
+                                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                            <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
+
+                                                            <input readonly class="form-control" name="teacher"
+                                                                   type="text"
+                                                                   value="{{ teacher.first_name }} {{ teacher.last_name }}">
+                                                        </div>
+                                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                                            <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
+
+                                                            <input readonly class="form-control" name="teacher"
+                                                                   type="text"
+                                                                   value="Grupa nie ma jeszcze drugiego nauczyciela">
+                                                        </div>
+
+                                                    {% endif %}
                                                 {% empty %}
                                                     <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                                         <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
@@ -116,7 +147,8 @@
 
 
 
-                                                                <div class="container mb-1" style="background-color: white">
+                                                                <div class="container mb-1"
+                                                                     style="background-color: white">
                                                                     <div class="row" style="padding-top: 10px;">
                                                                         <div class="col-xl-1 col-lg-6 col-md-6 col-sm-6 col-12"
                                                                              style="justify-content: start">
@@ -141,10 +173,7 @@
                                                                         <div class="col mt-3 ml-5">
 
 
-                                                                            {#                                                                        </td>#}
-                                                                            {#                                                                        <td class="justify-content-right"#}
-                                                                            {#                                                                            style="padding-top: 22px; padding-left: 270px; position: relative">#}
-                                                                            {% if kid.parents.all %}
+                                                                            {% if kid.parenta_set.all %}
 
                                                                                 <a style="font-size: 20px;  text-decoration:none; color: #75736B; margin-top: 20px "
                                                                                    href="{% url 'invite_parent'  pk=kid.id %}">
@@ -175,8 +204,7 @@
                                                                         </div>
                                                                         <div class="col-3 mt-3 ml-4"
                                                                              style="margin-right: 1px">
-                                                                            {#                                                                        </td>#}
-                                                                            {#                                                                        <td style="padding-top: 22px;">#}
+
                                                                             <div class="drodown">
                                                                                 <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
                                                                                    href="#"
@@ -193,18 +221,27 @@
                                                                                 >
                                                                                     <li>
                                                                                         <a href="{% url 'kid_details' pk=kid.id %}"
-                                                                                           class="dropdown-item">View
-                                                                                            detail</a>
+                                                                                           class="dropdown-item">Konto
+                                                                                            dziecka
+                                                                                        </a>
                                                                                     </li>
                                                                                     <li>
                                                                                         <a href="{% url 'change_kid_info' pk=kid.id %}"
-                                                                                           class="dropdown-item">Change
-                                                                                            info</a>
+                                                                                           class="dropdown-item">Zmien
+                                                                                            informacje</a>
                                                                                     </li>
                                                                                     <li>
-                                                                                        <a href="#!"
-                                                                                           class="dropdown-item">Delete
-                                                                                            user</a>
+                                                                                        <form method="POST"
+                                                                                              action="{% url 'kid_delete' pk=kid.id %}">
+                                                                                            {% csrf_token %}
+                                                                                            <button class="dropdown-item"
+                                                                                                    type="submit"
+                                                                                                    name="delete"
+                                                                                                    value="Usuń"
+                                                                                                    onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}');"
+                                                                                            >Usuń dziecko
+                                                                                            </button>
+                                                                                        </form>
                                                                                     </li>
                                                                                 </ul>
                                                                             </div>

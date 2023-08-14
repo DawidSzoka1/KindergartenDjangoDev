@@ -243,6 +243,24 @@ class GroupUpdateView(PermissionRequiredMixin, View):
         raise PermissionDenied
 
 
+class GroupDeleteView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def post(self, request, pk):
+        group = get_object_or_404(Groups, id=int(pk))
+        director = Director.objects.get(user=request.user.id)
+        if group.principal == director:
+            for kid in group.kid_set.filter(is_active=True):
+                kid.group = None
+                kid.save()
+            group.is_active = False
+            group.save()
+            messages.success(request,
+                             f'Poprawnie usunieto grupe')
+            return redirect('list_groups')
+        raise PermissionDenied
+
+
 class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
     permission_required = "director.is_director"
     model = Kid
@@ -319,15 +337,13 @@ class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
             context["kid"] = get_object_or_404(Director, user=self.request.user.id).kid_set.filter(
                 is_active=True).filter(id=context['kid'].id).first()
             context["meals"] = context['kid'].kid_meals.filter(is_active=True)
-            context["parents"] = context['kid'].parenta_set.filter(is_active=True)
+            context["parents"] = context['kid'].parenta_set.all()
         except Exception:
             raise PermissionDenied
         return context
 
     def test_func(self):
         kid = self.get_object()
-        if not kid:
-            return False
         if self.request.user == kid.principal.user:
             if kid.is_active == True:
                 return True
@@ -378,9 +394,18 @@ class KidDeleteView(PermissionRequiredMixin, View):
         kid = get_object_or_404(Kid, id=int(pk))
         director = Director.objects.get(user=request.user.id)
         if kid.principal == director:
+            kid_parents = kid.parenta_set.all()
+
+            for parent in kid_parents:
+                if parent.kids.filter(is_active=True).__len__() == 2:
+                    pass
+                elif parent.kids.filter(is_active=True).__len__() == 1:
+                    parent.delete()
+
             kid.is_active = False
             kid.save()
-            messages.success(request, f'Dziecko o nazwisko {kid.last_name} zostalo usuniete')
+            messages.success(request,
+                             f'Popprawnie usunieto dziecko {kid} jezeli jego rodzic nie mial innego dziecka jego konto tez zostalo usuniete')
             return redirect('list_kids')
         raise PermissionDenied
 
