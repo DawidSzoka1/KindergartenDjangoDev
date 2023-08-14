@@ -77,7 +77,14 @@
                                                     <a href="{% url 'meals_update' pk=meal.id %}" class="dropdown-item">Change info</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#!" class="dropdown-item">Delete user</a>
+                                                    <form method="POST" action="{% url 'meals_delete' pk=meal.id %}">
+                                                        {% csrf_token %}
+                                                        <button class="dropdown-item" type="submit" name="delete"
+                                                                value="Usuń"
+                                                                onclick="return confirm('Jestes pewny ze chcesz usunac posilek {{ meal }}?');"
+                                                        >Usuń
+                                                        </button>
+                                                    </form>
                                                 </li>
                                             </ul>
                                         </div>

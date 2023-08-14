@@ -71,6 +71,27 @@ class PaymentPlanUpdateView(PermissionRequiredMixin, View):
         return redirect('payment_plan_update', pk=pk)
 
 
+class PaymentPlanDeleteView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request, pk):
+        raise PermissionDenied
+
+    def post(self, request, pk):
+        payment = get_object_or_404(PaymentPlan, id=int(pk))
+        director = Director.objects.get(user=request.user.id)
+        if payment.principal == director:
+            for kid in payment.kid_set.filter(is_active=True):
+                kid.payment_plan = None
+                kid.save()
+            payment.delete()
+            messages.success(request,
+                             f'Popprawnie usunieto plan platniczy {payment}')
+            return redirect('list_payments_plans')
+        raise PermissionDenied
+
+
+
 class MealAddView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
@@ -150,6 +171,26 @@ class MealsUpdateView(PermissionRequiredMixin, View):
                 return redirect('list_meals')
             messages.error(request, "Wypelnij wszystkie pola")
             return redirect('meals_update', pk=pk)
+        raise PermissionDenied
+
+
+class MealDeleteView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request, pk):
+        raise PermissionDenied
+
+    def post(self, request, pk):
+        meal = get_object_or_404(Meals, id=int(pk))
+        director = Director.objects.get(user=request.user.id)
+        if meal.principal == director:
+            for kid in meal.kid_set.filter(is_active=True):
+                kid.kid_meals = None
+                kid.save()
+            meal.delete()
+            messages.success(request,
+                             f'Popprawnie usunieto posilek {meal}')
+            return redirect('list_meals')
         raise PermissionDenied
 
 
@@ -246,6 +287,9 @@ class GroupUpdateView(PermissionRequiredMixin, View):
 class GroupDeleteView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
+    def get(self, request, pk):
+        raise PermissionDenied
+
     def post(self, request, pk):
         group = get_object_or_404(Groups, id=int(pk))
         director = Director.objects.get(user=request.user.id)
@@ -333,13 +377,13 @@ class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        try:
-            context["kid"] = get_object_or_404(Director, user=self.request.user.id).kid_set.filter(
+
+        context["kid"] = get_object_or_404(Director, user=self.request.user.id).kid_set.filter(
                 is_active=True).filter(id=context['kid'].id).first()
-            context["meals"] = context['kid'].kid_meals.filter(is_active=True)
-            context["parents"] = context['kid'].parenta_set.all()
-        except Exception:
-            raise PermissionDenied
+        if context['kid'].kid_meals:
+            context["meals"] = context['kid'].kid_meals.all()
+        context["parents"] = context['kid'].parenta_set.all()
+
         return context
 
     def test_func(self):
@@ -390,22 +434,17 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
 class KidDeleteView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
+    def get(self, request, pk):
+        raise PermissionDenied
+
     def post(self, request, pk):
         kid = get_object_or_404(Kid, id=int(pk))
         director = Director.objects.get(user=request.user.id)
         if kid.principal == director:
-            kid_parents = kid.parenta_set.all()
-
-            for parent in kid_parents:
-                if parent.kids.filter(is_active=True).__len__() == 2:
-                    pass
-                elif parent.kids.filter(is_active=True).__len__() == 1:
-                    parent.delete()
-
             kid.is_active = False
             kid.save()
             messages.success(request,
-                             f'Popprawnie usunieto dziecko {kid} jezeli jego rodzic nie mial innego dziecka jego konto tez zostalo usuniete')
+                             f'Popprawnie usunieto dziecko {kid}')
             return redirect('list_kids')
         raise PermissionDenied
 

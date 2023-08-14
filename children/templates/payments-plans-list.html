@@ -70,7 +70,14 @@
                                                     <a href="{% url 'payment_plan_update' pk=plan.id %}" class="dropdown-item">Edytuj</a>
                                                 </li>
                                                 <li>
-                                                    <a href="#!" class="dropdown-item">Delete user</a>
+                                                    <form method="POST" action="{% url 'payment_plan_delete' pk=plan.id %}">
+                                                        {% csrf_token %}
+                                                        <button class="dropdown-item" type="submit" name="delete"
+                                                                value="Usuń"
+                                                                onclick="return confirm('Jestes pewny ze chcesz usunac plan platniczy {{ plan }}?');"
+                                                        >Usuń
+                                                        </button>
+                                                    </form>
                                                 </li>
                                             </ul>
                                         </div>

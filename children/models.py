@@ -56,9 +56,9 @@ class Kid(models.Model):
     gender = models.IntegerField(choices=gender_choices, default=1)
     start = models.DateField(default=timezone.now)
     end = models.DateField(null=True)
-    payment_plan = models.ForeignKey(PaymentPlan, on_delete=models.CASCADE)
+    payment_plan = models.ForeignKey(PaymentPlan, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=20, decimal_places=2, null=True)
-    kid_meals = models.ManyToManyField(Meals)
+    kid_meals = models.ForeignKey(Meals, on_delete=models.CASCADE, null=True)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     is_active = models.BooleanField(default=True)
 

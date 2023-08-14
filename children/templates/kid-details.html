@@ -53,8 +53,13 @@
 
                                         <div class="form-group">
                                             <label for="group">Nazwa grupy:</label>
-                                            <input class="form-control" name="group" type="text"
-                                                   value="{{ kid.group.name }}">
+                                            {% if kid.group %}
+                                                <input class="form-control" name="group" type="text"
+                                                       value="{{ kid.group.name }}">
+                                            {% else %}
+                                                <input class="form-control" name="group" type="text"
+                                                       value="Dziecko nie jest przypisane do grupy">
+                                            {% endif %}
 
                                         </div>
                                     </div>
@@ -85,8 +90,13 @@
 
                                         <div class="form-group">
                                             <label for="payment">Plan Platniczy</label>
-                                            <input class="form-control" name="payment" type="text"
-                                                   value="{{ kid.payment_plan.name }}">
+                                             {% if kid.payment_plan %}
+                                                <input class="form-control" name="payment_plan" type="text"
+                                                       value="{{ kid.payment_plan.name }}">
+                                            {% else %}
+                                                <input class="form-control" name="group" type="text"
+                                                       value="Dziecko nie ma planu platniczego">
+                                            {% endif %}
 
                                         </div>
                                     </div>
@@ -118,6 +128,16 @@
 
                                             </div>
                                         </div>
+                                        </div>
+                                    {% empty %}
+                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
+
+                                            <div class="form-group">
+                                                <label for="meals">Plan zywieniowy:</label>
+                                                <input class="form-control" name="meals" type="text"
+                                                       value="Nie ma planu zywieniowego">
+
+                                            </div>
                                         </div>
                                     {% endfor %}
 
