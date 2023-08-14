@@ -81,7 +81,7 @@ class ParentListView(PermissionRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["parents"] = Director.objects.get(user=self.request.user.id).parenta_set.filter(is_active=True)
+        context["parents"] = Director.objects.get(user=self.request.user.id).parenta_set.all()
         return context
 
 
@@ -132,6 +132,18 @@ class ParentProfileView(LoginRequiredMixin, View):
             p_form.save()
             u_form.save()
             return redirect('parent_profile')
+
+
+class ParentDeleteView(PermissionRequiredMixin, View):
+    permission_required = 'director.is_director'
+
+    def post(self, request, pk):
+        parent = get_object_or_404(ParentA, id=int(pk))
+        if parent.principal.first().user.email == request.user.email:
+            parent.delete()
+            messages.success(request, f'Rodzic {parent.user.email} został usniety')
+            return redirect('list_parent')
+        raise PermissionDenied
 
 
 class ParentSearchView(LoginRequiredMixin, View):
