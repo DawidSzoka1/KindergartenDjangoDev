@@ -11,6 +11,7 @@ class Groups(models.Model):
     capacity = models.IntegerField(null=True, validators=[MinValueValidator(limit_value=1)])
     photo = models.ManyToManyField(GroupPhotos)
     is_active = models.BooleanField(default=True)
+    yearbook = models.IntegerField(null=True)
 
     def __str__(self):
         """

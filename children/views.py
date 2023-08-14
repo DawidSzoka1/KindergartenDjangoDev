@@ -52,10 +52,23 @@ class PaymentPlanUpdateView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request, pk):
-        return render(request, 'payment-plan-update.html')
+        payment = get_object_or_404(PaymentPlan, id=int(pk))
+        director = Director.objects.get(user=request.user.id)
+        if payment:
+            if payment.principal == director:
+                form = PaymentPlanForm(instance=payment)
+                return render(request, 'payment-plan-update.html', {'form': form})
+        raise PermissionDenied
 
     def post(self, request, pk):
-        pass
+        payment = get_object_or_404(PaymentPlan, id=int(pk))
+        form = PaymentPlanForm(request.POST, instance=payment)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Poprawnie zmieniono informacje')
+            return redirect('list_payments_plans')
+        messages.error(request, f"{form.errors}")
+        return redirect('payment_plan_update', pk=pk)
 
 
 class MealAddView(PermissionRequiredMixin, View):
