@@ -62,6 +62,11 @@ class Kid(models.Model):
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     is_active = models.BooleanField(default=True)
 
+    def __str__(self):
+        """
+        String representation
+        """
+        return f'{self.first_name.title()} {self.last_name.title()}'
 
 presenceChoices = (
     (1, 'Nieobeconsc'),

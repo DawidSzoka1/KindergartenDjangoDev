@@ -5,11 +5,11 @@
 
     <div class="container mt-3 mb-4 center">
         <form class="d-flex" method="POST" action="{% url 'kid-search' %}">
-        {% csrf_token %}
-        <input class="form-control me-2" type="search" placeholder="szukaj po imieniu"
-               aria-label="szukaj po imieniu" name="search">
-        <button class="btn btn-outline-secondary" type="submit">Szukaj</button>
-    </form>
+            {% csrf_token %}
+            <input class="form-control me-2" type="search" placeholder="szukaj po imieniu"
+                   aria-label="szukaj po imieniu" name="search">
+            <button class="btn btn-outline-secondary" type="submit">Szukaj</button>
+        </form>
         <div class="col-lg-9 mt-4 mt-lg-0">
             <div class="col d-flex justify-content-end mb-2 noPadding">
                 <a href="{% url 'home_page' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
@@ -125,6 +125,14 @@
                                                 <li>
                                                     <a href="{% url 'calendar' kid.id %}"
                                                        class="dropdown-item">Calendar</a>
+                                                </li>
+                                                <li>
+                                                    <form method="POST" action="{% url 'kid_delete' pk=kid.id %}">
+                                                        {% csrf_token %}
+                                                        <button class="dropdown-item" type="submit" name="delete" value="Usuń" onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}');"
+                                                                >Usuń
+                                                        </button>
+                                                    </form>
                                                 </li>
                                             </ul>
                                         </div>

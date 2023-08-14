@@ -329,7 +329,8 @@ class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
         if not kid:
             return False
         if self.request.user == kid.principal.user:
-            return True
+            if kid.is_active == True:
+                return True
         return False
 
 
@@ -363,10 +364,25 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
 
         try:
             if self.request.user == kid.principal.user:
-                return True
+                if kid.is_active == True:
+                    return True
         except Exception:
             return False
         return False
+
+
+class KidDeleteView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def post(self, request, pk):
+        kid = get_object_or_404(Kid, id=int(pk))
+        director = Director.objects.get(user=request.user.id)
+        if kid.principal == director:
+            kid.is_active = False
+            kid.save()
+            messages.success(request, f'Dziecko o nazwisko {kid.last_name} zostalo usuniete')
+            return redirect('list_kids')
+        raise PermissionDenied
 
 
 class KidSearchView(LoginRequiredMixin, View):
