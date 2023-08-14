@@ -129,8 +129,10 @@
                                                 <li>
                                                     <form method="POST" action="{% url 'kid_delete' pk=kid.id %}">
                                                         {% csrf_token %}
-                                                        <button class="dropdown-item" type="submit" name="delete" value="Usuń" onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}');"
-                                                                >Usuń
+                                                        <button class="dropdown-item" type="submit" name="delete"
+                                                                value="Usuń"
+                                                                onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }} jego rodzic tez moze zostac usuniety');"
+                                                        >Usuń
                                                         </button>
                                                     </form>
                                                 </li>

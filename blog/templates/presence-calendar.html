@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <form method="POST" action="">
+{% csrf_token %}
+    {% for kid in kids %}
+        {{ kid }}
+    {% endfor %}
+
+    </form>
+    <script src="{% static 'calendar.js' %}"></script>
+{% endblock %}

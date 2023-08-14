@@ -52,7 +52,7 @@ class Kid(models.Model):
     gender_choices = ((1, 'Chłopiec'), (2, 'Dziewczynka'))
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
-    group = models.ForeignKey(Groups, on_delete=models.CASCADE)
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True)
     gender = models.IntegerField(choices=gender_choices, default=1)
     start = models.DateField(default=timezone.now)
     end = models.DateField(null=True)
@@ -77,6 +77,6 @@ presenceChoices = (
 
 
 class PresenceModel(models.Model):
-    day = models.DateField(default=timezone.now())
+    day = models.DateField(auto_created=timezone.now())
     kid = models.ForeignKey(Kid, on_delete=models.CASCADE)
     presenceType = models.IntegerField(choices=presenceChoices)

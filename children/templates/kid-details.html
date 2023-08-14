@@ -133,6 +133,7 @@
                         <h6 class="mb-3 text-primary">Parents</h6>
                     </div>
                     {% for parent in parents %}
+
                         <a href="{% url 'parent_details' pk=parent.id %}">Profil Rodzica</a>
                         <div class="card h-90">
                             <div class="card-body">

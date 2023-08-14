@@ -126,6 +126,22 @@ class Home(View):
         return render(request, 'home.html')
 
 
+class PresenceCalendarView(LoginRequiredMixin, View):
+    def get(self, request):
+        user = request.user
+        if user.get_user_permissions() == {'director.is_director'}:
+            director = Director.objects.get(user=user.id)
+            kids = director.kid_set.filter(is_active=True)
+        elif user.get_user_permissions() == {'teacher.is_teacher'}:
+            teacher = Employee.objects.get(user=user.id)
+            kids = teacher.group.first().kid_set.filter(is_active=True)
+        else:
+            parent = ParentA.objects.get(user=user.id)
+            kids = parent.kids.filter(is_active=True)
+        today = timezone.now().day
+        return render(request, 'presence-calendar.html', {'kids': kids, 'today': today})
+
+
 class PostListView(ListView):
     model = Post
     template_name = 'post_list.html'
