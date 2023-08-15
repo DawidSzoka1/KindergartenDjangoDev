@@ -45,7 +45,7 @@
                             <img src=""
                                  width="64" height="64"
                                  alt="Planowana nieobecnosc">
-
+                            <input type="hidden" value="{{ perms.director }}" id="user">
                         </label>
                     </div>
                 </div>
@@ -73,10 +73,11 @@
                             <img src=""
                                  width="64" height="64"
                                  alt="Nieobecnosc">
-
+                            <input type="hidden" value="{{ perms.teacher }}" id="user">
                         </label>
                     </div>
                 </div>
+
             {% elif perms.parent.is_parent %}
                 <div class="form-group">
                     <div class="form-check" id="options">
@@ -87,11 +88,14 @@
                             <img src=""
                                  width="64" height="64"
                                  alt="Planowana nieobecnosc">
+                            <input type="hidden" value="{{ perms.parent }}" id="user">
 
                         </label>
                     </div>
                 </div>
+
             {% endif %}
+
             <div class="form-group">
                 <input type="hidden" value="{{ day_current }}" id="currentDay">
             </div>
