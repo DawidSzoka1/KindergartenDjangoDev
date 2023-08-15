@@ -90,7 +90,7 @@
 
                                         <div class="form-group">
                                             <label for="payment">Plan Platniczy</label>
-                                             {% if kid.payment_plan %}
+                                            {% if kid.payment_plan %}
                                                 <input class="form-control" name="payment_plan" type="text"
                                                        value="{{ kid.payment_plan.name }}">
                                             {% else %}
@@ -118,28 +118,29 @@
 
                                         </div>
                                     </div>
-                                    {% for meal in meals %}
-                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
+                                    {#                                    {% for meal in meals %}#}
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
 
-                                            <div class="form-group">
-                                                <label for="meals">Plan zywieniowy:</label>
-                                                <input class="form-control" name="meals" type="text"
-                                                       value="{{ meal.name }}">
+                                        <div class="form-group">
+                                            <label for="meals">Plan zywieniowy:</label>
+                                            <input class="form-control" name="meals" type="text"
+                                                   value="{{ meals.name }}">
 
-                                            </div>
                                         </div>
-                                        </div>
-                                    {% empty %}
-                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">
+                                    </div>
+                                </div>
 
-                                            <div class="form-group">
-                                                <label for="meals">Plan zywieniowy:</label>
-                                                <input class="form-control" name="meals" type="text"
-                                                       value="Nie ma planu zywieniowego">
-
-                                            </div>
-                                        </div>
-                                    {% endfor %}
+                                {#                                    {% empty %}#}
+                                {#                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12 mt-2">#}
+                                {##}
+                                {#                                            <div class="form-group">#}
+                                {#                                                <label for="meals">Plan zywieniowy:</label>#}
+                                {#                                                <input class="form-control" name="meals" type="text"#}
+                                {#                                                       value="Nie ma planu zywieniowego">#}
+                                {##}
+                                {#                                            </div>#}
+                                {#                                        </div>#}
+                                {#                                    {% endfor %}#}
 
                             </div>
 

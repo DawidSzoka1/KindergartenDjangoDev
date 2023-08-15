@@ -112,7 +112,7 @@ class ParentProfileView(LoginRequiredMixin, View):
             p_form = ParentUpdateForm(instance=request.user.parenta)
             u_form = UserUpdateForm(instance=request.user)
             parent_logged = ParentA.objects.get(user=request.user.id)
-            parent_kids = parent_logged.kid_set.filter(is_active=True)
+            parent_kids = parent_logged.kids.filter(is_active=True)
 
             context = {
                 'p_form': p_form,
@@ -132,6 +132,8 @@ class ParentProfileView(LoginRequiredMixin, View):
             p_form.save()
             u_form.save()
             return redirect('parent_profile')
+        messages.error(request, f'{u_form.errors} i {p_form.errors}')
+        return redirect('parent_profile')
 
 
 class ParentDeleteView(PermissionRequiredMixin, View):

@@ -76,18 +76,28 @@
                                                     aria-labelledby="navbarDropdownMenuAvatar"
                                             >
 {#                                                <li>#}
-{#                                                    <a href="{% url 'kid_details'  pk=kid.id %}"#}
-{#                                                       class="dropdown-item">View detail</a>#}
+{#                                                    <form method="POST" action="{% url 'kid_delete' pk=kid.id %}">#}
+{#                                                        {% csrf_token %}#}
+{#                                                        <button class="dropdown-item" type="submit" name="delete"#}
+{#                                                                value="Usuń"#}
+{#                                                                onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}?');"#}
+{#                                                        >Usuń#}
+{#                                                        </button>#}
+{#                                                    </form>#}
 {#                                                </li>#}
-{#                                                <li>#}
-{#                                                    <a href="{% url 'change_kid_info'  pk=kid.id %}"#}
-{#                                                       class="dropdown-item">Change#}
-{#                                                        info</a>#}
-{#                                                </li>#}
-{#                                                <li>#}
-{#                                                    <a href="{% url 'calendar' kid.id %}"#}
-{#                                                       class="dropdown-item">Calendar</a>#}
-{#                                                </li>#}
+                                                {#                                                <li>#}
+                                                {#                                                    <a href="{% url 'kid_details'  pk=kid.id %}"#}
+                                                {#                                                       class="dropdown-item">View detail</a>#}
+                                                {#                                                </li>#}
+                                                {#                                                <li>#}
+                                                {#                                                    <a href="{% url 'change_kid_info'  pk=kid.id %}"#}
+                                                {#                                                       class="dropdown-item">Change#}
+                                                {#                                                        info</a>#}
+                                                {#                                                </li>#}
+                                                {#                                                <li>#}
+                                                {#                                                    <a href="{% url 'calendar' kid.id %}"#}
+                                                {#                                                       class="dropdown-item">Calendar</a>#}
+                                                {#                                                </li>#}
                                             </ul>
                                         </div>
                                     </td>
@@ -136,18 +146,28 @@
                                                     aria-labelledby="navbarDropdownMenuAvatar"
                                             >
 {#                                                <li>#}
-{#                                                    <a href="{% url 'kid_details'  pk=kid.id %}"#}
-{#                                                       class="dropdown-item">View detail</a>#}
+{#                                                    <form method="POST" action="{% url 'kid_delete' pk=kid.id %}">#}
+{#                                                        {% csrf_token %}#}
+{#                                                        <button class="dropdown-item" type="submit" name="delete"#}
+{#                                                                value="Usuń"#}
+{#                                                                onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}?');"#}
+{#                                                        >Usuń#}
+{#                                                        </button>#}
+{#                                                    </form>#}
 {#                                                </li>#}
-{#                                                <li>#}
-{#                                                    <a href="{% url 'change_kid_info'  pk=kid.id %}"#}
-{#                                                       class="dropdown-item">Change#}
-{#                                                        info</a>#}
-{#                                                </li>#}
-{#                                                <li>#}
-{#                                                    <a href="{% url 'calendar' kid.id %}"#}
-{#                                                       class="dropdown-item">Calendar</a>#}
-{#                                                </li>#}
+                                                {#                                                <li>#}
+                                                {#                                                    <a href="{% url 'kid_details'  pk=kid.id %}"#}
+                                                {#                                                       class="dropdown-item">View detail</a>#}
+                                                {#                                                </li>#}
+                                                {#                                                <li>#}
+                                                {#                                                    <a href="{% url 'change_kid_info'  pk=kid.id %}"#}
+                                                {#                                                       class="dropdown-item">Change#}
+                                                {#                                                        info</a>#}
+                                                {#                                                </li>#}
+                                                {#                                                <li>#}
+                                                {#                                                    <a href="{% url 'calendar' kid.id %}"#}
+                                                {#                                                       class="dropdown-item">Calendar</a>#}
+                                                {#                                                </li>#}
                                             </ul>
                                         </div>
                                     </td>

@@ -17,13 +17,12 @@
                                 </div>
                                 <div class="col-xl-6">
                                     <div class="card-body p-md-5 text-black">
-                                        {% if messages %}
-                                            {% for message in messages %}
-                                                <div class="alert alert-danger">
-                                                    {{ message }}
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
+
+                                        <div class="alert alert-danger">
+                                            {{ form.errors }}
+                                        </div>
+
+
                                         <div class="row">
                                             <div class="col mb-4">
                                                 <h3 class="text-uppercase d-flex justify-content-start">Dodaj
@@ -57,12 +56,11 @@
                                             {{ form.gender|as_crispy_field }}
 
 
-
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
                                                 {% if form.group %}
-                                                {{ form.group|as_crispy_field }}
+                                                    {{ form.group|as_crispy_field }}
                                                 {% endif %}
 
                                             </div>
@@ -75,7 +73,7 @@
                                             </div>
                                         </div>
                                         <div class="form-outline mb-4">
-                                           {{ form.start|as_crispy_field }}
+                                            {{ form.start|as_crispy_field }}
                                             <div>
                                                 <label class="form-check-label mb-0 me-4" for="mySwitch">Umowa na czas
                                                     nieokteślony:</label>
@@ -99,7 +97,7 @@
 
                                             </div>
                                         </div>
-
+                                        {{ form.principal }}
 
                                         <div class="d-flex justify-content-end pt-3">
                                             <button type="submit" class="btn btn-warning btn-lg ms-2">Add

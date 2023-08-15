@@ -12,4 +12,4 @@ class UserUpdateForm(forms.ModelForm):
 class ParentUpdateForm(forms.ModelForm):
     class Meta:
         model = ParentA
-        fields = ['first_name', 'last_name', 'phone']
+        fields = ['first_name', 'last_name', 'phone', 'city', 'address', 'zip_code', ]

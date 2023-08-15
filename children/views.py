@@ -91,7 +91,6 @@ class PaymentPlanDeleteView(PermissionRequiredMixin, View):
         raise PermissionDenied
 
 
-
 class MealAddView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
@@ -370,28 +369,27 @@ class KidsListView(PermissionRequiredMixin, ListView):
         return context
 
 
-class DetailsKidView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
-    permission_required = "director.is_director"
-    model = Kid
-    template_name = 'kid-details.html'
+class DetailsKidView(LoginRequiredMixin, View):
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get(self, request, pk):
+        kid = Kid.objects.filter(id=int(pk)).filter(is_active=True).first()
+        if kid:
+            meals = None
+            if kid.kid_meals.is_active == True:
+                meals = kid.kid_meals
 
-        context["kid"] = get_object_or_404(Director, user=self.request.user.id).kid_set.filter(
-                is_active=True).filter(id=context['kid'].id).first()
-        if context['kid'].kid_meals:
-            context["meals"] = context['kid'].kid_meals.all()
-        context["parents"] = context['kid'].parenta_set.all()
-
-        return context
-
-    def test_func(self):
-        kid = self.get_object()
-        if self.request.user == kid.principal.user:
-            if kid.is_active == True:
-                return True
-        return False
+            if request.user.get_user_permissions() == {'director.is_director'}:
+                if kid.principal.user.email == request.user.email:
+                    return render(request, 'kid-details.html', {'kid': kid, 'meals': meals})
+            elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
+                teachers = kid.group.filter(is_active=True).first().employee_set.values_list('user', flat=True)
+                if request.user in teachers:
+                    return render(request, 'kid-details.html', {'kid': kid, 'meals': meals})
+            elif request.user.get_user_permissions() == {'parent.is_parent'}:
+                parents = kid.parenta_set.values_list('user__email', flat=True)
+                if request.user.email in parents:
+                    return render(request, 'kid-details.html', {'kid': kid, 'meals': meals})
+        raise PermissionDenied
 
 
 class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
@@ -421,7 +419,6 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
 
     def test_func(self):
         kid = self.get_object()
-
         try:
             if self.request.user == kid.principal.user:
                 if kid.is_active == True:

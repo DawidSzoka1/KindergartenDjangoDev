@@ -40,7 +40,8 @@
 
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'post_list_view' %} " style="font-size: 20px; color: white; text-decoration:none">WYDARZENIA</a>
+                            <a class="nav-link" href="{% url 'post_list_view' %} "
+                               style="font-size: 20px; color: white; text-decoration:none">WYDARZENIA</a>
                         </li>
 
                         <li class="nav-item mt-1">
@@ -48,9 +49,22 @@
                                style="font-size: 25px; color: white; text-decoration:none">| &nbsp;<b>DS</b>
                                 &nbsp;|</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'director_profile' %}" style="font-size: 20px; color: white; text-decoration:none">MÓJ PROFIL</a>
-                        </li>
+                        {% if perms.director.is_director %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'director_profile' %}"
+                                   style="font-size: 20px; color: white; text-decoration:none">MÓJ PROFIL</a>
+                            </li>
+                        {% elif perms.parent.is_parent %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'parent_profile' %}"
+                                   style="font-size: 20px; color: white; text-decoration:none">MÓJ PROFIL</a>
+                            </li>
+                            {% elif perms.teacher.is_teacher %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'teacher-profile' pk=user.teacher.id %}"
+                                   style="font-size: 20px; color: white; text-decoration:none">MÓJ PROFIL</a>
+                            </li>
+                        {% endif %}
                     {% else %}
                         <li class="nav-item">
 

@@ -123,6 +123,9 @@ class CalendarKid(LoginRequiredMixin, View):
 
 class Home(View):
     def get(self, request):
+        if request.user.get_user_permissions() == {'parent.is_parent'}:
+            kids = ParentA.objects.get(user=request.user.id).kids.filter(is_active=True)
+            return render(request, 'home.html', {'kids': kids})
         return render(request, 'home.html')
 
 
@@ -132,14 +135,29 @@ class PresenceCalendarView(LoginRequiredMixin, View):
         if user.get_user_permissions() == {'director.is_director'}:
             director = Director.objects.get(user=user.id)
             kids = director.kid_set.filter(is_active=True)
+
         elif user.get_user_permissions() == {'teacher.is_teacher'}:
             teacher = Employee.objects.get(user=user.id)
+            director = teacher.principal.first()
             kids = teacher.group.first().kid_set.filter(is_active=True)
         else:
             parent = ParentA.objects.get(user=user.id)
+            director = parent.principal.first()
             kids = parent.kids.filter(is_active=True)
+        kids_presence = PresenceModel.objects.filter(day=timezone.now()).filter(kid__principal=director).filter(
+            presenceType=2)
+        kids_absent = PresenceModel.objects.filter(day=timezone.now()).filter(kid__principal=director).filter(
+            presenceType=1)
+        kids_planned_absent = PresenceModel.objects.filter(day=timezone.now()).filter(kid__principal=director).filter(
+            presenceType=3)
         today = timezone.now().day
-        return render(request, 'presence-calendar.html', {'kids': kids, 'today': today})
+        return render(request, 'presence-calendar.html',
+                      {'kids': kids,
+                       'today': today,
+                       'kids_presence': kids_presence,
+                       'kids_absent': kids_absent,
+                       'kids_planned_absent': kids_planned_absent,
+                       })
 
 
 class PostListView(ListView):
