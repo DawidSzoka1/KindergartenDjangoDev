@@ -1,3 +1,5 @@
+import calendar
+
 from django.shortcuts import render, HttpResponse, redirect
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
@@ -42,6 +44,11 @@ class Calendar(HTMLCalendar):
         if day != 0:
 
             for presence in presences:
+                if calendar.weekday(year=self.year, month=self.month, day=day) == 5 or calendar.weekday(year=self.year,
+                                                                                                        month=self.month,
+                                                                                                        day=day) == 6:
+                    return f"<td id='days' style='background-color: grey'><span class='date'>{day}</span></td>"
+
                 if day == presence.day.day:
                     if presence.presenceType == 1:
                         return f"<td id='days' style='background-color: red'><span class='date'>{day}</span></td>"
@@ -57,7 +64,7 @@ class Calendar(HTMLCalendar):
         week = ''
         for d, weekday in theweek:
             week += self.formatday(d, events)
-        return f'<tr> {week} </tr>'
+        return f"<tr> {week} </tr>"
 
     # formats a month as a table
     # filter events by year and month

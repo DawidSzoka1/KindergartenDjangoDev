@@ -3,6 +3,7 @@ from children.models import Groups
 from django.views import View
 from django.contrib import messages
 from director.models import Director
+from parent.models import ParentA
 from .models import Employee, roles
 from .forms import TeacherUpdateForm
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
@@ -28,6 +29,18 @@ class EmployeeProfileView(LoginRequiredMixin, View):
             return redirect('list_teachers')
         elif user.get_user_permissions() == {'teacher.is_teacher'}:
             if user.employee == employee:
+                return render(request, 'employee-profile.html',
+                              {'employee': employee})
+        elif user.get_user_permissions() == {'parent.is_parent'}:
+            group = employee.group.filter(is_active=True).first()
+            kids = group.kid_set.filter(is_active=True)
+            parent = ParentA.objects.get(user=user.id)
+            allow = False
+            for kid in kids:
+                if kid in parent.kids.filter(is_active=True):
+                    allow = True
+                    break
+            if allow:
                 return render(request, 'employee-profile.html',
                               {'employee': employee})
         raise PermissionDenied

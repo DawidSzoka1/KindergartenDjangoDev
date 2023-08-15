@@ -6,6 +6,7 @@ from teacher.models import Employee
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import KidAddForm, PaymentPlanForm, GroupsForm
 from .models import Kid, Groups, PaymentPlan, Meals
+from parent.models import ParentA
 from django.core.exceptions import PermissionDenied
 from director.models import Director, MealPhotos, GroupPhotos
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
@@ -222,21 +223,24 @@ class GroupAddView(PermissionRequiredMixin, View):
         return redirect('add_group')
 
 
-class GroupsListView(PermissionRequiredMixin, ListView):
-    permission_required = "director.is_director"
-    model = Groups
-    template_name = 'groups-list.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["groups"] = Groups.objects.filter(principal=Director.objects.get(user=self.request.user.id)).filter(
-            is_active=True)
-        return context
+class GroupsListView(LoginRequiredMixin, View):
+    def get(self, request):
+        user = request.user
+        if user.get_user_permissions() == {'director.is_director'}:
+            groups = Director.objects.get(user=user.id).groups_set.filter(is_active=True)
+        elif user.get_user_permissions() == {'parent.is_parent'}:
+            kids = ParentA.objects.get(user=user.id).kids.filter(is_active=True)
+            groups = []
+            for kid in kids:
+                groups.append(kid.group)
+        else:
+            raise PermissionDenied
+        return render(request, 'groups-list.html', {'groups': groups})
 
 
 class GroupDetailsView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        group = Groups.objects.get(id=int(pk))
+        group = get_object_or_404(Groups, id=int(pk))
         teachers = list(group.employee_set.filter(is_active=True).values_list("user__email", flat=True))
         kids = group.kid_set.filter(is_active=True)
 
@@ -248,6 +252,17 @@ class GroupDetailsView(LoginRequiredMixin, View):
         elif request.user.get_user_permissions() == {'director.is_director'}:
             director = Director.objects.get(user=request.user.id)
             if director == group.principal:
+                return render(request, 'group-details.html',
+                              {'group': group, 'teachers': teachers, 'kids': kids})
+        elif request.user.get_user_permissions() == {'parent.is_parent'}:
+            parent = ParentA.objects.get(user=request.user.id)
+            parent_kids = parent.kids.filter(is_active=True)
+            allow = False
+            for kid in parent_kids:
+                if kid in kids:
+                    allow = True
+                    break
+            if allow:
                 return render(request, 'group-details.html',
                               {'group': group, 'teachers': teachers, 'kids': kids})
 
@@ -358,15 +373,20 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMix
         return redirect('add_meal')
 
 
-class KidsListView(PermissionRequiredMixin, ListView):
-    permission_required = "director.is_director"
-    model = Kid
-    template_name = 'kids-list.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["kids"] = Director.objects.get(user=self.request.user.id).kid_set.filter(is_active=True)
-        return context
+class KidsListView(LoginRequiredMixin, View):
+    def get(self, request):
+        if request.user.get_user_permissions() == {'director.is_director'}:
+            kids = Director.objects.get(user=request.user.id).kid_set.filter(is_active=True)
+        elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
+            groups = Employee.objects.get(user=request.user.id).group.filter(is_active=True)
+            kids = []
+            for group in groups:
+                kids.append(group.kid_set.filter(is_active=True))
+        elif request.user.get_user_permissions() == {'parent.is_parent'}:
+            kids = ParentA.objects.get(user=request.user.id).kids.filter(is_active=True)
+        else:
+            raise PermissionDenied
+        return render(request, 'kids-list.html', {'kids': kids})
 
 
 class DetailsKidView(LoginRequiredMixin, View):

@@ -68,6 +68,7 @@ class Kid(models.Model):
         """
         return f'{self.first_name.title()} {self.last_name.title()}'
 
+
 presenceChoices = (
     (1, 'Nieobeconsc'),
     (2, 'Obecnosc'),
