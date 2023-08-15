@@ -157,6 +157,22 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
         raise PermissionDenied
 
 
+class EmployeeDeleteView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request, pk):
+        raise PermissionDenied
+
+    def post(self, request, pk):
+        employee = get_object_or_404(Employee, id=int(pk))
+        director = Director.objects.get(user=request.user.id)
+        if employee.principal.first() == director:
+            employee.delete()
+            messages.success(request, f'Poprawnie usunieto praconika {employee}')
+            return redirect('list_teachers')
+        raise PermissionDenied
+
+
 class TeacherSearchView(LoginRequiredMixin, View):
     def get(self, request):
         return redirect('list_teachers')

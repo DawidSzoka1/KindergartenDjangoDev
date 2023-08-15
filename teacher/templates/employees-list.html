@@ -108,6 +108,16 @@
                                                     <a href="{% url 'teacher_update' pk=teacher.id %}"
                                                        class="dropdown-item">Change info</a>
                                                 </li>
+                                                <li>
+                                                    <form method="POST" action="{% url 'teacher_delete' pk=teacher.id %}">
+                                                        {% csrf_token %}
+                                                        <button class="dropdown-item" type="submit" name="delete"
+                                                                value="Usuń"
+                                                                onclick="return confirm('Jestes pewny ze chcesz usunac pracownika {{ teacher }}?');"
+                                                        >Usuń
+                                                        </button>
+                                                    </form>
+                                                </li>
                                             </ul>
                                         </div>
                                     </td>
