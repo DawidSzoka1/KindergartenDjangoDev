@@ -3,8 +3,12 @@
 {% block content %}
     <form method="POST" action="">
 {% csrf_token %}
+    {{ today }}
     {% for kid in kids %}
         {{ kid }}
+
+        <input type="hidden" value="{{ kid.id }}" name="data">
+        <button type="submit">obecny</button>
     {% endfor %}
     <h1>Liczba obecnych dzieci {{ kids_presence.count }}</h1>
     <h1>Liczba nieobecnych dzieci  {{ kids_absent.count }}</h1>

@@ -64,7 +64,7 @@ class Calendar(HTMLCalendar):
         week = ''
         for d, weekday in theweek:
             week += self.formatday(d, events)
-        return f"<tr> {week} </tr>"
+        return f"<tr> {week} </tr></div>"
 
     # formats a month as a table
     # filter events by year and month
@@ -147,17 +147,19 @@ class PresenceCalendarView(LoginRequiredMixin, View):
             teacher = Employee.objects.get(user=user.id)
             director = teacher.principal.first()
             kids = teacher.group.first().kid_set.filter(is_active=True)
-        else:
+        elif user.get_user_permissions() == {'parent.is_parent'}:
             parent = ParentA.objects.get(user=user.id)
             director = parent.principal.first()
             kids = parent.kids.filter(is_active=True)
+        else:
+            raise PermissionDenied
         kids_presence = PresenceModel.objects.filter(day=timezone.now()).filter(kid__principal=director).filter(
             presenceType=2)
         kids_absent = PresenceModel.objects.filter(day=timezone.now()).filter(kid__principal=director).filter(
             presenceType=1)
         kids_planned_absent = PresenceModel.objects.filter(day=timezone.now()).filter(kid__principal=director).filter(
             presenceType=3)
-        today = timezone.now().day
+        today = timezone.now().strftime("%Y-%m-%d")
         return render(request, 'presence-calendar.html',
                       {'kids': kids,
                        'today': today,
@@ -166,6 +168,30 @@ class PresenceCalendarView(LoginRequiredMixin, View):
                        'kids_planned_absent': kids_planned_absent,
                        })
 
+    def post(self, request):
+        data = request.POST.get('data')
+
+        user = request.user.get_user_permissions()
+        kid_id = data[0]
+        day = timezone.now().strftime("%Y-%m-%d")
+        kid = Kid.objects.filter(id=int(kid_id)).filter(is_active=True).first()
+        check = PresenceModel.objects.filter(kid=kid).filter(day=day).first()
+        if user == {'parent.is_parent'}:
+            if kid:
+                if check:
+                    check.presenceType = 3
+                    check.save()
+                else:
+                    PresenceModel.objects.create(day=day, kid=kid, presenceType=3)
+        elif user == {'director.is_director'} or user == {'teacher.is_teacher'}:
+            if kid:
+                if check:
+                    check.presenceType = 2
+                    check.save()
+                else:
+                    PresenceModel.objects.create(day=day, kid=kid, presenceType=2)
+
+        return redirect('presence_calendar')
 
 class PostListView(ListView):
     model = Post
