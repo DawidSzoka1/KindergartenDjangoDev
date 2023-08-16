@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.urls import reverse_lazy
@@ -386,7 +387,27 @@ class KidsListView(LoginRequiredMixin, View):
             kids = ParentA.objects.get(user=request.user.id).kids.filter(is_active=True)
         else:
             raise PermissionDenied
-        return render(request, 'kids-list.html', {'kids': kids})
+        paginator = Paginator(kids, 10)
+        page = request.GET.get('page')
+        page_obj = paginator.get_page(page)
+        return render(request, 'kids-list.html', {'page_obj': page_obj})
+
+    def post(self, request):
+        search = request.POST.get('search')
+        if request.user.get_user_permissions() == {'director.is_director'}:
+            kids = Director.objects.get(user=request.user.id).kid_set.filter(first_name__icontains=search).filter(
+                is_active=True)
+        elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
+            groups = Employee.objects.get(user=request.user.id).group.filter(is_active=True)
+            kids = []
+            for group in groups:
+                kids.append(group.kid_set.filter(first_name__icontains=search).filter(is_active=True))
+        else:
+            raise PermissionDenied
+        paginator = Paginator(kids, 10)
+        page = request.GET.get('page')
+        page_obj = paginator.get_page(page)
+        return render(request, 'kids-list.html', {'page_obj': page_obj})
 
 
 class DetailsKidView(LoginRequiredMixin, View):

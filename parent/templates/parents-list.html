@@ -41,7 +41,7 @@
     </nav>
     {% if perms.director.is_director %}
         <div class="justify-content-center">
-            <form class="d-flex" method="POST" action="{% url 'parent-search' %}"
+            <form class="d-flex" method="POST" action="#"
                   style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">
                 {% csrf_token %}
                 <input class="form-control" type="search" placeholder="Wpisz mail"
@@ -51,7 +51,7 @@
             </form>
         </div>
     {% endif %}
-    {% for parent in parents %}
+    {% for parent in page_obj %}
 
 
         <div class="container-fluid mt-3"
@@ -133,7 +133,7 @@
 
 
     {% endfor %}
-    {% if is_paginated %}
+
 
         {% if page_obj.has_previous %}
             <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
@@ -153,7 +153,7 @@
             <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
         {% endif %}
 
-    {% endif %}
+
 
 
 {% endblock %}

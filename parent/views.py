@@ -76,19 +76,28 @@ class InviteParentView(PermissionRequiredMixin, View):
             return redirect('invite_parent', pk=pk)
 
 
-class ParentListView(PermissionRequiredMixin, ListView):
+class ParentListView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
-    model = ParentA
-    template_name = 'parents-list.html'
-    paginate_by = 5
-    context_object_name = "parents"
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context["parents"] = Director.objects.get(user=self.request.user.id).parenta_set.all()
-    #     return context
-    def get_queryset(self):
-        return Director.objects.get(user=self.request.user.id).parenta_set.all()
+    def get(self, request):
+        user = request.user
+        director = get_object_or_404(Director, user=user.id)
+        parents = director.parenta_set.all()
+        paginator = Paginator(parents, 5)
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+        return render(request, 'parents-list.html', {'page_obj': page_obj})
+
+    def post(self, request):
+        user = request.user
+        director = get_object_or_404(Director, user=user.id)
+        search = request.POST.get('search')
+        parents = director.parenta_set.filter(user__email__icontains=search)
+        paginator = Paginator(parents, 5)
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+        return render(request, 'parents-list.html', {'page_obj': page_obj})
+
 
 class DetailsParentView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
     permission_required = "director.is_director"

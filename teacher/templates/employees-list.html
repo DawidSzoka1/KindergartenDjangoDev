@@ -4,12 +4,12 @@
     <link rel="stylesheet" href="{% static 'kids.css' %}">
 
     <div class="container mt-3 mb-4 center">
-    <form class="d-flex" method="POST" action="{% url 'teacher-search' %}">
-        {% csrf_token %}
-        <input class="form-control me-2" type="search" placeholder="szukaj po emailu"
-               aria-label="szukaj po emailu" name="search">
-        <button class="btn btn-outline-secondary" type="submit">Szukaj</button>
-    </form>
+        <form class="d-flex" method="POST" action="{% url 'teacher-search' %}">
+            {% csrf_token %}
+            <input class="form-control me-2" type="search" placeholder="szukaj po emailu"
+                   aria-label="szukaj po emailu" name="search">
+            <button class="btn btn-outline-secondary" type="submit">Szukaj</button>
+        </form>
         <div class="col-lg-9 mt-4 mt-lg-0">
             <div class="col d-flex justify-content-end mb-2 noPadding">
                 <a href="{% url 'home_page' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
@@ -39,7 +39,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% for teacher in teachers %}
+                            {% for teacher in page_obj %}
 
 
 
@@ -77,7 +77,9 @@
                                     </td>
                                     <td>
                                         {% for group in teacher.groups_set.all %}
-                                            {{ group.name }}
+                                            {% if group.is_active == True %}
+                                                {{ group.name }}
+                                            {% endif %}
                                         {% endfor %}
                                     </td>
                                     <td>
@@ -109,7 +111,8 @@
                                                        class="dropdown-item">Change info</a>
                                                 </li>
                                                 <li>
-                                                    <form method="POST" action="{% url 'teacher_delete' pk=teacher.id %}">
+                                                    <form method="POST"
+                                                          action="{% url 'teacher_delete' pk=teacher.id %}">
                                                         {% csrf_token %}
                                                         <button class="dropdown-item" type="submit" name="delete"
                                                                 value="Usuń"
@@ -133,6 +136,22 @@
             </div>
         </div>
     </div>
+    {% if page_obj.has_previous %}
+        <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
 
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
 
 {% endblock %}
