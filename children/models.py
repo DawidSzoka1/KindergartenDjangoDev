@@ -78,6 +78,6 @@ presenceChoices = (
 
 
 class PresenceModel(models.Model):
-    day = models.DateField(auto_created=timezone.now())
+    day = models.DateField(auto_created=True)
     kid = models.ForeignKey(Kid, on_delete=models.CASCADE)
     presenceType = models.IntegerField(choices=presenceChoices)
