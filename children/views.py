@@ -394,20 +394,23 @@ class KidsListView(LoginRequiredMixin, View):
 
     def post(self, request):
         search = request.POST.get('search')
-        if request.user.get_user_permissions() == {'director.is_director'}:
-            kids = Director.objects.get(user=request.user.id).kid_set.filter(first_name__icontains=search).filter(
-                is_active=True)
-        elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
-            groups = Employee.objects.get(user=request.user.id).group.filter(is_active=True)
-            kids = []
-            for group in groups:
-                kids.append(group.kid_set.filter(first_name__icontains=search).filter(is_active=True))
-        else:
-            raise PermissionDenied
-        paginator = Paginator(kids, 10)
-        page = request.GET.get('page')
-        page_obj = paginator.get_page(page)
-        return render(request, 'kids-list.html', {'page_obj': page_obj})
+        if search:
+            if request.user.get_user_permissions() == {'director.is_director'}:
+                kids = Director.objects.get(user=request.user.id).kid_set.filter(first_name__icontains=search).filter(
+                    is_active=True)
+            elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
+                groups = Employee.objects.get(user=request.user.id).group.filter(is_active=True)
+                kids = []
+                for group in groups:
+                    kids.append(group.kid_set.filter(first_name__icontains=search).filter(is_active=True))
+            else:
+                raise PermissionDenied
+
+            paginator = Paginator(kids, 10)
+            page = request.GET.get('page')
+            page_obj = paginator.get_page(page)
+            return render(request, 'kids-list.html', {'page_obj': page_obj})
+        return redirect('list_kids')
 
 
 class DetailsKidView(LoginRequiredMixin, View):

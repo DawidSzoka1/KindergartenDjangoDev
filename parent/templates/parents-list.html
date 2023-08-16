@@ -23,7 +23,9 @@
                 <!-- Navbar brand -->
                 <!-- Left links -->
                 <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
-                    <li class="nav-item" style="font-size: 35px; "><a href="{% url 'list_parent' %}" style="text-decoration: none; color:#75736B;"><b>RODZICE</b></a></li>
+                    <li class="nav-item" style="font-size: 35px; "><a href="{% url 'list_parent' %}"
+                                                                      style="text-decoration: none; color:#75736B;"><b>RODZICE</b></a>
+                    </li>
                 </ul>
             </div>
             {% if perms.director.is_director %}
@@ -64,10 +66,15 @@
                              style="height: 150px;"
                              src="{% static 'parent_female.jpg' %}"
                              alt="">
-                    {% else %}
+                    {% elif parent.gender == 1 %}
                         <img class="img"
                              style="height: 150px; margin-left: 3%; margin-right: 2%"
                              src="{% static 'parent_male.jpg' %}"
+                             alt="">
+                    {% else %}
+                        <img class="img"
+                             style="height: 150px; margin-left: 3%; margin-right: 2%"
+                             src="{% static 'gander_null.jpg' %}"
                              alt="">
                     {% endif %}
                 </div>
@@ -83,8 +90,7 @@
                     {% if parent.first_name and parent.last_name %}
 
                         {{ parent.first_name.title }} {{ parent.last_name.title }}
-                    {% else %}
-                        Nie zostaly podane dane
+
                     {% endif %}
 
                 </div>
@@ -135,23 +141,23 @@
     {% endfor %}
 
 
-        {% if page_obj.has_previous %}
-            <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
-            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-        {% endif %}
+    {% if page_obj.has_previous %}
+        <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
 
-        {% for num in page_obj.paginator.page_range %}
-            {% if page_obj.number == num %}
-                <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
-            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
-            {% endif %}
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
-            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
         {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
 
 
 

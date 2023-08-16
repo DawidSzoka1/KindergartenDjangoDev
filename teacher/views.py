@@ -53,10 +53,22 @@ class EmployeesListView(PermissionRequiredMixin, LoginRequiredMixin, View):
     def get(self, request):
         user = Director.objects.get(user=request.user.id)
         teachers = user.employee_set.all()
-        paginator = Paginator(teachers, 10)  # Show 25 contacts per page.
+        paginator = Paginator(teachers, 10)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
         return render(request, 'employees-list.html', {'page_obj': page_obj})
+
+    def post(self, request):
+        search = request.POST.get('search')
+        if search:
+            teachers = Employee.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
+                user__email__icontains=search
+            )
+            paginator = Paginator(teachers, 10)
+            page_number = request.GET.get("page")
+            page_obj = paginator.get_page(page_number)
+            return render(request, 'employees-list.html', {'page_obj': page_obj})
+        return redirect('list_teachers')
 
 
 class EmployeeAddView(PermissionRequiredMixin, View):
@@ -188,17 +200,3 @@ class EmployeeDeleteView(PermissionRequiredMixin, View):
             messages.success(request, f'Poprawnie usunieto praconika {employee}')
             return redirect('list_teachers')
         raise PermissionDenied
-
-
-class TeacherSearchView(LoginRequiredMixin, View):
-    def get(self, request):
-        return redirect('list_teachers')
-
-    def post(self, request):
-        search = request.POST.get('search')
-        if search:
-            teachers = Employee.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
-                user__email__icontains=search
-            )
-            return render(request, 'employees-list.html', {'teachers': teachers})
-        return redirect('list_teachers')

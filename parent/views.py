@@ -92,11 +92,13 @@ class ParentListView(PermissionRequiredMixin, View):
         user = request.user
         director = get_object_or_404(Director, user=user.id)
         search = request.POST.get('search')
-        parents = director.parenta_set.filter(user__email__icontains=search)
-        paginator = Paginator(parents, 5)
-        page_number = request.GET.get("page")
-        page_obj = paginator.get_page(page_number)
-        return render(request, 'parents-list.html', {'page_obj': page_obj})
+        if search:
+            parents = director.parenta_set.filter(user__email__icontains=search)
+            paginator = Paginator(parents, 5)
+            page_number = request.GET.get("page")
+            page_obj = paginator.get_page(page_number)
+            return render(request, 'parents-list.html', {'page_obj': page_obj})
+        return redirect('list_parent')
 
 
 class DetailsParentView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
