@@ -1,175 +1,331 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+    <link rel="stylesheet" href="{% static 'input_foucs.css' %}">
 
+    {#    <div class="container mt-3 mb-4 center">#}
+    {#        {% if perms.director.is_director %}#}
+    {#            <form class="d-flex" method="POST" action="{% url 'kid-search' %}">#}
+    {#                {% csrf_token %}#}
+    {#                <input class="form-control me-2" type="search" placeholder="szukaj po imieniu"#}
+    {#                       aria-label="szukaj po imieniu" name="search">#}
+    {#                <button class="btn btn-outline-secondary" type="submit">Szukaj</button>#}
+    {#            </form>#}
+    {#        {% endif %}#}
+    {#        <div class="col-lg-9 mt-4 mt-lg-0">#}
+    {#            <div class="col d-flex justify-content-end mb-2 noPadding">#}
+    {#                <a href="{% url 'home_page' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>#}
+    {#            </div>#}
+    {#            <div class="row">#}
+    {#                <div class="col-md-12">#}
+    {#                    <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">#}
+    {#                        <div class="card-header d-flex justify-content-between align-items-center mb-2">#}
+    {#                            <h5 class="mb-0">Lista dzieci</h5>#}
+    {#                            <a href="{% url 'add_kid' %}" class="btn btn-light btn-sm">#}
+    {#                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"#}
+    {#                                     class="bi bi-person-plus-fill" viewBox="0 0 16 16">#}
+    {#                                    <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>#}
+    {#                                    <path fill-rule="evenodd"#}
+    {#                                          d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>#}
+    {#                                </svg>#}
+    {#                                Dodaj#}
+    {##}
+    {#                            </a>#}
+    {#                        </div>#}
+    {#                        <table class="table manage-candidates-top mb-0">#}
+    {#                            <thead>#}
+    {#                            <tr>#}
+    {#                                <th>Imię i Nazwisko Dziecka</th>#}
+    {#                                <th class="text-center">Status</th>#}
+    {#                                <th class="action text-right">Action</th>#}
+    {#                            </tr>#}
+    {#                            </thead>#}
+    {#                            <tbody>#}
+    {##}
+    {#                            {% for kid in kids %}#}
+    {##}
+    {##}
+    {##}
+    {##}
+    {#                                <tr class="candidates-list">#}
+    {#                                    <td class="title">#}
+    {#                                        <div class="thumb">#}
+    {#                                            <img class="img-fluid"#}
+    {#                                                 src="https://bootdey.com/img/Content/avatar/avatar7.png"#}
+    {#                                                 alt="">#}
+    {#                                        </div>#}
+    {#                                        <div class="candidate-list-details">#}
+    {#                                            <div class="candidate-list-info">#}
+    {#                                                <div class="candidate-list-title">#}
+    {#                                                    <h5 class="mb-0"><a#}
+    {#                                                            href="#">{{ kid.first_name }} {{ kid.last_name }}</a>#}
+    {#                                                    </h5>#}
+    {#                                                </div>#}
+    {#                                                <div class="candidate-list-option">#}
+    {#                                                    <ul class="list-unstyled">#}
+    {#                                                        <li>#}
+    {#                                                            <i class="fas fa-filter pr-1"></i>{{ kid.group.name }}#}
+    {#                                                        </li>#}
+    {#                                                        <li>#}
+    {#                                                            <i class="fas fa-filter pr-1"></i>{{ kid.payment_plan.name }}#}
+    {#                                                        </li>#}
+    {#                                                    </ul>#}
+    {#                                                </div>#}
+    {#                                            </div>#}
+    {#                                        </div>#}
+    {#                                    </td>#}
+    {#                                    {% if kid.parenta_set.all %}#}
+    {#                                        <td class="candidate-list-favourite-time text-center"#}
+    {#                                            style="color:green;">#}
+    {#                                            &#9745;<br>#}
+    {#                                            <a class="candidate-list-favourite order-2 text-success"#}
+    {#                                               href="{% url 'invite_parent'  pk=kid.id %}">Dodaj kolejnego#}
+    {#                                                rodzica<i#}
+    {#                                                        class="fas fa-heart"></i></a>#}
+    {#                                        </td>#}
+    {##}
+    {#                                    {% else %}#}
+    {#                                        <td class="candidate-list-favourite-time text-center"#}
+    {#                                            style="color:red;">#}
+    {#                                            &#9746;<br>#}
+    {#                                            <a class="candidate-list-favourite order-2 text-danger"#}
+    {#                                               href="{% url 'invite_parent'  pk=kid.id %}">Dodaj konto rodzica<i#}
+    {#                                                    class="fas fa-heart"></i></a>#}
+    {##}
+    {#                                        </td>#}
+    {#                                    {% endif %}#}
+    {#                                    <td>#}
+    {#                                        <div class="drodown">#}
+    {##}
+    {#                                            <a class="dropdown-toggle d-flex align-items-center hidden-arrow"#}
+    {#                                               href="#"#}
+    {#                                               id="navbarDropdownMenuAvatar"#}
+    {#                                               role="button"#}
+    {#                                               data-bs-toggle="dropdown"#}
+    {#                                               aria-expanded="false">#}
+    {#                                                <img#}
+    {#                                                        src="{{ user.profilemodel.image.url }}"#}
+    {#                                                        class="rounded-circle"#}
+    {#                                                        height="30"#}
+    {#                                                        alt="Action"#}
+    {#                                                        loading="lazy"#}
+    {#                                                />#}
+    {#                                            </a>#}
+    {#                                            <ul#}
+    {#                                                    class="dropdown-menu dropdown-menu-end"#}
+    {#                                                    aria-labelledby="navbarDropdownMenuAvatar"#}
+    {#                                            >#}
+    {#                                                {% if perms.parent.is_parent or perm.teacher.is_teacher %}#}
+    {#                                                    <li>#}
+    {#                                                        <a href="{% url 'kid_details'  pk=kid.id %}"#}
+    {#                                                           class="dropdown-item">View detail</a>#}
+    {#                                                    </li>#}
+    {##}
+    {#                                                    <li>#}
+    {#                                                        <a href="{% url 'group_details' pk=kid.group.id %}"#}
+    {#                                                           class="dropdown-item">Grupa</a>#}
+    {#                                                    </li>#}
+    {#                                                    <li>#}
+    {#                                                        <a href="{% url 'calendar' kid.id %}"#}
+    {#                                                           class="dropdown-item">Calendar</a>#}
+    {#                                                    </li>#}
+    {#                                                {% elif perms.director.is_director %}#}
+    {#                                                    <li>#}
+    {#                                                        <a href="{% url 'kid_details'  pk=kid.id %}"#}
+    {#                                                           class="dropdown-item">View detail</a>#}
+    {#                                                    </li>#}
+    {#                                                    <li>#}
+    {#                                                        <a href="{% url 'change_kid_info'  pk=kid.id %}"#}
+    {#                                                           class="dropdown-item">Change#}
+    {#                                                            info</a>#}
+    {#                                                    </li>#}
+    {#                                                    <li>#}
+    {#                                                        <a href="{% url 'calendar' kid.id %}"#}
+    {#                                                           class="dropdown-item">Calendar</a>#}
+    {#                                                    </li>#}
+    {#                                                    <li>#}
+    {#                                                        <form method="POST" action="{% url 'kid_delete' pk=kid.id %}">#}
+    {#                                                            {% csrf_token %}#}
+    {#                                                            <button class="dropdown-item" type="submit" name="delete"#}
+    {#                                                                    value="Usuń"#}
+    {#                                                                    onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}?');"#}
+    {#                                                            >Usuń#}
+    {#                                                            </button>#}
+    {#                                                        </form>#}
+    {#                                                    </li>#}
+    {#                                                {% endif %}#}
+    {##}
+    {#                                            </ul>#}
+    {#                                        </div>#}
+    {#                                    </td>#}
+    {#                                </tr>#}
+    {##}
+    {#                            {% endfor %}#}
+    {##}
+    {#                            </tbody>#}
+    {#                        </table>#}
+    {##}
+    {#                    </div>#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
 
-    <div class="container mt-3 mb-4 center">
-        {% if perms.director.is_director %}
-            <form class="d-flex" method="POST" action="{% url 'kid-search' %}">
-                {% csrf_token %}
-                <input class="form-control me-2" type="search" placeholder="szukaj po imieniu"
-                       aria-label="szukaj po imieniu" name="search">
-                <button class="btn btn-outline-secondary" type="submit">Szukaj</button>
-            </form>
-        {% endif %}
-        <div class="col-lg-9 mt-4 mt-lg-0">
-            <div class="col d-flex justify-content-end mb-2 noPadding">
-                <a href="{% url 'home_page' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
+    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+            <!-- Left links -->
+            <ul class="navbar-nav flex-row">
+
+                <li class="nav-item me-2 me-lg-0">
+
+                    <a href="{% url 'home_page' %}" role="button"
+                       style="font-size: 25px; color: #75736B; text-decoration:none;">
+
+                        MENU
+                    </a>
+                </li>
+
+            </ul>
+            <!-- Left links -->
+            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+                <!-- Navbar brand -->
+                <!-- Left links -->
+                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
+                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>DZIECI</b></li>
+                </ul>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
-                        <div class="card-header d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Lista dzieci</h5>
-                            <a href="{% url 'add_kid' %}" class="btn btn-light btn-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                     class="bi bi-person-plus-fill" viewBox="0 0 16 16">
-                                    <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
-                                    <path fill-rule="evenodd"
-                                          d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
+            {% if perms.director.is_director %}
+                <ul class="navbar-nav d-flex flex-row me-1">
+                    <li class="nav-item">
+                        <button class="btn" onclick="location.href='{% url 'add_kid' %}'"
+                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
+                            DODAJ DZIECKO
+                        </button>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+        <!-- Container wrapper -->
+    </nav>
+    {% if perms.director.is_director %}
+        <div class="justify-content-center">
+            <form class="d-flex" method="POST" action="{% url 'kid-search' %}"
+                  style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">
+                {% csrf_token %}
+                <input class="form-control" type="search" placeholder="Wpisz imie dziecka"
+                       aria-label="Wpisz imie dziecka" name="search">
+                <span><button class="btn " type="submit"
+                              style="margin-left: -8px; background-color: #BAB1AB; color: white">SZUKAJ</button></span>
+            </form>
+        </div>
+    {% endif %}
+    {% for kid in kids %}
+        {% if kid.is_active == True %}
+
+            <div class="container-fluid mb-1 mt-5"
+                 style="background-color: white">
+                <div class="row align-item-center" style="padding-top: 10px;">
+                    <div class="col-xl-1 col-lg-6 col-md-6 col-sm-6 col-12"
+                         style="justify-content: start">
+                        {% if kid.gender == 2 %}
+                            <img class="img"
+                                 style="height: 100px;"
+                                 src="{% static 'girl.jpg' %}"
+                                 alt="">
+                        {% else %}
+                            <img class="img"
+                                 style="height: 100px; margin-left: 3%; margin-right: 2%"
+                                 src="{% static 'boy.jpg' %}"
+                                 alt="">
+                        {% endif %}
+                    </div>
+                    <div class="col-8 md-5 mt-3">
+
+                        <a href="{% url 'kid_details' pk=kid.id %}"
+                           style="font-size: 20px; text-decoration:none; color: #75736B ">{{ kid.first_name.title }} {{ kid.last_name.title }}</a>
+
+                    </div>
+                    <div class="col-2 mt-3 ml-5">
+
+
+                        {% if kid.parenta_set.all %}
+
+                            <a style="font-size: 20px;  text-decoration:none; color: #75736B; margin-top: 20px "
+                               href="{% url 'invite_parent'  pk=kid.id %}">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     width="16"
+                                     height="16"
+                                     fill="currentColor"
+                                     class="bi bi-check2-square"
+                                     viewBox="0 0 16 16">
+                                    <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
+                                    <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
                                 </svg>
-                                Dodaj
+                                Dodaj rodzica</a>
+                        {% else %}
+                            <a style="font-size: 20px;  text-decoration:none; color: #75736B "
+                               href="{% url 'invite_parent'  pk=kid.id %}">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     width="16"
+                                     height="16"
+                                     fill="currentColor"
+                                     class="bi bi-app"
+                                     viewBox="0 0 16 16">
+                                    <path d="M11 2a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3h6zM5 1a4 4 0 0 0-4 4v6a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4V5a4 4 0 0 0-4-4H5z"/>
+                                </svg>
+                                Dodaj rodzica</a>
+                        {% endif %}
 
+                    </div>
+                    <div class="col mt-3">
+
+                        <div class="drodown">
+                            <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
+                               href="#"
+                               id="navbarDropdownMenuAvatar"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false"
+                               style="font-size: 20px;  text-decoration:none; color: #75736B; ">
+                                | Opcje
                             </a>
+                            <ul
+                                    class="dropdown-menu dropdown-menu-end"
+                                    aria-labelledby="navbarDropdownMenuAvatar"
+                            >
+                                <li>
+                                    <a href="{% url 'kid_details' pk=kid.id %}"
+                                       class="dropdown-item">Konto
+                                        dziecka
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'change_kid_info' pk=kid.id %}"
+                                       class="dropdown-item">Zmien
+                                        informacje</a>
+                                </li>
+                                <li>
+                                    <form method="POST"
+                                          action="{% url 'kid_delete' pk=kid.id %}">
+                                        {% csrf_token %}
+                                        <button class="dropdown-item"
+                                                type="submit"
+                                                name="delete"
+                                                value="Usuń"
+                                                onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}');"
+                                        >Usuń dziecko
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
                         </div>
-                        <table class="table manage-candidates-top mb-0">
-                            <thead>
-                            <tr>
-                                <th>Imię i Nazwisko Dziecka</th>
-                                <th class="text-center">Status</th>
-                                <th class="action text-right">Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            {% for kid in kids %}
-
-
-
-
-                                <tr class="candidates-list">
-                                    <td class="title">
-                                        <div class="thumb">
-                                            <img class="img-fluid"
-                                                 src="https://bootdey.com/img/Content/avatar/avatar7.png"
-                                                 alt="">
-                                        </div>
-                                        <div class="candidate-list-details">
-                                            <div class="candidate-list-info">
-                                                <div class="candidate-list-title">
-                                                    <h5 class="mb-0"><a
-                                                            href="#">{{ kid.first_name }} {{ kid.last_name }}</a>
-                                                    </h5>
-                                                </div>
-                                                <div class="candidate-list-option">
-                                                    <ul class="list-unstyled">
-                                                        <li>
-                                                            <i class="fas fa-filter pr-1"></i>{{ kid.group.name }}
-                                                        </li>
-                                                        <li>
-                                                            <i class="fas fa-filter pr-1"></i>{{ kid.payment_plan.name }}
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    {% if kid.parenta_set.all %}
-                                        <td class="candidate-list-favourite-time text-center"
-                                            style="color:green;">
-                                            &#9745;<br>
-                                            <a class="candidate-list-favourite order-2 text-success"
-                                               href="{% url 'invite_parent'  pk=kid.id %}">Dodaj kolejnego
-                                                rodzica<i
-                                                        class="fas fa-heart"></i></a>
-                                        </td>
-
-                                    {% else %}
-                                        <td class="candidate-list-favourite-time text-center"
-                                            style="color:red;">
-                                            &#9746;<br>
-                                            <a class="candidate-list-favourite order-2 text-danger"
-                                               href="{% url 'invite_parent'  pk=kid.id %}">Dodaj konto rodzica<i
-                                                    class="fas fa-heart"></i></a>
-
-                                        </td>
-                                    {% endif %}
-                                    <td>
-                                        <div class="drodown">
-
-                                            <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                                               href="#"
-                                               id="navbarDropdownMenuAvatar"
-                                               role="button"
-                                               data-bs-toggle="dropdown"
-                                               aria-expanded="false">
-                                                <img
-                                                        src="{{ user.profilemodel.image.url }}"
-                                                        class="rounded-circle"
-                                                        height="30"
-                                                        alt="Action"
-                                                        loading="lazy"
-                                                />
-                                            </a>
-                                            <ul
-                                                    class="dropdown-menu dropdown-menu-end"
-                                                    aria-labelledby="navbarDropdownMenuAvatar"
-                                            >
-                                                {% if perms.parent.is_parent or perm.teacher.is_teacher %}
-                                                    <li>
-                                                        <a href="{% url 'kid_details'  pk=kid.id %}"
-                                                           class="dropdown-item">View detail</a>
-                                                    </li>
-
-                                                    <li>
-                                                        <a href="{% url 'group_details' pk=kid.group.id %}"
-                                                           class="dropdown-item">Grupa</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{% url 'calendar' kid.id %}"
-                                                           class="dropdown-item">Calendar</a>
-                                                    </li>
-                                                {% elif perms.director.is_director %}
-                                                    <li>
-                                                        <a href="{% url 'kid_details'  pk=kid.id %}"
-                                                           class="dropdown-item">View detail</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{% url 'change_kid_info'  pk=kid.id %}"
-                                                           class="dropdown-item">Change
-                                                            info</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{% url 'calendar' kid.id %}"
-                                                           class="dropdown-item">Calendar</a>
-                                                    </li>
-                                                    <li>
-                                                        <form method="POST" action="{% url 'kid_delete' pk=kid.id %}">
-                                                            {% csrf_token %}
-                                                            <button class="dropdown-item" type="submit" name="delete"
-                                                                    value="Usuń"
-                                                                    onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}?');"
-                                                            >Usuń
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                {% endif %}
-
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                            {% endfor %}
-
-                            </tbody>
-                        </table>
-
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+            <hr>
+        {% endif %}
+    {% endfor %}
 
 
 {% endblock %}
