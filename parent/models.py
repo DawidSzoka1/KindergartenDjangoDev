@@ -7,10 +7,12 @@ from children.models import Kid
 
 # Create your models here.
 class ParentA(models.Model):
+    gender_choices = ((1, 'Mezczyzna'), (2, 'Kobieta'))
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=128, null=True)
     last_name = models.CharField(max_length=128, null=True)
     kids = models.ManyToManyField(Kid)
+    gender = models.IntegerField(choices=gender_choices, null=True)
     phone_regex = RegexValidator(regex=r'^(?<!\w)(\(?(\+|00)?48\)?)?[ -]?\d{3}[ -]?\d{3}[ -]?\d{3}(?!\w)$',
                                  message="Numer telefony musi byc w formie: '+48 999 999 999' albo '(+48 999 999 999)' albo '999 999 999'.",
                                  code='invalid_numer_telefonu')

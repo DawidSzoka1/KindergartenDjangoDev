@@ -1,3 +1,5 @@
+from django.core.paginator import Paginator
+
 from .forms import ParentUpdateForm, UserUpdateForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
@@ -78,12 +80,15 @@ class ParentListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
     model = ParentA
     template_name = 'parents-list.html'
+    paginate_by = 5
+    context_object_name = "parents"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["parents"] = Director.objects.get(user=self.request.user.id).parenta_set.all()
-        return context
-
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context["parents"] = Director.objects.get(user=self.request.user.id).parenta_set.all()
+    #     return context
+    def get_queryset(self):
+        return Director.objects.get(user=self.request.user.id).parenta_set.all()
 
 class DetailsParentView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
     permission_required = "director.is_director"
@@ -158,5 +163,9 @@ class ParentSearchView(LoginRequiredMixin, View):
             parents = ParentA.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
                 user__email__icontains=search
             )
-            return render(request, 'parents-list.html', {'parents': parents})
-        return redirect('list_teachers')
+            paginator = Paginator(parents, 5)
+            page_number = request.POST.get('page')
+            page_obj = paginator.get_page(page_number)
+            parents = page_obj
+            return render(request, 'parents-list.html', {'parents': parents, 'page_obj': page_obj})
+        return redirect('list_parent')

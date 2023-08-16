@@ -1,115 +1,159 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" href="{% static 'kids.css' %}">
-    <div class="container mt-3 mb-4 center">
-        <form class="d-flex" method="POST" action="{% url 'parent-search' %}">
-            {% csrf_token %}
-            <input class="form-control me-2" type="search" placeholder="szukaj po emailu"
-                   aria-label="szukaj po emailu" name="search">
-            <button class="btn btn-outline-secondary" type="submit">Szukaj</button>
-        </form>
-        <div class="col-lg-9 mt-4 mt-lg-0">
-            <div class="col d-flex justify-content-end mb-2 noPadding">
-                <a href="{% url 'home_page' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
+    <link rel="stylesheet" href="{% static 'input_foucs.css' %}">
+    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+            <!-- Left links -->
+            <ul class="navbar-nav flex-row">
+
+                <li class="nav-item me-2 me-lg-0">
+
+                    <a href="{% url 'home_page' %}" role="button"
+                       style="font-size: 25px; color: #75736B; text-decoration:none;">
+
+                        MENU
+                    </a>
+                </li>
+
+            </ul>
+            <!-- Left links -->
+            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+                <!-- Navbar brand -->
+                <!-- Left links -->
+                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
+                    <li class="nav-item" style="font-size: 35px; "><a href="{% url 'list_parent' %}" style="text-decoration: none; color:#75736B;"><b>RODZICE</b></a></li>
+                </ul>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
-                        <div class="card-header d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Lista Rodzicow</h5>
-                        </div>
-                        <table class="table manage-candidates-top mb-0">
-                            <thead>
-                            <tr>
-                                <th class="text-left">Imię i Nazwisko Rodzica</th>
-                                <th class="text-center">Email</th>
-                                <th class="action text-right">Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for parent in parents %}
+            {% if perms.director.is_director %}
+                <ul class="navbar-nav d-flex flex-row me-1">
+                    <li class="nav-item">
+                        <button class="btn" onclick="location.href='#'"
+                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
+                            DODAJ RODZICA
+                        </button>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+        <!-- Container wrapper -->
+    </nav>
+    {% if perms.director.is_director %}
+        <div class="justify-content-center">
+            <form class="d-flex" method="POST" action="{% url 'parent-search' %}"
+                  style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">
+                {% csrf_token %}
+                <input class="form-control" type="search" placeholder="Wpisz mail"
+                       aria-label="Wpisz imie dziecka" name="search">
+                <span><button class="btn " type="submit"
+                              style="margin-left: -8px; background-color: #BAB1AB; color: white">SZUKAJ</button></span>
+            </form>
+        </div>
+    {% endif %}
+    {% for parent in parents %}
 
 
+        <div class="container-fluid mt-3"
+             style="background-color: white">
+            <div class="row align-item-center" style="padding-top: 10px;">
+                <div class="col mb-1"
+                     style="justify-content: start">
+                    {% if parent.gender == 2 %}
+                        <img class="img"
+                             style="height: 150px;"
+                             src="{% static 'parent_female.jpg' %}"
+                             alt="">
+                    {% else %}
+                        <img class="img"
+                             style="height: 150px; margin-left: 3%; margin-right: 2%"
+                             src="{% static 'parent_male.jpg' %}"
+                             alt="">
+                    {% endif %}
+                </div>
+                <div class="col-8" style="margin-top: 80px">
 
+                    <a href="{% url 'parent_details' pk=parent.id %}"
+                       style="font-size: 20px; text-decoration:none; color: #75736B ">{{ parent.user.email }}</a>
 
-                                <tr class="candidates-list">
-                                    <td class="title">
-                                        <div class="thumb">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
-                                                 fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
-                                                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
-                                            </svg>
-                                        </div>
-                                        <div class="candidate-list-details">
-                                            <div class="candidate-list-info">
-                                                <div class="candidate-list-title text-left">
-                                                    <h5 class="mb-0">
-                                                        {% if parent.first_name and parent.last_name %}
-                                                            <a href="#">{{ parent.first_name }} {{ parent.last_name }}</a>
-                                                        {% else %}
+                </div>
+                <div class="col-2 ml-5"
+                     style="font-size: 20px; text-decoration:none; color: #75736B; margin-top: 80px ">
 
-                                                            <h6 class="text-muted">Ten rodzic jeszcze nie wypelnil
-                                                                danych</h6>
-                                                        {% endif %}
-                                                    </h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="candidate-list-favourite-time text-center">
+                    {% if parent.first_name and parent.last_name %}
 
-                                        <h5 class="mb-0">
-                                            {{ parent.user.email }}
-                                        </h5>
+                        {{ parent.first_name.title }} {{ parent.last_name.title }}
+                    {% else %}
+                        Nie zostaly podane dane
+                    {% endif %}
 
-                                    </td>
-                                    <td class="text-right">
-                                        <div class="drodown">
-                                            <a class="dropdown-toggle d-flex align-items-right hidden-arrow"
-                                               href="#"
-                                               id="navbarDropdownMenuAvatar"
-                                               role="button"
-                                               data-bs-toggle="dropdown"
-                                               aria-expanded="false">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                                                     fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
-                                                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-                                                </svg>
-                                            </a>
-                                            <ul
-                                                    class="dropdown-menu dropdown-menu-end"
-                                                    aria-labelledby="navbarDropdownMenuAvatar"
-                                            >
-                                                <li>
-                                                    <a href="{% url 'parent_details'  pk=parent.id %}"
-                                                       class="dropdown-item">Profil rodzica</a>
-                                                </li>
-                                                <li>
-                                                    <form method="POST" action="{% url 'parent_delete' pk=parent.id %}">
-                                                        {% csrf_token %}
-                                                        <button class="dropdown-item" type="submit" name="delete"
-                                                                value="Usuń"
-                                                                onclick="return confirm('Jestes pewny ze chcesz usunac tego rodzica?');"
-                                                        >Usuń
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
+                </div>
+                <div class="col" style="margin-top: 80px">
 
-                            {% endfor %}
-
-                            </tbody>
-                        </table>
-
+                    <div class="drodown">
+                        <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
+                           href="#"
+                           id="navbarDropdownMenuAvatar"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           style="font-size: 20px;  text-decoration:none; color: #75736B; ">
+                            Opcje
+                        </a>
+                        <ul
+                                class="dropdown-menu dropdown-menu-end"
+                                aria-labelledby="navbarDropdownMenuAvatar"
+                        >
+                            <li>
+                                <a href="{% url 'parent_details' pk=parent.id %}"
+                                   class="dropdown-item">Konto
+                                    Rodzica
+                                </a>
+                            </li>
+                            <li>
+                                <form method="POST"
+                                      action="{% url 'parent_delete' pk=parent.id %}">
+                                    {% csrf_token %}
+                                    <button class="dropdown-item"
+                                            type="submit"
+                                            name="delete"
+                                            value="Usuń"
+                                            onclick="return confirm('Jestes pewny ze chcesz usunac rodzica {{ parent.user.email }}');"
+                                    >USUŃ
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
                     </div>
                 </div>
+                <hr>
             </div>
+
         </div>
-    </div>
+
+
+    {% endfor %}
+    {% if is_paginated %}
+
+        {% if page_obj.has_previous %}
+            <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+        {% endif %}
+
+    {% endif %}
 
 
 {% endblock %}
