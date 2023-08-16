@@ -25,20 +25,16 @@ class KidAddForm(forms.ModelForm):
 
         }
 
-
-class ChangeKidInfoForm(forms.ModelForm):
-    def __init__(self, *args, current_user=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        if current_user is not None:
-            self.fields['group'].queryset = Director.objects.get(user=current_user.id).groups.filter(is_active=True)
-            self.fields['kid_meals'].queryset = Director.objects.get(user=current_user.id).meals.filter(is_active=True)
-            self.fields['payment_plan'].queryset = Director.objects.get(user=current_user.id).payment_plan.filter(
-                is_active=True)
-
-    class Meta:
-        model = Kid
-        fields = ['first_name', 'last_name', 'group', 'gender', 'payment_plan', 'kid_meals', 'principal']
-        widgets = {'principal': forms.HiddenInput}
+        labels = {
+            'first_name': 'Imię:',
+            'last_name': 'Nazwisko:',
+            'group': 'Grupa:',
+            'gender': 'Płeć:',
+            'start': 'Początek umowy:',
+            'end': 'Koniec umowy:',
+            'payment_plan': 'Plan płatniczy:',
+            'kid_meals': 'Posiłek:',
+        }
 
 
 class PaymentPlanForm(forms.ModelForm):
