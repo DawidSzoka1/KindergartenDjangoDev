@@ -6,7 +6,6 @@ urlpatterns = [
     path("list/kids/", views.KidsListView.as_view(), name="list_kids"),
     path('change/kid/info/<int:pk>/', views.ChangeKidInfoView.as_view(), name='change_kid_info'),
     path('kid/details/<int:pk>/', views.DetailsKidView.as_view(), name='kid_details'),
-    path('kid/search/', views.KidSearchView.as_view(), name='kid-search'),
     path('kid/delete/<int:pk>/', views.KidDeleteView.as_view(), name='kid_delete'),
 
     path('add/group/', views.GroupAddView.as_view(), name='add_group'),

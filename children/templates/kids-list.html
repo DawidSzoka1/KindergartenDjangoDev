@@ -41,7 +41,7 @@
     </nav>
     {% if perms.director.is_director %}
         <div class="justify-content-center">
-            <form class="d-flex" method="POST" action="{% url 'kid-search' %}"
+            <form class="d-flex" method="POST" action=""
                   style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">
                 {% csrf_token %}
                 <input class="form-control" type="search" placeholder="Wpisz imie dziecka"

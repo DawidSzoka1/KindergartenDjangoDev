@@ -488,17 +488,3 @@ class KidDeleteView(PermissionRequiredMixin, View):
                              f'Popprawnie usunieto dziecko {kid}')
             return redirect('list_kids')
         raise PermissionDenied
-
-
-class KidSearchView(LoginRequiredMixin, View):
-    def get(self, request):
-        return redirect('list_kids')
-
-    def post(self, request):
-        search = request.POST.get('search')
-        if search:
-            kids = Kid.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
-                is_active=True).filter(
-                first_name__icontains=search)
-            return render(request, 'kids-list.html', {'kids': kids})
-        return redirect('list_kids')
