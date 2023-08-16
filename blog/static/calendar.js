@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const user = document.getElementById('user');
     days.forEach((elem, count) => {
         elem.addEventListener("click", function (ele) {
-            const html = ele.target.innerHTML;
+
 
             const day = this.firstChild.innerHTML
             const monthYear = this.parentElement.parentElement.children[0].children[0].innerHTML

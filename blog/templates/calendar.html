@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+
     <form method="POST" action="">
         <h1>Kalendarz dziecka {{ kid.first_name }} {{ kid.last_name }}</h1>
         {% csrf_token %}
-        {{ cal }}
+      {{ cal }}
 
         <div class="card" style="display: none" id="wholeDrop">
             <h5 class="card-title">Zaznacz obecnosc:</h5>
@@ -111,4 +112,5 @@
 
     </form>
     <script src="{% static 'calendar.js' %}"></script>
+
 {% endblock %}
