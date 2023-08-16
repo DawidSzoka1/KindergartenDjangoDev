@@ -36,7 +36,7 @@ class Meals(models.Model):
 
 
 class PaymentPlan(models.Model):
-    name = models.TextField()
+    name = models.CharField(max_length=128)
     price = models.DecimalField(max_digits=7, decimal_places=2, default=500)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     is_active = models.BooleanField(default=True)

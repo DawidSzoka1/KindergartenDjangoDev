@@ -43,6 +43,11 @@ class PaymentPlanForm(forms.ModelForm):
         fields = '__all__'
         widgets = {'principal': forms.HiddenInput}
 
+        labels = {
+            'name': 'Nazwa:',
+            'price': 'Kwota za miesiąc:'
+        }
+
 
 class GroupsForm(forms.ModelForm):
     class Meta:
@@ -50,6 +55,10 @@ class GroupsForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'principal': forms.HiddenInput,
+        }
+        labels = {
+            'name': 'Nazwa:',
+            'capacity': 'Pojemność:'
         }
 
     def __init__(self, *args, current_user=None, **kwargs):
