@@ -61,7 +61,7 @@
                                         <label class="mb-2" for="birth">DATA URODZENIA:</label>
                                         <input class="form-control" style="font-size: 20px" name="birth" type="text"
                                                id="birth"
-                                               value="{{ kid.birth }}" readonly>
+                                               value="{{ kid.date_of_birth }}" readonly>
                                     </h3>
                                 </div>
                             </div>
@@ -79,9 +79,15 @@
                                 <div class="form-group">
                                     <h3>
                                         <label class="mb-2" for="group">GRUPA:</label>
-                                        <input class="form-control" style="font-size: 20px" name="group" type="text"
-                                               id="group"
-                                               value="{{ kid.group.name }}" readonly>
+                                        {% if kid.group %}
+                                            <input class="form-control" style="font-size: 20px" name="group" type="text"
+                                                   id="group"
+                                                   value="{{ kid.group.name }}" readonly>
+                                        {% else %}
+                                            <input class="form-control" style="font-size: 20px" name="group" type="text"
+                                                   id="group"
+                                                   value="Brak, edytuj profil by dodać" readonly>
+                                        {% endif %}
                                     </h3>
                                 </div>
                             </div>
@@ -104,7 +110,7 @@
                                                    id="end"
                                                    value="{{ kid.end }}" readonly>
                                         {% else %}
-                                             <input class="form-control" style="font-size: 20px" name="end" type="text"
+                                            <input class="form-control" style="font-size: 20px" name="end" type="text"
                                                    id="end"
                                                    value="Na czas nieokreślony" readonly>
                                         {% endif %}
@@ -140,9 +146,15 @@
                                 <div class="form-group">
                                     <h3>
                                         <label class="mb-2" for="payment">PLAN PŁATNICZY:</label>
-                                        <input class="form-control" style="font-size: 20px" name="payment"
-                                               type="text" id="payment"
-                                               value="{{ kid.payment_plan }}" readonly>
+                                        {% if kid.payment_plan %}
+                                            <input class="form-control" style="font-size: 20px" name="payment"
+                                                   type="text" id="payment"
+                                                   value="{{ kid.payment_plan }}" readonly>
+                                        {% else %}
+                                            <input class="form-control" style="font-size: 20px" name="payment"
+                                                   type="text" id="payment"
+                                                   value="Brak, edytuj profil by dodać" readonly>
+                                        {% endif %}
                                     </h3>
                                 </div>
                             </div>
@@ -150,9 +162,15 @@
                                 <div class="form-group">
                                     <h3>
                                         <label class="mb-2" for="per_month">STAŁY KOSZT MIESIĘCZNY:</label>
-                                        <input class="form-control" style="font-size: 20px" name="per_month"
-                                               type="text" id="per_month"
-                                               value="{{ kid.payment_plan.price }} zł" readonly>
+                                        {% if kid.payment_plan %}
+                                            <input class="form-control" style="font-size: 20px" name="per_month"
+                                                   type="text" id="per_month"
+                                                   value="{{ kid.payment_plan.price }} zł" readonly>
+                                        {% else %}
+                                            <input class="form-control" style="font-size: 20px" name="per_month"
+                                                   type="text" id="per_month"
+                                                   value="0 zł" readonly>
+                                        {% endif %}
                                     </h3>
                                 </div>
                             </div>
@@ -164,10 +182,14 @@
                                             <input class="form-control" style="font-size: 20px" name="to_pay"
                                                    type="text" id="to_pay"
                                                    value="{{ kid.amount }} zł" readonly>
-                                        {% else %}
+                                        {% elif kid.payment_plan %}
                                             <input class="form-control" style="font-size: 20px" name="to_pay"
                                                    type="text" id="to_pay"
                                                    value="{{ kid.payment_plan.price }} zł" readonly>
+                                        {% else %}
+                                            <input class="form-control" style="font-size: 20px" name="to_pay"
+                                                   type="text" id="to_pay"
+                                                   value="0 zł" readonly>
                                         {% endif %}
                                     </h3>
                                 </div>
@@ -176,9 +198,15 @@
                                 <div class="form-group">
                                     <h3>
                                         <label class="mb-2" for="meal">PLAN ŻYWIENIOWY:</label>
-                                        <input class="form-control" style="font-size: 20px" name="meal"
-                                               type="text" id="meal"
-                                               value="{{ kid.kid_meals }}" readonly>
+                                        {% if kid.kid_meals %}
+                                            <input class="form-control" style="font-size: 20px" name="meal"
+                                                   type="text" id="meal"
+                                                   value="{{ kid.kid_meals }}" readonly>
+                                        {% else %}
+                                            <input class="form-control" style="font-size: 20px" name="meal"
+                                                   type="text" id="meal"
+                                                   value="Brak, edytuj profil by dodać" readonly>
+                                        {% endif %}
                                     </h3>
                                 </div>
                             </div>
@@ -186,9 +214,15 @@
                                 <div class="form-group">
                                     <h3>
                                         <label class="mb-2" for="per_day">DZIENNA OPŁATA ŻYWIENIOWA:</label>
-                                        <input class="form-control" style="font-size: 20px" name="per_day"
-                                               type="text" id="per_day"
-                                               value="{{ kid.kid_meals.per_day }} zł" readonly>
+                                        {% if kid.kid_meals %}
+                                            <input class="form-control" style="font-size: 20px" name="per_day"
+                                                   type="text" id="per_day"
+                                                   value="{{ kid.kid_meals.per_day }} zł" readonly>
+                                        {% else %}
+                                            <input class="form-control" style="font-size: 20px" name="per_day"
+                                                   type="text" id="per_day"
+                                                   value="0 zł" readonly>
+                                        {% endif %}
                                     </h3>
                                 </div>
                             </div>

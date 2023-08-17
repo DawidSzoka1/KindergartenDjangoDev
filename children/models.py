@@ -11,6 +11,7 @@ from payments_plans.models import PaymentPlan
 
 class Kid(models.Model):
     gender_choices = ((1, 'Chłopiec'), (2, 'Dziewczynka'))
+    date_of_birth = models.DateField(null=True)
     first_name = models.CharField(max_length=128)
     last_name = models.CharField(max_length=128)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True)

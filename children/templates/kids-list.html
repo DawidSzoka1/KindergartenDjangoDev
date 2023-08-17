@@ -138,18 +138,25 @@
                                         informacje</a>
                                 </li>
                                 <li>
-                                    <form method="POST"
-                                          action="{% url 'kid_delete' pk=kid.id %}">
-                                        {% csrf_token %}
-                                        <button class="dropdown-item"
-                                                type="submit"
-                                                name="delete"
-                                                value="Usuń"
-                                                onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}');"
-                                        >Usuń dziecko
-                                        </button>
-                                    </form>
+                                    <a href="{% url 'calendar' pk=kid.id %}"
+                                       class="dropdown-item">Kalendarz
+                                        </a>
                                 </li>
+                                {% if perms.director.is_director %}
+                                    <li>
+                                        <form method="POST"
+                                              action="{% url 'kid_delete' pk=kid.id %}">
+                                            {% csrf_token %}
+                                            <button class="dropdown-item"
+                                                    type="submit"
+                                                    name="delete"
+                                                    value="Usuń"
+                                                    onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}');"
+                                            >Usuń dziecko
+                                            </button>
+                                        </form>
+                                    </li>
+                                {% endif %}
                             </ul>
                         </div>
                     </div>

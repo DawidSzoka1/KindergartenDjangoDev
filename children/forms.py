@@ -16,11 +16,12 @@ class KidAddForm(forms.ModelForm):
     class Meta:
         model = Kid
         fields = ['first_name', 'last_name', 'group', 'gender', 'start', 'end', 'payment_plan', 'kid_meals',
-                  'principal']
+                  'principal', 'date_of_birth']
 
         widgets = {
             'start': forms.DateInput(attrs={'type': 'date'}),
             'end': forms.DateInput(attrs={'type': 'date'}),
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
             'principal': forms.HiddenInput,
 
         }
@@ -34,8 +35,5 @@ class KidAddForm(forms.ModelForm):
             'end': 'Koniec umowy:',
             'payment_plan': 'Plan płatniczy:',
             'kid_meals': 'Posiłek:',
+            'date_of_birth': 'Data urodzenia'
         }
-
-
-
-
