@@ -158,8 +158,9 @@ class ParentDeleteView(PermissionRequiredMixin, View):
     def post(self, request, pk):
         parent = get_object_or_404(ParentA, id=int(pk))
         if parent.principal.first().user.email == request.user.email:
-            parent.delete()
-            messages.success(request, f'Rodzic {parent.user.email} został usniety')
+            user = User.objects.get(parent=parent.id)
+            user.delete()
+            messages.success(request, f'Rodzic {user} został usniety')
             return redirect('list_parent')
         raise PermissionDenied
 

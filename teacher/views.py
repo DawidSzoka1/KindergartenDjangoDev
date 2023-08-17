@@ -86,7 +86,7 @@ class EmployeeAddView(PermissionRequiredMixin, View):
         salary = request.POST.get('salary')
         if role == 2:
             group_id = request.POST.get('group')
-            group = user.groups.get(id=int(group_id))
+            group = user.groups_set.get(id=int(group_id))
         teacher_email = request.POST.get('email')
         if teacher_email:
             try:
@@ -104,7 +104,8 @@ class EmployeeAddView(PermissionRequiredMixin, View):
                 teacher_object = Employee.objects.create(user=teacher_user, role=role, salary=float(salary))
                 user.employee_set.add(teacher_object)
                 if group:
-                    teacher_object.group.add(group)
+                    teacher_object.group = group
+                    teacher_object.save()
                 teacher_object.user.user_permissions.clear()
                 teacher_object.user.user_permissions.add(permission)
                 teacher_user.employee.save()
@@ -196,7 +197,9 @@ class EmployeeDeleteView(PermissionRequiredMixin, View):
         employee = get_object_or_404(Employee, id=int(pk))
         director = Director.objects.get(user=request.user.id)
         if employee.principal.first() == director:
-            employee.delete()
-            messages.success(request, f'Poprawnie usunieto praconika {employee}')
+            user = User.objects.get(employee=employee.id)
+            user.delete()
+
+            messages.success(request, f'Udało sie usunąc {user}')
             return redirect('list_teachers')
         raise PermissionDenied
