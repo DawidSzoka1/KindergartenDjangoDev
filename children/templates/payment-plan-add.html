@@ -20,10 +20,12 @@
 
                                 <div class="col" style="color: #75736B">
                                     <div class="card-body p-md-5 ">
-                                        {% if form.errors %}
-                                            <div class="alert alert-danger">
-                                                {{ form.errors }}
-                                            </div>
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                <div class="alert alert-{{ message.tags }}">
+                                                    {{ message }}
+                                                </div>
+                                            {% endfor %}
                                         {% endif %}
                                         <div class="row">
 
