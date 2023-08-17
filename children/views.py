@@ -20,77 +20,6 @@ from django.views.generic import (
 
 
 # Create your views here.
-class AddPaymentsPlanView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
-    permission_required = "director.is_director"
-    model = PaymentPlan
-    template_name = 'payment-plan-add.html'
-    form_class = PaymentPlanForm
-    success_url = reverse_lazy('list_payments_plans')
-    success_message = "Plan platnicz dodany porpawnie"
-
-    def get_initial(self):
-        initial = super(AddPaymentsPlanView, self).get_initial()
-        initial = initial.copy()
-        initial['principal'] = Director.objects.get(user=self.request.user.id)
-        return initial
-
-    def form_valid(self, form):
-        form.instance.save()
-        return super().form_valid(form)
-
-
-class PaymentPlansListView(PermissionRequiredMixin, ListView):
-    permission_required = "director.is_director"
-    model = PaymentPlan
-    template_name = 'payments-plans-list.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["plans"] = Director.objects.get(user=self.request.user.id).paymentplan_set.filter(is_active=True)
-        return context
-
-
-class PaymentPlanUpdateView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
-    def get(self, request, pk):
-        payment = get_object_or_404(PaymentPlan, id=int(pk))
-        director = Director.objects.get(user=request.user.id)
-        if payment:
-            if payment.principal == director:
-                form = PaymentPlanForm(instance=payment)
-                return render(request, 'payment-plan-update.html', {'form': form})
-        raise PermissionDenied
-
-    def post(self, request, pk):
-        payment = get_object_or_404(PaymentPlan, id=int(pk))
-        form = PaymentPlanForm(request.POST, instance=payment)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Poprawnie zmieniono informacje')
-            return redirect('list_payments_plans')
-        messages.error(request, f"{form.errors}")
-        return redirect('payment_plan_update', pk=pk)
-
-
-class PaymentPlanDeleteView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
-    def get(self, request, pk):
-        raise PermissionDenied
-
-    def post(self, request, pk):
-        payment = get_object_or_404(PaymentPlan, id=int(pk))
-        director = Director.objects.get(user=request.user.id)
-        if payment.principal == director:
-            for kid in payment.kid_set.filter(is_active=True):
-                kid.payment_plan = None
-                kid.save()
-            payment.delete()
-            messages.success(request,
-                             f'Popprawnie usunieto plan platniczy {payment}')
-            return redirect('list_payments_plans')
-        raise PermissionDenied
 
 
 class MealAddView(PermissionRequiredMixin, View):
@@ -100,7 +29,7 @@ class MealAddView(PermissionRequiredMixin, View):
         director = Director.objects.get(user=request.user.id)
         photos = director.mealphotos_set.filter(is_active=True)
         if photos:
-            return render(request, 'meal-add.html', {'photos': photos})
+            return render(request, '../meals/templates/meal-add.html', {'photos': photos})
         messages.info(request, 'Najpierwsz musisz dodac jakas iconke')
         return redirect('photo_add')
 
@@ -130,7 +59,7 @@ class MealAddView(PermissionRequiredMixin, View):
 class MealsListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
     model = Meals
-    template_name = 'meals-list.html'
+    template_name = '../meals/templates/meals-list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -147,7 +76,7 @@ class MealsUpdateView(PermissionRequiredMixin, View):
         if meal:
             current_photo = meal.photo.first()
             photos = director.mealphotos_set.filter(is_active=True)
-            return render(request, 'meal-update.html',
+            return render(request, '../meals/templates/meal-update.html',
                           {
                               'meal': meal,
                               'current_photo': current_photo,

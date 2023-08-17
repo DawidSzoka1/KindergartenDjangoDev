@@ -1,5 +1,5 @@
 from django import forms
-from .models import Kid, Groups, Director, PaymentPlan, Meals
+from .models import Kid, Director
 
 
 class KidAddForm(forms.ModelForm):
@@ -37,15 +37,5 @@ class KidAddForm(forms.ModelForm):
         }
 
 
-class PaymentPlanForm(forms.ModelForm):
-    class Meta:
-        model = PaymentPlan
-        fields = '__all__'
-        widgets = {'principal': forms.HiddenInput}
-
-        labels = {
-            'name': 'Nazwa:',
-            'price': 'Kwota za miesiąc:'
-        }
 
 
