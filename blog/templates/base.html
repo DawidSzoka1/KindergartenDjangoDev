@@ -120,17 +120,17 @@
     </nav>
 </header>
 <!-- Navbar -->
-<div class="row">
-    <div class="col-md-8">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    </div>
-</div>
+{#<div class="row">#}
+{#    <div class="col-md-8">#}
+{#        {% if messages %}#}
+{#            {% for message in messages %}#}
+{#                <div class="alert alert-{{ message.tags }}">#}
+{#                    {{ message }}#}
+{#                </div>#}
+{#            {% endfor %}#}
+{#        {% endif %}#}
+{#    </div>#}
+{#</div>#}
 
 {% block content %}{% endblock %}
 

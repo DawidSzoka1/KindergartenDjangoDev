@@ -21,7 +21,7 @@ class MealAddView(PermissionRequiredMixin, View):
         director = Director.objects.get(user=request.user.id)
         photos = director.mealphotos_set.filter(is_active=True)
         if photos:
-            return render(request, '../meals/templates/meal-add.html', {'photos': photos})
+            return render(request, 'meal-add.html', {'photos': photos})
         messages.info(request, 'Najpierwsz musisz dodac jakas iconke')
         return redirect('photo_add')
 
@@ -51,7 +51,7 @@ class MealAddView(PermissionRequiredMixin, View):
 class MealsListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
     model = Meals
-    template_name = '../meals/templates/meals-list.html'
+    template_name = 'meals-list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -68,7 +68,7 @@ class MealsUpdateView(PermissionRequiredMixin, View):
         if meal:
             current_photo = meal.photo.first()
             photos = director.mealphotos_set.filter(is_active=True)
-            return render(request, '../meals/templates/meal-update.html',
+            return render(request, 'meal-update.html',
                           {
                               'meal': meal,
                               'current_photo': current_photo,

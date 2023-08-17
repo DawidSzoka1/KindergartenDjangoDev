@@ -20,7 +20,7 @@ from django.views.generic import (
 class AddPaymentsPlanView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     permission_required = "director.is_director"
     model = PaymentPlan
-    template_name = '../payments_plans/templates/payment-plan-add.html'
+    template_name = 'payment-plan-add.html'
     form_class = PaymentPlanForm
     success_url = reverse_lazy('list_payments_plans')
     success_message = "Plan platnicz dodany porpawnie"
@@ -39,7 +39,7 @@ class AddPaymentsPlanView(PermissionRequiredMixin, SuccessMessageMixin, CreateVi
 class PaymentPlansListView(PermissionRequiredMixin, ListView):
     permission_required = "director.is_director"
     model = PaymentPlan
-    template_name = '../payments_plans/templates/payments-plans-list.html'
+    template_name = 'payments-plans-list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -56,7 +56,7 @@ class PaymentPlanUpdateView(PermissionRequiredMixin, View):
         if payment:
             if payment.principal == director:
                 form = PaymentPlanForm(instance=payment)
-                return render(request, '../payments_plans/templates/payment-plan-update.html', {'form': form})
+                return render(request, 'payment-plan-update.html', {'form': form})
         raise PermissionDenied
 
     def post(self, request, pk):

@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from director.models import Director, GroupPhotos, MealPhotos
 from groups.models import Groups
+from meals.models import Meals
+from payments_plans.models import PaymentPlan
 
 
 # Create your models here.
