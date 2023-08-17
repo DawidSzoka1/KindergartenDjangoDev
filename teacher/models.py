@@ -19,7 +19,7 @@ class Employee(models.Model):
     last_name = models.CharField(max_length=128, null=True)
     role = models.IntegerField(choices=roles, default=3)
     salary = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    group = models.ManyToManyField(Groups)
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True)
     phone_regex = RegexValidator(regex=r'^(?<!\w)(\(?(\+|00)?48\)?)?[ -]?\d{3}[ -]?\d{3}[ -]?\d{3}(?!\w)$',
                                  message="Numer telefony musi byc w formie: '+48 999 999 999' albo '(+48 999 999 999)' albo '999 999 999'.",
                                  code='invalid_numer_telefonu')

@@ -90,12 +90,13 @@
 
             {% if user.employee.role == 2 %}
 
-                <div class="text-center mt-5">
-                    <button type="button" class="btn  me-3"
-                            onclick="location.href='{% url 'group_details' pk=user.employee.group.first.id %}'">
-                        Grupa
-                    </button>
-                </div>
+{#                <div class="text-center mt-5">#}
+{#                    <button type="button" class="btn  me-3"#}
+{#                            onclick="location.href='{% url 'group_details' pk=teacher.group.id %}'">#}
+{#                        Grupa#}
+{#                    </button>#}
+{#                </div>#}
+                {{ teacher.group.all }}
 
             {% endif %}
         {% elif perms.parent.is_parent %}

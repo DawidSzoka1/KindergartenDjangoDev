@@ -53,6 +53,14 @@
             </form>
         </div>
     {% endif %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-error" style="background-color: red; color: black">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+    {% endif %}
     {% for teacher in page_obj %}
 
 

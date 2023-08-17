@@ -2,17 +2,25 @@
 {% load static %}
 {% block content %}
     <form method="POST" action="">
-{% csrf_token %}
-    {{ today }}
-    {% for kid in kids %}
-        {{ kid }}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-error" style="background-color: red; color: black">
+                    {{ message }}
+                </div>
+            {% endfor %}
 
-        <input type="hidden" value="{{ kid.id }}" name="data">
-        <button type="submit">obecny</button>
-    {% endfor %}
-    <h1>Liczba obecnych dzieci {{ kids_presence.count }}</h1>
-    <h1>Liczba nieobecnych dzieci  {{ kids_absent.count }}</h1>
-    <h1>Liczba planowanych nieobecnych dzieci {{ kids_planned_absent.count }}</h1>
+        {% endif %}
+        {% csrf_token %}
+        {{ today }}
+        {% for kid in kids %}
+            {{ kid }}
+
+            <input type="submit" value="{{ kid.id.as_hidden }} Obecny" name="data">
+
+        {% endfor %}
+        <h1>Liczba obecnych dzieci {{ kids_presence.count }}</h1>
+        <h1>Liczba nieobecnych dzieci {{ kids_absent.count }}</h1>
+        <h1>Liczba planowanych nieobecnych dzieci {{ kids_planned_absent.count }}</h1>
     </form>
     <script src="{% static 'calendar.js' %}"></script>
 {% endblock %}

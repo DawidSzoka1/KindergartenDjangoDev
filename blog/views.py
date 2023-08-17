@@ -133,6 +133,9 @@ class Home(View):
         if request.user.get_user_permissions() == {'parent.is_parent'}:
             kids = ParentA.objects.get(user=request.user.id).kids.filter(is_active=True)
             return render(request, 'home.html', {'kids': kids})
+        elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
+            teacher = Employee.objects.get(user=request.user.id)
+            return render(request, 'home.html', {'teacher': teacher})
         return render(request, 'home.html')
 
 
@@ -170,7 +173,6 @@ class PresenceCalendarView(LoginRequiredMixin, View):
 
     def post(self, request):
         data = request.POST.get('data')
-
         user = request.user.get_user_permissions()
         kid_id = data[0]
         day = timezone.now().strftime("%Y-%m-%d")
@@ -190,8 +192,9 @@ class PresenceCalendarView(LoginRequiredMixin, View):
                     check.save()
                 else:
                     PresenceModel.objects.create(day=day, kid=kid, presenceType=2)
-
+        messages.info(request, f'{kid_id}')
         return redirect('presence_calendar')
+
 
 class PostListView(ListView):
     model = Post

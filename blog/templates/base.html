@@ -61,7 +61,7 @@
                             </li>
                             {% elif perms.teacher.is_teacher %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'teacher-profile' pk=user.teacher.id %}"
+                                <a class="nav-link" href="{% url 'teacher-profile' pk=teacher.id %}"
                                    style="font-size: 20px; color: white; text-decoration:none">MÓJ PROFIL</a>
                             </li>
                         {% endif %}
