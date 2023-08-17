@@ -8,7 +8,7 @@
         }
     </style>
     <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5% ">
-    <form method="post" action="#">
+    <form method="post" action="#" enctype='multipart/form-data'>
         {% csrf_token %}
         <section class="h-100">
 
@@ -20,10 +20,12 @@
 
                                 <div class="col" style="color: #75736B">
                                     <div class="card-body p-md-5 ">
-                                        {% if form.errors %}
-                                            <div class="alert alert-danger">
-                                                {{ form.errors }}
-                                            </div>
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                <div class="alert alert-error">
+                                                    {{ message }}
+                                                </div>
+                                            {% endfor %}
                                         {% endif %}
                                         <div class="row">
 
@@ -88,5 +90,5 @@
             </div>
         </section>
     </form>
-    <script src="{% static 'group.js' %}"></script>
+
 {% endblock %}
