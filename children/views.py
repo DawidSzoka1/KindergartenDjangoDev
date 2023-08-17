@@ -188,3 +188,25 @@ class KidDeleteView(PermissionRequiredMixin, View):
                              f'Popprawnie usunieto dziecko {kid}')
             return redirect('list_kids')
         raise PermissionDenied
+
+
+class KidParentInfoView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        user = request.user.get_user_permissions()
+        kid = get_object_or_404(Kid, id=int(pk))
+        parents = None
+        if user == {'director.is_director'}:
+            if kid.principal.user.email == request.user.email:
+                parents = kid.parenta_set.all()
+
+        elif user == {'teacher.is_teacher'}:
+            if request.user.email in kid.group.employee_set.values_list('user__email', flat=True):
+                parents = kid.parenta_set.all()
+
+        elif user == {'parent.is_parent'}:
+            if request.user.email in kid.parenta_set.values_list('user__email', flat=True):
+                parents = kid.parenta_set.all()
+
+        if parents:
+            return render(request, 'kid-parent-info.html', {'kid': kid, 'parents': parents})
+        raise PermissionDenied

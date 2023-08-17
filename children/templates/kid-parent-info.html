@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block content %}
+    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+            <!-- Left links -->
+            <!-- Left links -->
+            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+                <!-- Navbar brand -->
+                <!-- Left links -->
+                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
+                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>DANE KONTAKTOWE RODZICA</b></li>
+                </ul>
+            </div>
+            {% if perms.director.is_director %}
+                <ul class="navbar-nav d-flex flex-row me-1">
+                    <li class="nav-item">
+                        <button class="btn" onclick="location.href='{% url 'change_kid_info' pk=kid.id %}'"
+                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
+                            EDYTUJ PROFIL
+                        </button>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+        <!-- Container wrapper -->
+    </nav>
+
+    <form method="post" action="#">
+        {% csrf_token %}
+        <div class="container" style="margin-top: 85px">
+            <div class="row gutters">
+                {% for parent in parents %}
+                    <div class="col-6" style="margin-left: auto; margin-right: auto">
+                        <div class="card h-100" style="background-color: #BAB1AB; border-color: #BAB1AB">
+                            <div class="card-body text-white">
+                                <div class="col mt-4">
+                                    <div class="form-group">
+                                        <h1>
+                                            <label class="mb-2" for="birth">IMIĘ RODZICA:</label>
+                                            {% if parent.first_name %}
+                                                <input class="form-control" style="font-size: 30px" name="birth"
+                                                       type="text"
+                                                       id="birth"
+                                                       value="{{ parent.first_name }}" readonly>
+                                            {% else %}
+                                                <input class="form-control" style="font-size: 30px" name="birth"
+                                                       type="text"
+                                                       id="birth"
+                                                       value="Nie zostało jeszcze podane" readonly>
+                                            {% endif %}
+                                        </h1>
+                                    </div>
+                                </div>
+                                <div class="col mt-4">
+                                    <div class="form-group">
+                                        <h1>
+                                            <label class="mb-2" for="gender">NAZWISKO RODZICA:</label>
+                                           {% if parent.first_name %}
+                                                <input class="form-control" style="font-size: 30px" name="birth"
+                                                       type="text"
+                                                       id="birth"
+                                                       value="{{ parent.last_name }}" readonly>
+                                            {% else %}
+                                                <input class="form-control" style="font-size: 30px" name="birth"
+                                                       type="text"
+                                                       id="birth"
+                                                       value="Nie zostało jeszcze podane" readonly>
+                                            {% endif %}
+                                        </h1>
+                                    </div>
+                                </div>
+                                <div class="col mt-4">
+                                    <div class="form-group">
+                                        <h1>
+                                            <label class="mb-2" for="group">E-MAIL:</label>
+
+                                                <input class="form-control" style="font-size: 30px" name="group"
+                                                       type="email"
+                                                       id="group"
+                                                       value="{{ parent.user.email }}" readonly>
+
+                                        </h1>
+                                    </div>
+                                </div>
+                                <div class="col mt-4 mb-4">
+                                    <div class="form-group">
+                                        <h1>
+                                            <label class="mb-2" for="end">NR KOMÓRKOWY:</label>
+                                            {% if parent.phone %}
+                                                <input class="form-control" style="font-size: 30px" name="end"
+                                                       type="text"
+                                                       id="end"
+                                                       value="{{ parent.phone }}" readonly>
+                                            {% else %}
+                                                <input class="form-control" style="font-size: 30px" name="end"
+                                                       type="text"
+                                                       id="end"
+                                                       value="Nie został jeszcze podany" readonly>
+                                            {% endif %}
+                                        </h1>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+
+            </div>
+
+        </div>
+    </form>
+    {% if kid.parenta_set.all %}
+        <button class="btn"
+                type="button" style="position: absolute; left: -1%; bottom: 40%"
+                onclick="location.href='{% url 'kid_details' pk=kid.id %}'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor"
+                 style="color: black"
+                 class="bi bi-caret-left-fill" viewBox="0 0 16 16">
+                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+            </svg>
+        </button>
+    {% endif %}
+
+
+
+{% endblock %}
