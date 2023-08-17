@@ -8,9 +8,4 @@ urlpatterns = [
     path('kid/details/<int:pk>/', views.DetailsKidView.as_view(), name='kid_details'),
     path('kid/delete/<int:pk>/', views.KidDeleteView.as_view(), name='kid_delete'),
 
-    path('add/meal/', views.MealAddView.as_view(), name='add_meal'),
-    path('list/meals/', views.MealsListView.as_view(), name='list_meals'),
-    path('meals/update/<int:pk>/', views.MealsUpdateView.as_view(), name='meals_update'),
-    path('meals/delete/<int:pk>/', views.MealDeleteView.as_view(), name='meals_delete'),
-
 ]
