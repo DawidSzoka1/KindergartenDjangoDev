@@ -81,11 +81,11 @@ class EmployeeAddView(PermissionRequiredMixin, View):
 
     def post(self, request):
         user = Director.objects.get(user=request.user.id)
-        group = None
         role = request.POST.get('role')
         salary = request.POST.get('salary')
-        if role == 2:
-            group_id = request.POST.get('group')
+        group_id = request.POST.get('group')
+        group = None
+        if group_id:
             group = user.groups_set.get(id=int(group_id))
         teacher_email = request.POST.get('email')
         if teacher_email:
@@ -94,7 +94,7 @@ class EmployeeAddView(PermissionRequiredMixin, View):
             except User.DoesNotExist:
                 test = None
             if test:
-                messages.error(request, 'Ten nauczyciel juz istnieje')
+                messages.error(request, f'Ten email jest zajety')
                 return redirect('add_teacher')
             try:
                 password = User.objects.make_random_password()
@@ -170,7 +170,7 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
                 if group and salary:
                     teacher.salary = float(salary)
                     group_obj = Groups.objects.get(id=int(group))
-                    teacher.group.add(group_obj)
+                    teacher.group = group_obj
                     teacher.role = role
                     teacher.save()
                     messages.success(request, 'Udalo sie zmienic informacje')

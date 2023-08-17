@@ -96,7 +96,8 @@
 {#                        Grupa#}
 {#                    </button>#}
 {#                </div>#}
-                {{ teacher.group.all }}
+                {{ teacher.group }}
+                {{ teacher.role }}
 
             {% endif %}
         {% elif perms.parent.is_parent %}
