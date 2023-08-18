@@ -134,33 +134,45 @@ class DetailsParentView(PermissionRequiredMixin, UserPassesTestMixin, DetailView
 
 
 class ParentProfileView(LoginRequiredMixin, View):
-    def get(self, request):
-        if request.user.get_user_permissions() == {'parent.is_parent'}:
-            p_form = ParentUpdateForm(instance=request.user.parenta)
-            u_form = UserUpdateForm(instance=request.user)
-            parent_logged = ParentA.objects.get(user=request.user.id)
-            parent_kids = parent_logged.kids.filter(is_active=True)
+    def get(self, request, pk):
+        user = request.user
+        parent = get_object_or_404(ParentA, id=int(pk))
+        p_form = ParentUpdateForm(instance=parent)
+        u_form = UserUpdateForm(instance=parent.user)
+        parent_kids = parent.kids.filter(is_active=True)
 
-            context = {
-                'p_form': p_form,
-                'u_form': u_form,
-                'parent_logged': parent_logged,
-                'parent_kids': parent_kids,
+        context = {
+            'p_form': p_form,
+            'u_form': u_form,
+            'parent_logged': parent,
+            'parent_kids': parent_kids,
 
-            }
-            return render(request, 'parent_profile.html', context)
+        }
+        if user.get_user_permissions() == {'parent.is_parent'}:
+            if parent.user.email == user.email:
+                return render(request, 'parent_profile.html', context)
+        elif user.get_user_permissions() == {'director.is_director'}:
+            director = get_object_or_404(Director, user=user.id)
+            if parent in director.parenta_set.all():
+                return render(request, 'parent_profile.html', context)
+        elif user.get_user_permissions() == {'teacher.is_teacher'}:
+            teacher = get_object_or_404(Employee, user=user.id)
+            if parent.kids.filter(group=teacher.group).filter(is_active=True):
+                return render(request, 'parent_profile.html', context)
+
         raise PermissionDenied
 
-    def post(self, request):
-        p_form = ParentUpdateForm(request.POST, instance=request.user.parenta)
-        u_form = UserUpdateForm(request.POST, instance=request.user)
 
-        if p_form.is_valid() and u_form.is_valid():
-            p_form.save()
-            u_form.save()
-            return redirect('parent_profile')
-        messages.error(request, f'{u_form.errors} i {p_form.errors}')
-        return redirect('parent_profile')
+    # def post(self, request):
+    #     p_form = ParentUpdateForm(request.POST, instance=request.user.parenta)
+    #     u_form = UserUpdateForm(request.POST, instance=request.user)
+    #
+    #     if p_form.is_valid() and u_form.is_valid():
+    #         p_form.save()
+    #         u_form.save()
+    #         return redirect('parent_profile')
+    #     messages.error(request, f'{u_form.errors} i {p_form.errors}')
+    #     return redirect('parent_profile')
 
 
 class ParentDeleteView(PermissionRequiredMixin, View):

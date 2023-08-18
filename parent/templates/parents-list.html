@@ -119,24 +119,26 @@
                                 aria-labelledby="navbarDropdownMenuAvatar"
                         >
                             <li>
-                                <a href="{% url 'parent_details' pk=parent.id %}"
+                                <a href="{% url 'parent_profile' pk=parent.id %}"
                                    class="dropdown-item">Konto
                                     Rodzica
                                 </a>
                             </li>
-                            <li>
-                                <form method="POST"
-                                      action="{% url 'parent_delete' pk=parent.id %}">
-                                    {% csrf_token %}
-                                    <button class="dropdown-item"
-                                            type="submit"
-                                            name="delete"
-                                            value="Usuń"
-                                            onclick="return confirm('Jestes pewny ze chcesz usunac rodzica {{ parent.user.email }}');"
-                                    >USUŃ
-                                    </button>
-                                </form>
-                            </li>
+                            {% if perms.director.is_director %}
+                                <li>
+                                    <form method="POST"
+                                          action="{% url 'parent_delete' pk=parent.id %}">
+                                        {% csrf_token %}
+                                        <button class="dropdown-item"
+                                                type="submit"
+                                                name="delete"
+                                                value="Usuń"
+                                                onclick="return confirm('Jestes pewny ze chcesz usunac rodzica {{ parent.user.email }}');"
+                                        >USUŃ
+                                        </button>
+                                    </form>
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
