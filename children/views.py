@@ -52,7 +52,7 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMix
         return super().form_valid(form)
 
     def test_func(self):
-        director = Director.objects.get(user=self.request.user.id)
+        director = get_object_or_404(Director, user=self.request.user.id)
         if director.groups_set.filter(is_active=True):
             if director.meals_set.filter(is_active=True):
                 if director.paymentplan_set.filter(is_active=True):
@@ -60,7 +60,7 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMix
         return False
 
     def handle_no_permission(self):
-        director = Director.objects.get(user=self.request.user.id)
+        director = get_object_or_404(Director, user=self.request.user.id)
         if not director.groups_set.filter(is_active=True):
             messages.error(self.request, 'Dodaj najpierw jakas grupe')
             return redirect('add_group')
@@ -77,16 +77,16 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMix
 class KidsListView(LoginRequiredMixin, View):
     def get(self, request):
         if request.user.get_user_permissions() == {'director.is_director'}:
-            kids = Director.objects.get(user=request.user.id).kid_set.filter(is_active=True)
+            kids = get_object_or_404(Director, user=request.user.id).kid_set.filter(is_active=True)
         elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
-            groups = Employee.objects.get(user=request.user.id).group
+            groups = get_object_or_404(Employee, user=request.user.id).group
             if groups.is_active == True:
                 kids = groups.kid_set.filter(is_active=True)
             else:
                 kids = None
 
         elif request.user.get_user_permissions() == {'parent.is_parent'}:
-            kids = ParentA.objects.get(user=request.user.id).kids.filter(is_active=True)
+            kids = get_object_or_404(ParentA, user=request.user.id).kids.filter(is_active=True)
         else:
             raise PermissionDenied
         if kids:
@@ -100,10 +100,10 @@ class KidsListView(LoginRequiredMixin, View):
         search = request.POST.get('search')
         if search:
             if request.user.get_user_permissions() == {'director.is_director'}:
-                kids = Director.objects.get(user=request.user.id).kid_set.filter(first_name__icontains=search).filter(
+                kids = get_object_or_404(Director, user=request.user.id).kid_set.filter(first_name__icontains=search).filter(
                     is_active=True)
             elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
-                groups = Employee.objects.get(user=request.user.id).group.filter(is_active=True)
+                groups = get_object_or_404(Employee, user=request.user.id).group.filter(is_active=True)
                 kids = []
                 for group in groups:
                     kids.append(group.kid_set.filter(first_name__icontains=search).filter(is_active=True))
@@ -184,7 +184,7 @@ class KidDeleteView(PermissionRequiredMixin, View):
 
     def post(self, request, pk):
         kid = get_object_or_404(Kid, id=int(pk))
-        director = Director.objects.get(user=request.user.id)
+        director = get_object_or_404(Director, user=request.user.id)
         if kid.principal == director:
             kid.is_active = False
             kid.save()

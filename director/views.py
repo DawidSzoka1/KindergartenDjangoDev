@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from .models import ContactModel, Director, MealPhotos, GroupPhotos
@@ -48,7 +48,7 @@ class DirectorProfileView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
-        director = Director.objects.get(user=self.request.user.id)
+        director = get_object_or_404(Director, user=request.user.id)
         return render(request, 'director-profile.html', {'director': director})
 
 
@@ -78,7 +78,7 @@ class ContactUpdateView(PermissionRequiredMixin, View):
         phone = request.POST.get('phone')
         city = request.POST.get('city')
         zip_code = request.POST.get('zip_code')
-        director = Director.objects.get(user=self.request.user.id)
+        director = get_object_or_404(Director, user=request.user.id)
         if address and email_address and phone and city and zip_code:
             contact = ContactModel.objects.get(director=director)
             contact.address = address

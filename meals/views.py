@@ -31,7 +31,7 @@ class MealAddView(PermissionRequiredMixin, View):
         per_day = request.POST.get('per_day')
         name = request.POST.get('name')
         description = request.POST.get('description')
-        image = MealPhotos.objects.get(id=int(photo_id))
+        image = get_object_or_404(MealPhotos, id=int(photo_id))
         if image and name and description and per_day:
             new_meal = Meals.objects.create(name=name, description=description, principal=director,
                                             per_day=float(per_day))

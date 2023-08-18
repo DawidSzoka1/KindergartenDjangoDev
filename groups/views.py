@@ -30,7 +30,7 @@ class GroupAddView(PermissionRequiredMixin, View):
                 messages.error(request, 'pojemnosc nie moze byc ujemna')
                 return redirect('add_group')
             else:
-                image = GroupPhotos.objects.get(id=int(photo_id))
+                image = get_object_or_404(GroupPhotos, id=int(photo_id))
                 new_group = Groups.objects.create(name=name, capacity=int(capacity), principal=director)
                 new_group.photo.add(image)
                 messages.success(request, f'poprawnie dodano grupe o nazwie {new_group.name}')
@@ -90,7 +90,7 @@ class GroupUpdateView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request, pk):
-        group = Groups.objects.get(id=int(pk))
+        group = get_object_or_404(Groups, id=int(pk))
         director = Director.objects.get(user=request.user.id)
         group.photo.filter(is_active=True).first()
         if director == group.principal:
@@ -101,7 +101,7 @@ class GroupUpdateView(PermissionRequiredMixin, View):
         raise PermissionDenied
 
     def post(self, request, pk):
-        group = Groups.objects.get(id=int(pk))
+        group = get_object_or_404(Groups, id=int(pk))
         director = Director.objects.get(user=request.user.id)
         if director == group.principal:
             form = GroupsForm(request.POST, instance=group)

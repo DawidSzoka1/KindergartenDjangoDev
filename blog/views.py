@@ -1,7 +1,7 @@
 import calendar
 
 from django.core.paginator import Paginator
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
 from parent.models import ParentA
@@ -93,16 +93,16 @@ class CalendarKid(LoginRequiredMixin, View):
         if not kid:
             raise PermissionDenied
         elif permissions == {'director.is_director'}:
-            director = Director.objects.get(user=request.user.id)
+            director = get_object_or_404(Director, user=request.user.id)
             if kid.principal == director:
                 return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
         elif permissions == {'teacher.is_teacher'}:
-            teacher = Employee.objects.get(user=request.user.id)
+            teacher = get_object_or_404(Employee, user=request.user.id)
             kids = list(teacher.group.kid_set.filter(is_active=True))
             if kid in kids:
                 return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
         elif permissions == {'parent.is_parent'}:
-            parent = ParentA.objects.get(user=request.user.id)
+            parent = get_object_or_404(ParentA, user=request.user.id)
             parent_kids = list(parent.kids.filter(is_active=True))
             if kid in parent_kids:
                 return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
@@ -118,13 +118,13 @@ class CalendarKid(LoginRequiredMixin, View):
         presence.reverse()
         presence = '-'.join(presence)
         presence_type = presenceChoices[int(presence_type)][0]
-        kid = Kid.objects.get(id=int(pk))
+        kid = get_object_or_404(Kid, id=int(pk))
         test = PresenceModel.objects.filter(kid=kid).filter(day=presence).first()
         if test:
             test.presenceType = presence_type
             test.save()
         else:
-            PresenceModel.objects.create(day=presence, kid=Kid.objects.get(id=int(pk)), presenceType=presence_type)
+            PresenceModel.objects.create(day=presence, kid=kid, presenceType=presence_type)
         messages.success(request, f"Zmieniono obecnosc")
         return redirect('calendar', pk=pk)
 
@@ -132,10 +132,11 @@ class CalendarKid(LoginRequiredMixin, View):
 class Home(View):
     def get(self, request):
         if request.user.get_user_permissions() == {'parent.is_parent'}:
-            kids = ParentA.objects.get(user=request.user.id).kids.filter(is_active=True)
+
+            kids = get_object_or_404(ParentA, user=request.user.id).kids.filter(is_active=True)
             return render(request, 'home.html', {'kids': kids})
         elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
-            teacher = Employee.objects.get(user=request.user.id)
+            teacher = get_object_or_404(Employee, user=request.user.id)
             return render(request, 'home.html', {'teacher': teacher})
         return render(request, 'home.html')
 
@@ -144,15 +145,15 @@ class PresenceCalendarView(LoginRequiredMixin, View):
     def get(self, request):
         user = request.user
         if user.get_user_permissions() == {'director.is_director'}:
-            director = Director.objects.get(user=user.id)
+            director = get_object_or_404(Director, user=user.id)
             kids = director.kid_set.filter(is_active=True)
 
         elif user.get_user_permissions() == {'teacher.is_teacher'}:
-            teacher = Employee.objects.get(user=user.id)
+            teacher = get_object_or_404(Employee, user=user.id)
             director = teacher.principal.first()
             kids = teacher.group.kid_set.filter(is_active=True)
         elif user.get_user_permissions() == {'parent.is_parent'}:
-            parent = ParentA.objects.get(user=user.id)
+            parent = get_object_or_404(ParentA, user=user.id)
             director = parent.principal.first()
             kids = parent.kids.filter(is_active=True)
         else:

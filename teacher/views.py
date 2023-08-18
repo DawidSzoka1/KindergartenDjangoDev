@@ -20,11 +20,11 @@ from django.contrib.contenttypes.models import ContentType
 class EmployeeProfileView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
-        employee = Employee.objects.get(id=int(pk))
+        employee = get_object_or_404(Employee, id=int(pk))
         user = self.request.user
         if user.get_user_permissions() == {'director.is_director'}:
             if employee.principal.first() == user.director:
-                return render(request, 'employee-details.html',
+                return render(request, 'employee-profile.html',
                               {'employee': employee})
             messages.error(request, f"Nie masz na to pozwolenia")
             return redirect('list_teachers')
@@ -33,7 +33,7 @@ class EmployeeProfileView(LoginRequiredMixin, View):
                 return render(request, 'employee-profile.html',
                               {'employee': employee})
         elif user.get_user_permissions() == {'parent.is_parent'}:
-            group = employee.group.filter(is_active=True).first()
+            group = employee.group
             kids = group.kid_set.filter(is_active=True)
             parent = ParentA.objects.get(user=user.id)
             allow = False
@@ -102,7 +102,7 @@ class EmployeeAddView(PermissionRequiredMixin, View):
                 content_type = ContentType.objects.get_for_model(Employee)
                 permission = Permission.objects.get(content_type=content_type, codename='is_teacher')
                 teacher_object = Employee.objects.create(user=teacher_user, role=role, salary=float(salary))
-                user.employee_set.add(teacher_object)
+                self.add = user.employee_set.add(teacher_object)
                 if group:
                     teacher_object.group = group
                     teacher_object.save()
@@ -132,7 +132,7 @@ class EmployeeAddView(PermissionRequiredMixin, View):
 class EmployeeUpdateView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
-        employee = Employee.objects.get(id=pk)
+        employee = get_object_or_404(Employee, id=int(pk))
         if request.user.get_user_permissions() == {'teacher.is_teacher'}:
             valid = Employee.objects.get(user=request.user.id)
             if employee == valid:
@@ -151,7 +151,7 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
 
     def post(self, request, pk):
         if request.user.get_user_permissions() == {'teacher.is_teacher'}:
-            employee = Employee.objects.get(id=int(pk))
+            employee = get_object_or_404(Employee, id=int(pk))
             if Employee.objects.get(user=self.request.user.id) == employee:
                 form = TeacherUpdateForm(request.POST, instance=employee)
                 if form.is_valid():
