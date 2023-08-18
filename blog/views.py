@@ -149,7 +149,7 @@ class PresenceCalendarView(LoginRequiredMixin, View):
         elif user.get_user_permissions() == {'teacher.is_teacher'}:
             teacher = Employee.objects.get(user=user.id)
             director = teacher.principal.first()
-            kids = teacher.group.first().kid_set.filter(is_active=True)
+            kids = teacher.group.kid_set.filter(is_active=True)
         elif user.get_user_permissions() == {'parent.is_parent'}:
             parent = ParentA.objects.get(user=user.id)
             director = parent.principal.first()

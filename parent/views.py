@@ -1,5 +1,6 @@
 from django.core.paginator import Paginator
 
+from teacher.models import Employee
 from .forms import ParentUpdateForm, UserUpdateForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
@@ -76,13 +77,23 @@ class InviteParentView(PermissionRequiredMixin, View):
             return redirect('invite_parent', pk=pk)
 
 
-class ParentListView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
+class ParentListView(LoginRequiredMixin, View):
 
     def get(self, request):
         user = request.user
-        director = get_object_or_404(Director, user=user.id)
-        parents = director.parenta_set.all()
+        if user.get_user_permissions() == {'director.is_director'}:
+            director = get_object_or_404(Director, user=user.id)
+            parents = director.parenta_set.all()
+        elif user.get_user_permissions() == {'teacher.is_teacher'}:
+            teacher = get_object_or_404(Employee, user=user.id)
+            kids = teacher.group.kid_set.filter(is_active=True).values_list('parenta', flat=True)
+            all_parents = teacher.principal.first().parenta_set.all()
+            parents = []
+            for parent in all_parents:
+                if parent.id in kids:
+                    parents.append(parent)
+        else:
+            raise PermissionDenied
         paginator = Paginator(parents, 5)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)

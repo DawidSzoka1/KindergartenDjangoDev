@@ -79,18 +79,22 @@ class KidsListView(LoginRequiredMixin, View):
         if request.user.get_user_permissions() == {'director.is_director'}:
             kids = Director.objects.get(user=request.user.id).kid_set.filter(is_active=True)
         elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
-            groups = Employee.objects.get(user=request.user.id).group.filter(is_active=True)
-            kids = []
-            for group in groups:
-                kids.append(group.kid_set.filter(is_active=True))
+            groups = Employee.objects.get(user=request.user.id).group
+            if groups.is_active == True:
+                kids = groups.kid_set.filter(is_active=True)
+            else:
+                kids = None
+
         elif request.user.get_user_permissions() == {'parent.is_parent'}:
             kids = ParentA.objects.get(user=request.user.id).kids.filter(is_active=True)
         else:
             raise PermissionDenied
-        paginator = Paginator(kids, 10)
-        page = request.GET.get('page')
-        page_obj = paginator.get_page(page)
-        return render(request, 'kids-list.html', {'page_obj': page_obj})
+        if kids:
+            paginator = Paginator(kids, 10)
+            page = request.GET.get('page')
+            page_obj = paginator.get_page(page)
+            return render(request, 'kids-list.html', {'page_obj': page_obj})
+        raise PermissionDenied
 
     def post(self, request):
         search = request.POST.get('search')

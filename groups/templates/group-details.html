@@ -6,15 +6,25 @@
         <div class="container-fluid">
             <!-- Left links -->
             <ul class="navbar-nav flex-row">
+                {% if perms.director.is_director %}
+                    <li class="nav-item me-2 me-lg-0">
 
-                <li class="nav-item me-2 me-lg-0">
+                        <a href="{% url 'list_groups' %}" role="button"
+                           style="font-size: 25px; color: #75736B; text-decoration:none;">
 
-                    <a href="{% url 'list_groups' %}" role="button"
-                       style="font-size: 25px; color: #75736B; text-decoration:none;">
+                            GRUPY
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="nav-item me-2 me-lg-0">
 
-                        GRUPY
-                    </a>
-                </li>
+                        <a href="{% url 'home_page' %}" role="button"
+                           style="font-size: 25px; color: #75736B; text-decoration:none;">
+
+                            MENU
+                        </a>
+                    </li>
+                {% endif %}
 
             </ul>
             <!-- Left links -->
