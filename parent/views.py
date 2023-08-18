@@ -112,27 +112,6 @@ class ParentListView(LoginRequiredMixin, View):
         return redirect('list_parent')
 
 
-class DetailsParentView(PermissionRequiredMixin, UserPassesTestMixin, DetailView):
-    permission_required = "director.is_director"
-    model = ParentA
-    template_name = 'parent-details.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        try:
-            context["parent"] = get_object_or_404(Director, user=self.request.user.id).parenta_set.get(
-                id=context['parent'].id)
-        except Exception:
-            context["parent"] = None
-        return context
-
-    def test_func(self):
-        parenta = self.get_object()
-        if self.request.user == parenta.principal.first().user:
-            return True
-        return False
-
-
 class ParentProfileView(LoginRequiredMixin, View):
     def get(self, request, pk):
         user = request.user
