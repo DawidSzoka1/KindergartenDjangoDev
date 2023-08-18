@@ -130,8 +130,8 @@ class DetailsKidView(LoginRequiredMixin, View):
                 if kid.principal.user.email == request.user.email:
                     return render(request, 'kid-details.html', {'kid': kid, 'meals': meals})
             elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
-                teachers = kid.group.filter(is_active=True).first().employee_set.values_list('user', flat=True)
-                if request.user in teachers:
+                teachers = kid.group.employee_set.values_list('user__email', flat=True)
+                if request.user.email in teachers:
                     return render(request, 'kid-details.html', {'kid': kid, 'meals': meals})
             elif request.user.get_user_permissions() == {'parent.is_parent'}:
                 parents = kid.parenta_set.values_list('user__email', flat=True)

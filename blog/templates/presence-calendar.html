@@ -53,7 +53,7 @@
     {% endif %}
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-error" style="background-color: red; color: black">
+            <div class="alert alert-error">
                 {{ message }}
             </div>
         {% endfor %}
@@ -89,7 +89,7 @@
                     </div>
                     <div class="col-2 mt-5 ml-5">
 
-                        {% if perms.teacher.is_teacher %}
+                        {% if perms.teacher.is_teacher or perms.director.is_director %}
                             {% if presence.presenceType == 2 %}
 
                                 <label>
