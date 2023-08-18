@@ -66,8 +66,10 @@
                                     <img src="{% static 'gander_null.jpg' %}" alt=""
                                          style="height: 80%; display: block; margin-left: auto; margin-right: auto">
                                 {% endif %}
-                                <figcaption
-                                        style="text-align: center; margin-top: 20px; font-size: 50px">{{ employee.first_name }} {{ employee.last_name }}</figcaption>
+                                {% if employee.first_name and employee.last_name %}
+                                    <figcaption
+                                            style="text-align: center; margin-top: 20px; font-size: 50px">{{ employee.first_name }} {{ employee.last_name }}</figcaption>
+                                {% endif %}
                             </figure>
                         </div>
                     </div>

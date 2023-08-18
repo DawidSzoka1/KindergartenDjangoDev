@@ -9,6 +9,7 @@ urlpatterns = [
     path("contact/update/", views.ContactUpdateView.as_view(), name="contact-update"),
     path("photos/list/", views.PhotosListView.as_view(), name="photos_list"),
     path("photo/add/", views.PhotosAddView.as_view(), name="photo_add"),
+    path("photo/delete/<int:pk>/", views.PhotoDeleteView.as_view(), name="photo_delete"),
 
 ]
 

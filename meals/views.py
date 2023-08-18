@@ -34,11 +34,10 @@ class MealAddView(PermissionRequiredMixin, View):
         image = get_object_or_404(MealPhotos, id=int(photo_id))
         if image and name and description and per_day:
             new_meal = Meals.objects.create(name=name, description=description, principal=director,
-                                            per_day=float(per_day))
-            new_meal.photo.add(image)
+                                            per_day=float(per_day),  photo=image)
+
         elif image and name and per_day:
-            new_meal = Meals.objects.create(name=name, principal=director, per_day=float(per_day))
-            new_meal.photo.add(image)
+            new_meal = Meals.objects.create(name=name, principal=director, per_day=float(per_day), photo=image)
 
         else:
             messages.error(request, 'Wszystkie pola musza byc wypelnione')
@@ -66,7 +65,7 @@ class MealsUpdateView(PermissionRequiredMixin, View):
         director = Director.objects.get(user=request.user.id)
         meal = Meals.objects.filter(is_active=True).filter(id=int(pk)).filter(principal=director).first()
         if meal:
-            current_photo = meal.photo.first()
+            current_photo = meal.photo
             photos = director.mealphotos_set.filter(is_active=True)
             return render(request, 'meal-update.html',
                           {
@@ -81,15 +80,16 @@ class MealsUpdateView(PermissionRequiredMixin, View):
         description = request.POST.get("description")
         per_day = request.POST.get("per_day")
         photo = request.POST.get("photo")
+        photo = get_object_or_404(MealPhotos, id=int(photo))
         meal = Meals.objects.filter(is_active=True).filter(id=int(pk)).first()
         if meal:
             if name and description and per_day and photo:
                 meal.name = name
                 meal.description = description
                 meal.per_day = per_day
-                meal.photo.clear()
-                meal.photo.add(photo)
+                meal.photo = photo
                 meal.save()
+
                 return redirect('list_meals')
             messages.error(request, "Wypelnij wszystkie pola")
             return redirect('meals_update', pk=pk)

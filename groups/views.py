@@ -31,8 +31,8 @@ class GroupAddView(PermissionRequiredMixin, View):
                 return redirect('add_group')
             else:
                 image = get_object_or_404(GroupPhotos, id=int(photo_id))
-                new_group = Groups.objects.create(name=name, capacity=int(capacity), principal=director)
-                new_group.photo.add(image)
+                new_group = Groups.objects.create(name=name, capacity=int(capacity), principal=director, photo=image)
+
                 messages.success(request, f'poprawnie dodano grupe o nazwie {new_group.name}')
                 return redirect('list_groups')
         messages.error(request, 'Wszystkie pola musza byc wypelnione')
@@ -58,7 +58,7 @@ class GroupsListView(LoginRequiredMixin, View):
 class GroupDetailsView(LoginRequiredMixin, View):
     def get(self, request, pk):
         group = get_object_or_404(Groups, id=int(pk))
-        teachers = list(group.employee_set.filter(is_active=True).values_list("user__email", flat=True))
+        teachers = list(group.employee_set.values_list("user__email", flat=True))
         kids = group.kid_set.filter(is_active=True)
 
         if request.user.get_user_permissions() == {'teacher.is_teacher'}:
@@ -92,12 +92,12 @@ class GroupUpdateView(PermissionRequiredMixin, View):
     def get(self, request, pk):
         group = get_object_or_404(Groups, id=int(pk))
         director = Director.objects.get(user=request.user.id)
-        group.photo.filter(is_active=True).first()
+
         if director == group.principal:
             form = GroupsForm(instance=group)
             photos = director.groupphotos_set.filter(is_active=True)
             return render(request, 'group-update.html',
-                          {'form': form, 'photos': photos, 'group_photo': group.photo.first()})
+                          {'form': form, 'photos': photos, 'group_photo': group.photo})
         raise PermissionDenied
 
     def post(self, request, pk):

@@ -8,7 +8,7 @@ class Groups(models.Model):
     name = models.CharField(max_length=128)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     capacity = models.IntegerField(null=True, validators=[MinValueValidator(limit_value=1)])
-    photo = models.ManyToManyField(GroupPhotos)
+    photo = models.ForeignKey(GroupPhotos, on_delete=models.CASCADE, null=True)
     is_active = models.BooleanField(default=True)
     yearbook = models.IntegerField(null=True)
 

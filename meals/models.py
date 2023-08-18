@@ -9,7 +9,7 @@ class Meals(models.Model):
     name = models.CharField(max_length=128)
     description = models.TextField(null=True)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
-    photo = models.ManyToManyField(MealPhotos)
+    photo = models.ForeignKey(MealPhotos, on_delete=models.CASCADE, null=True)
     per_day = models.DecimalField(max_digits=6, decimal_places=2, null=True)
     is_active = models.BooleanField(default=True)
 

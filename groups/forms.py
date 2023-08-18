@@ -12,7 +12,8 @@ class GroupsForm(forms.ModelForm):
         }
         labels = {
             'name': 'Nazwa:',
-            'capacity': 'Pojemność:'
+            'capacity': 'Pojemność:',
+            'yearbook': "Rocznik:"
         }
 
     def __init__(self, *args, current_user=None, **kwargs):

@@ -12,8 +12,8 @@ class PhotosListView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
-        group_photos = GroupPhotos.objects.filter(principal=request.user.director)
-        meal_photos = MealPhotos.objects.filter(principal=request.user.director)
+        group_photos = GroupPhotos.objects.filter(principal=request.user.director).filter(is_active=True)
+        meal_photos = MealPhotos.objects.filter(principal=request.user.director).filter(is_active=True)
         return render(request, 'photos-list.html', {'group_photos': group_photos, 'meal_photos': meal_photos})
 
 
@@ -41,6 +41,45 @@ class PhotosAddView(PermissionRequiredMixin, View):
         elif photo_type == 'meal':
             MealPhotos.objects.create(meal_photos=file, principal=request.user.director, name=name)
         messages.success(request, 'udalo sie')
+        return redirect('photos_list')
+
+
+class PhotoDeleteView(PermissionRequiredMixin, View):
+    permission_required = 'director.is_director'
+
+    def get(self, request, pk):
+        raise PermissionDenied
+
+    def post(self, request, pk):
+        type = int(request.POST.get("delete"))
+        director = get_object_or_404(Director, user=request.user.id)
+        if type == 1:
+            photo = get_object_or_404(GroupPhotos, id=int(pk))
+            if photo in director.groupphotos_set.filter(is_active=True):
+                photo.is_active = False
+                groups = photo.groups_set.all()
+                for group in groups:
+                    group.photo = None
+                    group.save()
+                photo.save()
+                messages.success(request, f'Poprawnie usunieto zdjecie {photo.name}')
+            else:
+                raise PermissionDenied
+
+        elif type == 2:
+            photo = get_object_or_404(MealPhotos, id=int(pk))
+            if photo in director.mealphotos_set.filter(is_active=True):
+                photo.is_active = False
+                meals = photo.meals_set.all()
+                for meal in meals:
+                    meal.photo = None
+                    meal.save()
+                photo.save()
+                messages.success(request, f'Poprawnie usunieto zdjecie {photo.name}')
+            else:
+                raise PermissionDenied
+        else:
+            messages.error(request, "Cos poszło nie tak")
         return redirect('photos_list')
 
 

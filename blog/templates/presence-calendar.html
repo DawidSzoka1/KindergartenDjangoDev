@@ -31,7 +31,8 @@
                 <!-- Navbar brand -->
                 <!-- Left links -->
                 <ul class="navbar-nav mb-2">
-                    <li class="nav-item" style="font-size: 35px; color:#75736B; margin-left: -25%"><b>LISTA OBECNOŚCI</b></li>
+                    <li class="nav-item" style="font-size: 35px; color:#75736B; margin-left: -25%"><b>LISTA
+                        OBECNOŚCI</b></li>
                 </ul>
             </div>
             {% if perms.director.is_director %}
@@ -108,7 +109,7 @@
 
                                 </label>
                             {% elif presence.presenceType == 3 %}
-                                <b style="color: #BAF3F5">ZAPLANOWANE NIEOBECNOŚĆ</b>
+                                <b style="color: #BAF3F5 ; border: solid 1px #BAF3F5; font-size: 20px">ZAPLANOWANA NIEOBECNOŚĆ</b>
                             {% else %}
                                 <label>
                                     <input type="submit" value="{{ kid.id }}2" name="data"
