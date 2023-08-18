@@ -1,26 +1,199 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <form method="POST" action="">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-error" style="background-color: red; color: black">
-                    {{ message }}
-                </div>
-            {% endfor %}
+    <link rel="stylesheet" href="{% static 'input_foucs.css' %}">
+    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+            <!-- Left links -->
+            <ul class="navbar-nav justify-content-start">
 
-        {% endif %}
+                <li class="nav-item me-2 me-lg-0">
+
+                    <a href="{% url 'home_page' %}" role="button"
+                       style="font-size: 25px; color: #75736B; text-decoration:none;">
+
+                        MENU
+                    </a>
+                </li>
+
+            </ul>
+            <!-- Left links -->
+            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+                <!-- Navbar brand -->
+                <!-- Left links -->
+                <ul class="navbar-nav mb-2">
+                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>LISTA OBECNOŚCI</b></li>
+                </ul>
+            </div>
+            {% if perms.director.is_director %}
+                <ul class="navbar-nav d-flex flex-row me-1">
+                    <li class="nav-item">
+                        <button class="btn" onclick="location.href='{% url 'add_kid' %}'"
+                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
+                            DODAJ DZIECKO
+                        </button>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+        <!-- Container wrapper -->
+    </nav>
+    {% if perms.director.is_director %}
+        <div class="justify-content-center">
+            <form class="d-flex" method="POST" action=""
+                  style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">
+                {% csrf_token %}
+                <input class="form-control" type="search" placeholder="Wpisz imie dziecka"
+                       aria-label="Wpisz imie dziecka" name="search">
+                <span><button class="btn " type="submit"
+                              style="margin-left: -8px; background-color: #BAB1AB; color: white">SZUKAJ</button></span>
+            </form>
+        </div>
+    {% endif %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-error" style="background-color: red; color: black">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+    {% endif %}
+    <form action="" method="POST">
         {% csrf_token %}
-        {{ today }}
-        {% for kid in kids %}
-            {{ kid }}
+        {% for kid, presence in dict.items %}
 
-            <input type="submit" value="{{ kid.id.as_hidden }} Obecny" name="data">
+
+            <div class="container-fluid mb-1 mt-5"
+                 style="background-color: white">
+                <div class="row align-item-center" style="padding-top: 10px;">
+                    <div class="col mb-3"
+                         style="justify-content: start">
+                        {% if kid.gender == 2 %}
+                            <img class="img"
+                                 style="height: 150px;"
+                                 src="{% static 'girl.jpg' %}"
+                                 alt="">
+                        {% else %}
+                            <img class="img"
+                                 style="height: 150px; margin-left: 3%; margin-right: 2%"
+                                 src="{% static 'boy.jpg' %}"
+                                 alt="">
+                        {% endif %}
+                    </div>
+                    <div class="col-8 md-5 mt-5">
+
+                        <a href="{% url 'kid_details' pk=kid.id %}"
+                           style="font-size: 20px; text-decoration:none; color: #75736B ">{{ kid.first_name.title }} {{ kid.last_name.title }}</a>
+
+                    </div>
+                    <div class="col-2 mt-5 ml-5">
+
+                        {% if perms.teacher.is_teacher %}
+                            {% if presence.presenceType == 2 %}
+
+                                <label>
+                                    <input type="submit" value="{{ kid.id }}1" name="data"
+                                           style="background-image: url('{% static 'check2-square.svg' %}'); border: none; width: 50px; height: 50px; font-size: 0"
+                                           onclick="return confirm('Jestes pewny ze chcesz cofnąć obecność dziecka {{ kid }}');"
+                                    >
+
+                                </label>
+                            {% elif presence.presenceType == 3 %}
+                                <b style="color: #BAF3F5">ZAPLANOWANE NIEOBECNOŚĆ</b>
+                            {% else %}
+                                <label>
+                                    <input type="submit" value="{{ kid.id }}2" name="data"
+                                           style="background-image: url('{% static 'x-square.svg' %}'); border: none; width: 50px; height: 50px; font-size: 0">
+
+                                </label>
+                            {% endif %}
+                        {% endif %}
+
+                    </div>
+
+                    <div class="col mt-5">
+
+                        <div class="drodown">
+                            <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
+                               href="#"
+                               id="navbarDropdownMenuAvatar"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false"
+                               style="font-size: 20px;  text-decoration:none; color: #75736B; ">
+                                Opcje
+                            </a>
+                            <ul
+                                    class="dropdown-menu dropdown-menu-end"
+                                    aria-labelledby="navbarDropdownMenuAvatar"
+                            >
+                                <li>
+                                    <a href="{% url 'kid_details' pk=kid.id %}"
+                                       class="dropdown-item">Konto
+                                        dziecka
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'change_kid_info' pk=kid.id %}"
+                                       class="dropdown-item">Zmien
+                                        informacje</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'calendar' pk=kid.id %}"
+                                       class="dropdown-item">Kalendarz
+                                    </a>
+                                </li>
+                                {% if perms.director.is_director %}
+                                    <li>
+                                        <form method="POST"
+                                              action="{% url 'kid_delete' pk=kid.id %}">
+                                            {% csrf_token %}
+                                            <button class="dropdown-item"
+                                                    type="submit"
+                                                    name="delete"
+                                                    value="Usuń"
+                                                    onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}');"
+                                            >Usuń dziecko
+                                            </button>
+                                        </form>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
 
         {% endfor %}
-        <h1>Liczba obecnych dzieci {{ kids_presence.count }}</h1>
-        <h1>Liczba nieobecnych dzieci {{ kids_absent.count }}</h1>
-        <h1>Liczba planowanych nieobecnych dzieci {{ kids_planned_absent.count }}</h1>
     </form>
-    <script src="{% static 'calendar.js' %}"></script>
+
+    <div style="display: flex; justify-content: center; align-items: center; ">
+        {% if page_obj.has_previous %}
+
+            <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
+               style="display: inline-block; font-size: 50px; color:#75736B">< </a>
+        {% else %}
+            <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
+               style="display: inline-block; font-size: 50px; color:#75736B">< </a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <a class="btn mb-4" href="?page={{ num }}"
+                   style="display: inline-block; font-size: 50px; color:#75736B">{{ num }}</a>
+            {% endif %}
+
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
+               style="display: inline-block; text-decoration: none; font-size: 50px; color:#75736B"> ></a>
+        {% else %}
+
+            <a class="btn mb-4" href="?page=1"
+               style="display: inline-block; font-size: 50px; color:#75736B"> > </a>
+        {% endif %}
+    </div>
 {% endblock %}

@@ -1,5 +1,6 @@
 import calendar
 
+from django.core.paginator import Paginator
 from django.shortcuts import render, HttpResponse, redirect
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
@@ -97,7 +98,7 @@ class CalendarKid(LoginRequiredMixin, View):
                 return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
         elif permissions == {'teacher.is_teacher'}:
             teacher = Employee.objects.get(user=request.user.id)
-            kids = list(teacher.group.first().kid_set.filter(is_active=True))
+            kids = list(teacher.group.kid_set.filter(is_active=True))
             if kid in kids:
                 return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
         elif permissions == {'parent.is_parent'}:
@@ -163,36 +164,45 @@ class PresenceCalendarView(LoginRequiredMixin, View):
         kids_planned_absent = PresenceModel.objects.filter(day=timezone.now()).filter(kid__principal=director).filter(
             presenceType=3)
         today = timezone.now().strftime("%Y-%m-%d")
+        dict = {}
+        for kid in kids:
+            presence = PresenceModel.objects.filter(kid=kid).filter(day=timezone.now()).first()
+            dict[kid] = presence
+
+        paginator = Paginator(kids, 10)
+        page = request.GET.get('page')
+        page_obj = paginator.get_page(page)
         return render(request, 'presence-calendar.html',
-                      {'kids': kids,
+                      {'page_obj': page_obj,
                        'today': today,
                        'kids_presence': kids_presence,
                        'kids_absent': kids_absent,
                        'kids_planned_absent': kids_planned_absent,
+                       'dict': dict
                        })
 
     def post(self, request):
         data = request.POST.get('data')
         user = request.user.get_user_permissions()
         kid_id = data[0]
+        type = data[1]
         day = timezone.now().strftime("%Y-%m-%d")
         kid = Kid.objects.filter(id=int(kid_id)).filter(is_active=True).first()
         check = PresenceModel.objects.filter(kid=kid).filter(day=day).first()
         if user == {'parent.is_parent'}:
             if kid:
                 if check:
-                    check.presenceType = 3
+                    check.presenceType = int(type)
                     check.save()
                 else:
-                    PresenceModel.objects.create(day=day, kid=kid, presenceType=3)
+                    PresenceModel.objects.create(day=day, kid=kid, presenceType=int(type))
         elif user == {'director.is_director'} or user == {'teacher.is_teacher'}:
             if kid:
                 if check:
-                    check.presenceType = 2
+                    check.presenceType = int(type)
                     check.save()
                 else:
-                    PresenceModel.objects.create(day=day, kid=kid, presenceType=2)
-        messages.info(request, f'{kid_id}')
+                    PresenceModel.objects.create(day=day, kid=kid, presenceType=int(type))
         return redirect('presence_calendar')
 
 
