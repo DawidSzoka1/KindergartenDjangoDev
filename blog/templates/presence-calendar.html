@@ -9,12 +9,20 @@
             <ul class="navbar-nav justify-content-start">
 
                 <li class="nav-item me-2 me-lg-0">
+                    <h2>
+                        <a href="{% url 'home_page' %}" role="button"
+                           style="color: #75736B; text-decoration:none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
+                                 height="32"
+                                 fill="currentColor" class="bi bi-caret-left-fill"
+                                 viewBox="0 0 16 16">
+                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+                            </svg>
 
-                    <a href="{% url 'home_page' %}" role="button"
-                       style="font-size: 25px; color: #75736B; text-decoration:none;">
+                            MENU
 
-                        MENU
-                    </a>
+                        </a>
+                    </h2>
                 </li>
 
             </ul>
@@ -23,7 +31,7 @@
                 <!-- Navbar brand -->
                 <!-- Left links -->
                 <ul class="navbar-nav mb-2">
-                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>LISTA OBECNOŚCI</b></li>
+                    <li class="nav-item" style="font-size: 35px; color:#75736B; margin-left: -25%"><b>LISTA OBECNOŚCI</b></li>
                 </ul>
             </div>
             {% if perms.director.is_director %}
@@ -134,17 +142,18 @@
                                         dziecka
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="{% url 'change_kid_info' pk=kid.id %}"
-                                       class="dropdown-item">Zmien
-                                        informacje</a>
-                                </li>
+
                                 <li>
                                     <a href="{% url 'calendar' pk=kid.id %}"
                                        class="dropdown-item">Kalendarz
                                     </a>
                                 </li>
                                 {% if perms.director.is_director %}
+                                    <li>
+                                        <a href="{% url 'change_kid_info' pk=kid.id %}"
+                                           class="dropdown-item">Zmien
+                                            informacje</a>
+                                    </li>
                                     <li>
                                         <form method="POST"
                                               action="{% url 'kid_delete' pk=kid.id %}">

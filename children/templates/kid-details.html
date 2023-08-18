@@ -133,7 +133,8 @@
                         <div class="card-body">
                             <figure>
                                 {% if kid.gender == 2 %}
-                                    <img src="{% static 'girl.jpg' %}" alt="" style="height: 80%; display: block; margin-right: auto; margin-left: auto">
+                                    <img src="{% static 'girl.jpg' %}" alt=""
+                                         style="height: 80%; display: block; margin-right: auto; margin-left: auto">
                                 {% else %}
                                     <img src="{% static 'boy.jpg' %}" alt=""
                                          style="height: 80%; display: block; margin-right: auto; margin-left: auto">
@@ -167,47 +168,49 @@
                                     </h3>
                                 </div>
                             </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="per_month">STAŁY KOSZT MIESIĘCZNY:</label>
-                                        {% if kid.payment_plan %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="per_month"
-                                                   type="text" id="per_month"
-                                                   value="{{ kid.payment_plan.price }} zł" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="per_month"
-                                                   type="text" id="per_month"
-                                                   value="0 zł" readonly>
-                                        {% endif %}
-                                    </h3>
+                            {% if perms.director.is_director or perms.parent.is_parent %}
+                                <div class="col mt-4">
+                                    <div class="form-group">
+                                        <h3>
+                                            <label class="mb-2" for="per_month">STAŁY KOSZT MIESIĘCZNY:</label>
+                                            {% if kid.payment_plan %}
+                                                <input class="form-control" style="font-size: 20px"
+                                                       name="per_month"
+                                                       type="text" id="per_month"
+                                                       value="{{ kid.payment_plan.price }} zł" readonly>
+                                            {% else %}
+                                                <input class="form-control" style="font-size: 20px"
+                                                       name="per_month"
+                                                       type="text" id="per_month"
+                                                       value="0 zł" readonly>
+                                            {% endif %}
+                                        </h3>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="to_pay">DO ZAPŁATY W TYM MIESIĄCU:</label>
-                                        {% if kid.amount %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="to_pay"
-                                                   type="text" id="to_pay"
-                                                   value="{{ kid.amount }} zł" readonly>
-                                        {% elif kid.payment_plan %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="to_pay"
-                                                   type="text" id="to_pay"
-                                                   value="{{ kid.payment_plan.price }} zł" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="to_pay"
-                                                   type="text" id="to_pay"
-                                                   value="0 zł" readonly>
-                                        {% endif %}
-                                    </h3>
+                                <div class="col mt-4">
+                                    <div class="form-group">
+                                        <h3>
+                                            <label class="mb-2" for="to_pay">DO ZAPŁATY W TYM MIESIĄCU:</label>
+                                            {% if kid.amount %}
+                                                <input class="form-control" style="font-size: 20px"
+                                                       name="to_pay"
+                                                       type="text" id="to_pay"
+                                                       value="{{ kid.amount }} zł" readonly>
+                                            {% elif kid.payment_plan %}
+                                                <input class="form-control" style="font-size: 20px"
+                                                       name="to_pay"
+                                                       type="text" id="to_pay"
+                                                       value="{{ kid.payment_plan.price }} zł" readonly>
+                                            {% else %}
+                                                <input class="form-control" style="font-size: 20px"
+                                                       name="to_pay"
+                                                       type="text" id="to_pay"
+                                                       value="0 zł" readonly>
+                                            {% endif %}
+                                        </h3>
+                                    </div>
                                 </div>
-                            </div>
+                            {% endif %}
                             <div class="col mt-4">
                                 <div class="form-group">
                                     <h3>
@@ -224,24 +227,26 @@
                                     </h3>
                                 </div>
                             </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="per_day">DZIENNA OPŁATA ŻYWIENIOWA:</label>
-                                        {% if kid.kid_meals %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="per_day"
-                                                   type="text" id="per_day"
-                                                   value="{{ kid.kid_meals.per_day }} zł" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="per_day"
-                                                   type="text" id="per_day"
-                                                   value="0 zł" readonly>
-                                        {% endif %}
-                                    </h3>
+                            {% if perms.director.is_director or perms.parent.is_parent %}
+                                <div class="col mt-4">
+                                    <div class="form-group">
+                                        <h3>
+                                            <label class="mb-2" for="per_day">DZIENNA OPŁATA ŻYWIENIOWA:</label>
+                                            {% if kid.kid_meals %}
+                                                <input class="form-control" style="font-size: 20px"
+                                                       name="per_day"
+                                                       type="text" id="per_day"
+                                                       value="{{ kid.kid_meals.per_day }} zł" readonly>
+                                            {% else %}
+                                                <input class="form-control" style="font-size: 20px"
+                                                       name="per_day"
+                                                       type="text" id="per_day"
+                                                       value="0 zł" readonly>
+                                            {% endif %}
+                                        </h3>
+                                    </div>
                                 </div>
-                            </div>
+                            {% endif %}
 
                         </div>
                     </div>
