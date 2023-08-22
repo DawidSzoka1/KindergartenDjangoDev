@@ -1,7 +1,51 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-    {{ contact.phone }}
-    <button type="button" class="btn btn-primary me-3" onclick="location.href='{% url 'contact-update' %}'">
-            Zmien info
-        </button>
+    <section class="">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-6 vh-100 ml-3" style="background-color: #E6DCD3; color: #8D847B;">
+
+
+                    <div class="text-left ml-4 mr-4 mt-5"
+                         style="font-size: 35px; margin-left: 30px; margin-right: 100px">
+                        <label class="mb-4" for="birth">LOKALIZACJA:</label>
+                        <button class="btn mb-4" onclick="location.href='{% url 'contact-update' pk=contact.id %}'"
+                                style="color: white; background-color: #8D847B; width: 30%; height: 70px; font-size: 30px; margin-left: 43%">
+                            EDYTUJ DANE
+                        </button>
+                        <input class="form-control" style="font-size: 25px;" name="birth"
+                               type="text"
+                               id="birth"
+                               value="{{ contact.localization }}" readonly>
+                    </div>
+                    <div class="text-left ml-4 mr-4 mt-5"
+                         style="font-size: 35px; margin-left: 30px; margin-right: 100px">
+                        <label class="mb-4" for="birth">NR KONTAKTOWY:</label>
+                        <input class="form-control" style="font-size: 25px;" name="birth"
+                               type="text"
+                               id="birth"
+                               value="{{ contact.phone }}" readonly>
+                    </div>
+                    <div class="text-left ml-4 mr-4 mt-5"
+                         style="font-size: 35px; margin-left: 30px; margin-right: 100px">
+                        <label class="mb-4" for="birth">E-MAIL KONTAKTOWY:</label>
+                        <input class="form-control" style="font-size: 25px;" name="birth"
+                               type="text"
+                               id="birth"
+                               value="{{ contact.email_address }}" readonly>
+                    </div>
+
+                </div>
+                <div class="col-lg-6 vh-100" style="background-color: white; ">
+                    <img style="width: 50%; position: absolute;
+                            right: 0; bottom: 0;"
+                         src="{% static 'podworko.jpg' %}"
+                         alt="zdjecie"
+                    >
+                </div>
+            </div>
+        </div>
+
+    </section>
 {% endblock %}

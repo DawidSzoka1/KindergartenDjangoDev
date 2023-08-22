@@ -1,8 +1,13 @@
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
 from django.views import View
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import CreateView, UpdateView
+
 from .models import ContactModel, Director, MealPhotos, GroupPhotos
+from .forms import ContactAddForm
 from teacher.models import Employee
 from parent.models import ParentA
 from django.core.exceptions import PermissionDenied
@@ -104,28 +109,23 @@ class ContactView(LoginRequiredMixin, View):
         return render(request, 'contact.html', {'contact': contact})
 
 
-class ContactUpdateView(PermissionRequiredMixin, View):
+class ContactUpdateView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     permission_required = "director.is_director"
+    model = ContactModel
+    template_name = 'contact-update.html'
+    form_class = ContactAddForm
+    success_url = reverse_lazy('contact')
+    success_message = "Dane kontaktowe zmieniono poprawnie"
 
-    def get(self, request):
-        contact = ContactModel.objects.get(director=Director.objects.get(user=self.request.user.id))
-        return render(request, 'contact-update.html', {'contact': contact})
+    def form_valid(self, form):
+        form.instance.save()
+        return super().form_valid(form)
 
-    def post(self, request):
-        address = request.POST.get('address')
-        email_address = request.POST.get('email_address')
-        phone = request.POST.get('phone')
-        city = request.POST.get('city')
-        zip_code = request.POST.get('zip_code')
-        director = get_object_or_404(Director, user=request.user.id)
-        if address and email_address and phone and city and zip_code:
-            contact = ContactModel.objects.get(director=director)
-            contact.address = address
-            contact.email_address = email_address
-            contact.phone = phone
-            contact.city = city
-            contact.zip_code = zip_code
-            contact.save()
-            return redirect('contact')
-        messages.error(request, 'Wypełnij wszytkie pola poprawnie poprawnie')
-        return redirect('contact-update')
+    def test_func(self):
+        contact = self.get_object()
+        try:
+            if self.request.user == contact.director.user:
+                return True
+        except Exception:
+            return False
+        return False

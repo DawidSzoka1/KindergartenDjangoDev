@@ -82,11 +82,7 @@ class ContactModel(models.Model):
     director = models.OneToOneField(Director, on_delete=models.CASCADE)
     email_address = models.EmailField(null=True)
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',
-                                 message="Numer telefonu w formacie: '+99 999 999 999'. Up to 15 digits allowed.")
+                                 message="Numer telefonu w formacie: '+99 999 999 999'")
     phone = models.CharField(null=True, unique=True, max_length=17, validators=[phone_regex])
-    city = models.CharField(max_length=64, null=True)
-    address = models.CharField(max_length=128, null=True)
-    zip_code = models.CharField(null=True, max_length=6, validators=[RegexValidator(
-        regex=r'^(^[0-9]{2}(?:-[0-9]{3})?$)?$)',
-        message=(u'Format kodu pocztowego to - 12-123'),
-    )], )
+    localization = models.TextField(max_length=128, null=True)
+

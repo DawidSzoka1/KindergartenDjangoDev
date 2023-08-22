@@ -2,78 +2,78 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <form method="post" action="#">
+    <style>
+        body {
+            background-color: #E9DAD7;
+        }
+    </style>
+    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5% ">
+    <form method="post" action="#" enctype='multipart/form-data'>
         {% csrf_token %}
-        <section class="h-100 bg-dark">
-            <div class="container py-5 h-100">
-                <div class="row d-flex justify-content-center align-items-center h-100">
+        <section class="h-100">
+
+            <div class="container py-5 h-100" style="width: 40%; float: right; margin-right: 35px">
+                <div class="row d-flex h-100">
                     <div class="col">
                         <div class="card card-registration my-4">
                             <div class="row g-0">
-                                <div class="col-xl-6 d-none d-xl-block">
-                                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/img4.webp"
-                                         alt="Sample photo" class="img-fluid"
-                                         style="border-top-left-radius: .25rem; border-bottom-left-radius: .25rem;"/>
-                                </div>
-                                <div class="col-xl-6">
-                                    <div class="card-body p-md-5 text-black">
-                                         <div class="row">
+
+                                <div class="col" style="color: #75736B">
+                                    <div class="card-body p-md-5 ">
+                                        {% if form.errors %}
+
+                                                <div class="alert alert-error">
+                                                    {{ form.errors }}
+                                                </div>
+
+                                        {% endif %}
+                                        <div class="row">
+
                                             <div class="col mb-4">
-                                                <h3 class="text-uppercase d-flex justify-content-start">Dodaj
-                                                    Informacje do kontaktu</h3>
-                                            </div>
-                                            <div class="col mb-4">
-                                                <div class="d-flex justify-content-end noPadding">
-                                                    <a href="{% url 'contact' %}"
-                                                       class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
+                                                <div class="d-flex justify-content-start noPadding">
+                                                    <h2>
+                                                        <a href="{% url 'contact' %}"
+                                                           style="text-decoration: none; color: #75736B;">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
+                                                                 height="32"
+                                                                 fill="currentColor" class="bi bi-caret-left-fill"
+                                                                 viewBox="0 0 16 16">
+                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+                                                            </svg>
+                                                            POWRÓT</a>
+                                                    </h2>
                                                 </div>
                                             </div>
+                                            <div class="col mb-4">
+                                                <h2 class="text-uppercase d-flex justify-content-end"
+                                                    style="color: #75736B">Zmień
+                                                    Dane kontktowe</h2>
+                                            </div>
 
+                                            <div class="col-md-6 mb-4">
+                                                {{ form.director.as_hidden }}
+                                            </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
-
-                                                <label class="form-label" for="role">Address:</label>
-                                                <input type="text" name="address" class="form-control form-control-lg">
+                                                {{ form.email_address|as_crispy_field }}
                                             </div>
                                             <div class="col-md-6 mb-4">
-
-                                                <label class="form-label" for="salary">Address Email:</label>
-                                                <input type="email"
-                                                       class="form-control form-control-lg" name="email_address"/>
+                                                {{ form.phone|as_crispy_field }}
+                                            </div>
+                                            <div class="col-md-6 mb-4">
+                                                {{ form.localization|as_crispy_field }}
                                             </div>
 
                                         </div>
 
                                         <div class="row">
-
-
-
-
-                                            <div class="col-md-6 mb-4">
-                                                <label class="mr-2 mb-2">Numer Telefonu</label><br>
-                                                <input type="tel" pattern="+[0-9]{2}-[0-9]{3}-[0-9]{3}-[0-9]{3}"
-                                                       class="form-control form-control-lg" name="phone"/>
-
+                                            <div class="d-flex justify-content-end pt-3">
+                                                <button type="submit" class="btn"
+                                                        style="background-color: #75736B; color: white; width: 35%">
+                                                    DODAJ
+                                                </button>
                                             </div>
-                                             <div class="col-md-6 mb-4">
-                                                <label class="mr-2 mb-2">City</label><br>
-                                                <input type="text"
-                                                       class="form-control form-control-lg" name="city"/>
-
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                             <div class="col-md-6 mb-4">
-                                                <label class="mr-2 mb-2">Kod pocztowy</label><br>
-                                                <input type="text" pattern="[0-9]{2}-[0-9]{3}"
-                                                       class="form-control form-control-lg" name="zip_code"/>
-
-                                            </div>
-                                        </div>
-                                        <div class="d-flex justify-content-end pt-3 mr-3">
-                                            <button type="submit" class="btn btn-warning btn-lg ms-2">Dodaj informacje kontaktowe
-                                            </button>
                                         </div>
 
                                     </div>
@@ -85,5 +85,5 @@
             </div>
         </section>
     </form>
-    <script src="{% static 'group.js' %}"></script>
+
 {% endblock %}
