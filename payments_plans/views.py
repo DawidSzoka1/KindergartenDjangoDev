@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.urls import reverse_lazy
@@ -36,15 +37,15 @@ class AddPaymentsPlanView(PermissionRequiredMixin, SuccessMessageMixin, CreateVi
         return super().form_valid(form)
 
 
-class PaymentPlansListView(PermissionRequiredMixin, ListView):
+class PaymentPlansListView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
-    model = PaymentPlan
-    template_name = 'payments-plans-list.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["plans"] = Director.objects.get(user=self.request.user.id).paymentplan_set.filter(is_active=True)
-        return context
+    def get(self, request):
+        payments_plans = PaymentPlan.objects.filter(principal__user=request.user).filter(is_active=True).order_by('-id')
+        paginator = Paginator(payments_plans, 10)
+        page = request.GET.get('page')
+        page_obj = paginator.get_page(page)
+        return render(request, 'payments-plans-list.html', {'page_obj': page_obj})
 
 
 class PaymentPlanUpdateView(PermissionRequiredMixin, View):

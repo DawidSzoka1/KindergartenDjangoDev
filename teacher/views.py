@@ -52,7 +52,7 @@ class EmployeesListView(PermissionRequiredMixin, LoginRequiredMixin, View):
 
     def get(self, request):
         user = Director.objects.get(user=request.user.id)
-        teachers = user.employee_set.all()
+        teachers = user.employee_set.all().order_by('-id')
         paginator = Paginator(teachers, 10)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
@@ -63,7 +63,7 @@ class EmployeesListView(PermissionRequiredMixin, LoginRequiredMixin, View):
         if search:
             teachers = Employee.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
                 user__email__icontains=search
-            )
+            ).order_by('-id')
             paginator = Paginator(teachers, 10)
             page_number = request.GET.get("page")
             page_obj = paginator.get_page(page_number)

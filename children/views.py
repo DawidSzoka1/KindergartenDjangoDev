@@ -77,16 +77,16 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMix
 class KidsListView(LoginRequiredMixin, View):
     def get(self, request):
         if request.user.get_user_permissions() == {'director.is_director'}:
-            kids = get_object_or_404(Director, user=request.user.id).kid_set.filter(is_active=True)
+            kids = get_object_or_404(Director, user=request.user.id).kid_set.filter(is_active=True).order_by('-id')
         elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
             groups = get_object_or_404(Employee, user=request.user.id).group
             if groups.is_active == True:
-                kids = groups.kid_set.filter(is_active=True)
+                kids = groups.kid_set.filter(is_active=True).order_by('-id')
             else:
                 kids = None
 
         elif request.user.get_user_permissions() == {'parent.is_parent'}:
-            kids = get_object_or_404(ParentA, user=request.user.id).kids.filter(is_active=True)
+            kids = get_object_or_404(ParentA, user=request.user.id).kids.filter(is_active=True).order_by('-id')
         else:
             raise PermissionDenied
         if kids:
@@ -100,13 +100,12 @@ class KidsListView(LoginRequiredMixin, View):
         search = request.POST.get('search')
         if search:
             if request.user.get_user_permissions() == {'director.is_director'}:
-                kids = get_object_or_404(Director, user=request.user.id).kid_set.filter(first_name__icontains=search).filter(
-                    is_active=True)
+                kids = get_object_or_404(Director, user=request.user.id).kid_set.filter(
+                    first_name__icontains=search).filter(
+                    is_active=True).order_by('-id')
             elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
-                groups = get_object_or_404(Employee, user=request.user.id).group.filter(is_active=True)
-                kids = []
-                for group in groups:
-                    kids.append(group.kid_set.filter(first_name__icontains=search).filter(is_active=True))
+                group = get_object_or_404(Employee, user=request.user.id).group
+                kids = group.kid_set.filter(first_name__icontains=search).filter(is_active=True).order_by('-id')
             else:
                 raise PermissionDenied
 

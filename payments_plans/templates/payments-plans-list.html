@@ -1,96 +1,140 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" href="{% static 'kids.css' %}">
-    <div class="container mt-3 mb-4 center">
-        <div class="col-lg-9 mt-4 mt-lg-0">
-            <div class="col d-flex justify-content-end mb-2 noPadding">
-                <a href="{% url 'home_page' %}" class="btn btn-success rounded-0 pt-0 pb-0 pr-4 pl-4">Powrót</a>
+    <link rel="stylesheet" href="{% static 'input_foucs.css' %}">
+    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
+        <!-- Container wrapper -->
+        <div class="container-fluid">
+            <!-- Left links -->
+            <ul class="navbar-nav flex-row">
+
+                <li class="nav-item me-2 me-lg-0">
+                    <h2>
+                        <a href="{% url 'home_page' %}" role="button"
+                           style="color: #75736B; text-decoration:none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
+                                 height="32"
+                                 fill="currentColor" class="bi bi-caret-left-fill"
+                                 viewBox="0 0 16 16">
+                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+                            </svg>
+
+                            MENU
+
+                        </a>
+                    </h2>
+                </li>
+
+            </ul>
+            <!-- Left links -->
+            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+                <!-- Navbar brand -->
+                <!-- Left links -->
+                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
+                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>PLANY PŁATNICZE</b></li>
+                </ul>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="user-dashboard-info-box table-responsive mb-0 bg-white p-4 shadow-sm">
-                        <div class="card-header d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Plany płatnicze</h5>
-                            <a href="{% url 'add_payment_plans' %}" class="btn btn-light btn-sm">Dodaj</a>
-                        </div>
-                        <table class="table manage-candidates-top mb-0">
-                            <thead>
-                            <tr>
-                                <th>Opis</th>
-                                <th class="text-center">Cena za miesiac</th>
-                                <th class="action text-right">Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for plan in plans %}
-                                <tr class="candidates-list">
-                                    <td class="title">
-                                        <div class="thumb">
-                                            <img class="img-fluid"
-                                                 src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="">
-                                        </div>
-                                        <div class="candidate-list-details">
-                                            <div class="candidate-list-info">
-                                                <div class="candidate-list-title">
-                                                    <h5 class="mb-0"><a
-                                                            href="#">{{ plan.name }}</a></h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
+            {% if perms.director.is_director %}
+                <ul class="navbar-nav d-flex flex-row me-1">
+                    <li class="nav-item">
+                        <button class="btn" onclick="location.href='{% url 'add_payment_plans' %}'"
+                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
+                            DODAJ PLAN
+                        </button>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+        <!-- Container wrapper -->
+    </nav>
+    {% for plan in page_obj %}
 
 
-                                    <td class="candidate-list-favourite-time text-center">
-                                        <a class="candidate-list-favourite order-2 text-danger" href="#"><i
-                                                class="fas fa-heart"></i></a>
-                                        <span class="candidate-list-time order-1">{{ plan.price }}</span>
-                                    </td>
-                                    <td>
-                                        <div class="drodown">
-                                            <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                                               href="#"
-                                               id="navbarDropdownMenuAvatar"
-                                               role="button"
-                                               data-bs-toggle="dropdown"
-                                               aria-expanded="false">
-                                                <img
-                                                        src="{{ user.profilemodel.image.url }}"
-                                                        class="rounded-circle"
-                                                        height="30"
-                                                        alt="Action"
-                                                        loading="lazy"
-                                                />
-                                            </a>
-                                            <ul
-                                                    class="dropdown-menu dropdown-menu-end"
-                                                    aria-labelledby="navbarDropdownMenuAvatar"
-                                            >
-                                                <li>
-                                                    <a href="{% url 'payment_plan_update' pk=plan.id %}" class="dropdown-item">Edytuj</a>
-                                                </li>
-                                                <li>
-                                                    <form method="POST" action="{% url 'payment_plan_delete' pk=plan.id %}">
-                                                        {% csrf_token %}
-                                                        <button class="dropdown-item" type="submit" name="delete"
-                                                                value="Usuń"
-                                                                onclick="return confirm('Jestes pewny ze chcesz usunac plan platniczy {{ plan }}?');"
-                                                        >Usuń
-                                                        </button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% endfor %}
+        <div class="container-fluid mb-1 mt-5"
+             style="background-color: white">
+            <div class="row align-item-center" style="padding-top: 10px; font-size: 30px; color: #75736B;">
+                <div class="col mb-3 ml-3"
+                     style="justify-content: start;">
+                    {{ plan.name }}
+                </div>
+                <div class="col-2 mb-3">
+                    {{ plan.price }} zł
 
-                            </tbody>
-                        </table>
+                </div>
+                <div class="col-8"></div>
 
+                <div class="col mb-3">
+
+                    <div class="drodown">
+                        <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
+                           href="#"
+                           id="navbarDropdownMenuAvatar"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           style="  text-decoration:none; color: #75736B; ">
+                            Opcje
+                        </a>
+                        <ul
+                                class="dropdown-menu dropdown-menu-end"
+                                aria-labelledby="navbarDropdownMenuAvatar"
+                        >
+
+                            {% if perms.director.is_director %}
+                                <li>
+                                    <a href="{% url 'payment_plan_update' pk=plan.id %}"
+                                       class="dropdown-item">Zmien
+                                        informacje</a>
+                                </li>
+                                <li>
+                                    <form method="POST"
+                                          action="{% url 'payment_plan_delete' pk=plan.id %}">
+                                        {% csrf_token %}
+                                        <button class="dropdown-item"
+                                                type="submit"
+                                                name="delete"
+                                                value="Usuń"
+                                                onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ plan }}');"
+                                        >Usuń
+                                        </button>
+                                    </form>
+                                </li>
+                            {% endif %}
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+        <hr>
+
+    {% endfor %}
+    {% if page_obj.has_other_pages %}
+        <div style="position: absolute; bottom: auto; left:45%">
+            {% if page_obj.has_previous %}
+
+                <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
+                   style=" font-size: 50px; color:#75736B">< </a>
+            {% else %}
+                <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
+                   style=" font-size: 50px; color:#75736B">< </a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <a class="btn mb-4" href="?page={{ num }}"
+                       style=" font-size: 50px; color:#75736B">{{ num }}</a>
+                {% endif %}
+
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
+                   style=" text-decoration: none; font-size: 50px; color:#75736B"> ></a>
+            {% else %}
+
+                <a class="btn mb-4" href="?page=1"
+                   style=" font-size: 50px; color:#75736B"> > </a>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endblock %}

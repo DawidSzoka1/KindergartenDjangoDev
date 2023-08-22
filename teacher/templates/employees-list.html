@@ -151,33 +151,35 @@
     {% endfor %}
 
 
-    <div style="display: flex; justify-content: center; align-items: center; ">
-        {% if page_obj.has_previous %}
+    {% if page_obj.has_other_pages %}
+        <div style="position: absolute; bottom: auto; left:45%">
+            {% if page_obj.has_previous %}
 
-            <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
-               style="display: inline-block; font-size: 50px; color:#75736B">< </a>
-        {% else %}
-            <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
-               style="display: inline-block; font-size: 50px; color:#75736B">< </a>
-        {% endif %}
-
-        {% for num in page_obj.paginator.page_range %}
-            {% if page_obj.number == num %}
-                <a class="btn mb-4" href="?page={{ num }}"
-                   style="display: inline-block; font-size: 50px; color:#75736B">{{ num }}</a>
+                <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
+                   style=" font-size: 50px; color:#75736B">< </a>
+            {% else %}
+                <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
+                   style=" font-size: 50px; color:#75736B">< </a>
             {% endif %}
 
-        {% endfor %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <a class="btn mb-4" href="?page={{ num }}"
+                       style=" font-size: 50px; color:#75736B">{{ num }}</a>
+                {% endif %}
 
-        {% if page_obj.has_next %}
-            <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
-               style="display: inline-block; text-decoration: none; font-size: 50px; color:#75736B"> ></a>
-        {% else %}
+            {% endfor %}
 
-            <a class="btn mb-4" href="?page=1"
-               style="display: inline-block; font-size: 50px; color:#75736B"> > </a>
-        {% endif %}
-    </div>
+            {% if page_obj.has_next %}
+                <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
+                   style=" text-decoration: none; font-size: 50px; color:#75736B"> ></a>
+            {% else %}
+
+                <a class="btn mb-4" href="?page=1"
+                   style=" font-size: 50px; color:#75736B"> > </a>
+            {% endif %}
+        </div>
+    {% endif %}
 
 
 

@@ -51,7 +51,7 @@ class MealsListView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
-        meals = Meals.objects.filter(principal__user=request.user).filter(is_active=True)
+        meals = Meals.objects.filter(principal__user=request.user).filter(is_active=True).order_by('-id')
         paginator = Paginator(meals, 8)
         page = request.GET.get('page')
         page_obj = paginator.get_page(page)

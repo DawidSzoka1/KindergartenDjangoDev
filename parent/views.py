@@ -83,18 +83,18 @@ class ParentListView(LoginRequiredMixin, View):
         user = request.user
         if user.get_user_permissions() == {'director.is_director'}:
             director = get_object_or_404(Director, user=user.id)
-            parents = director.parenta_set.all()
+            parents = director.parenta_set.all().order_by('-id')
         elif user.get_user_permissions() == {'teacher.is_teacher'}:
             teacher = get_object_or_404(Employee, user=user.id)
             kids = teacher.group.kid_set.filter(is_active=True).values_list('parenta', flat=True)
-            all_parents = teacher.principal.first().parenta_set.all()
+            all_parents = teacher.principal.first().parenta_set.all().order_by('-id')
             parents = []
             for parent in all_parents:
                 if parent.id in kids:
                     parents.append(parent)
         else:
             raise PermissionDenied
-        paginator = Paginator(parents, 5)
+        paginator = Paginator(parents, 15)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
         return render(request, 'parents-list.html', {'page_obj': page_obj})
@@ -104,7 +104,7 @@ class ParentListView(LoginRequiredMixin, View):
         director = get_object_or_404(Director, user=user.id)
         search = request.POST.get('search')
         if search:
-            parents = director.parenta_set.filter(user__email__icontains=search)
+            parents = director.parenta_set.filter(user__email__icontains=search).order_by('-id')
             paginator = Paginator(parents, 5)
             page_number = request.GET.get("page")
             page_obj = paginator.get_page(page_number)
