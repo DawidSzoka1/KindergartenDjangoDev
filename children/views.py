@@ -7,6 +7,7 @@ from teacher.models import Employee
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import KidAddForm
 from .models import Kid
+from django.utils import timezone
 from parent.models import ParentA
 from django.core.exceptions import PermissionDenied
 from director.models import Director
@@ -93,7 +94,9 @@ class KidsListView(LoginRequiredMixin, View):
             paginator = Paginator(kids, 10)
             page = request.GET.get('page')
             page_obj = paginator.get_page(page)
-            return render(request, 'kids-list.html', {'page_obj': page_obj})
+            month = int(timezone.now().month)
+            year = int(timezone.now().year)
+            return render(request, 'kids-list.html', {'page_obj': page_obj, 'month': month, 'year': year})
         raise PermissionDenied
 
     def post(self, request):

@@ -52,7 +52,7 @@
         {% csrf_token %}
         <div class="container" style="margin-top: 85px">
             <div class="row gutters">
-                <div class="col-6" style="margin-left: -25%">
+                <div class="col-5" style='margin-left: -15%'>
                     <div class="card h-100" style="background-color: #BAB1AB; border-color: #BAB1AB">
                         <div class="card-body text-white">
                             <div class="col mt-4">
@@ -128,7 +128,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-5">
                     <div class="card h-100 border-0">
                         <div class="card-body">
                             <figure>
@@ -147,7 +147,7 @@
                 </div>
 
 
-                <div class="col-6" style="margin-right: -60%">
+                <div class="col-5" style="margin-right: -60%">
                     <div class="card h-100" style="background-color: #BAB1AB; border-color: #BAB1AB">
                         <div class="card-body text-white">
                             <div class="col mt-4">
@@ -259,7 +259,7 @@
     </form>
     {% if kid.parenta_set.all %}
         <button class="btn"
-                type="button" style="position: absolute; right: -1%; bottom: 40%"
+                type="button" style="position: absolute; right: 0%; bottom: 40%"
                 onclick="location.href='{% url 'kid_parent' pk=kid.id %}'">
             <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor"
                  style="color: black"

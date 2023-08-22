@@ -8,6 +8,7 @@ from groups.forms import GroupsForm
 from groups.models import Groups
 from parent.models import ParentA
 from teacher.models import Employee
+from django.utils import timezone
 
 
 class GroupAddView(PermissionRequiredMixin, View):
@@ -60,17 +61,18 @@ class GroupDetailsView(LoginRequiredMixin, View):
         group = get_object_or_404(Groups, id=int(pk))
         teachers = list(group.employee_set.values_list("user__email", flat=True))
         kids = group.kid_set.filter(is_active=True)
-
+        month = int(timezone.now().month)
+        year = int(timezone.now().year)
         if request.user.get_user_permissions() == {'teacher.is_teacher'}:
             teacher_email = Employee.objects.get(user=request.user.id).user.email
             if teacher_email in teachers:
                 return render(request, 'group-details.html',
-                              {'group': group, 'teachers': teachers, 'kids': kids})
+                              {'group': group, 'teachers': teachers, 'kids': kids, 'month': month, 'year': year})
         elif request.user.get_user_permissions() == {'director.is_director'}:
             director = Director.objects.get(user=request.user.id)
             if director == group.principal:
                 return render(request, 'group-details.html',
-                              {'group': group, 'teachers': teachers, 'kids': kids})
+                              {'group': group, 'teachers': teachers, 'kids': kids, 'month': month, 'year': year})
         elif request.user.get_user_permissions() == {'parent.is_parent'}:
             parent = ParentA.objects.get(user=request.user.id)
             parent_kids = parent.kids.filter(is_active=True)
@@ -81,7 +83,7 @@ class GroupDetailsView(LoginRequiredMixin, View):
                     break
             if allow:
                 return render(request, 'group-details.html',
-                              {'group': group, 'teachers': teachers, 'kids': kids})
+                              {'group': group, 'teachers': teachers, 'kids': kids, 'month': month, 'year': year})
 
         raise PermissionDenied
 

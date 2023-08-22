@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const dropdown = document.getElementById('wholeDrop');
     const currentDay = document.getElementById('currentDay');
     const user = document.getElementById('user');
+
     days.forEach((elem, count) => {
         elem.addEventListener("click", function (ele) {
 

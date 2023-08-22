@@ -1,5 +1,4 @@
 import calendar
-
 from django.core.paginator import Paginator
 from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.views import View
@@ -43,29 +42,28 @@ class Calendar(HTMLCalendar):
         presences = PresenceModel.objects.filter(kid=self.kid)
 
         if day != 0:
-
+            if calendar.weekday(year=self.year, month=self.month, day=day) == 5 or calendar.weekday(year=self.year,
+                                                                                                    month=self.month,
+                                                                                                    day=day) == 6:
+                return f"<td id='freeday' style='color: grey'><span class='date'>{day}</span></td>"
             for presence in presences:
-                if calendar.weekday(year=self.year, month=self.month, day=day) == 5 or calendar.weekday(year=self.year,
-                                                                                                        month=self.month,
-                                                                                                        day=day) == 6:
-                    return f"<td id='days' style='background-color: grey'><span class='date'>{day}</span></td>"
 
-                if day == presence.day.day:
+                if day == presence.day.day and self.month == presence.day.month and self.year == presence.day.year:
                     if presence.presenceType == 1:
-                        return f"<td id='days' style='background-color: red'><span class='date'>{day}</span></td>"
+                        return f"<td id='days' style='background-color: #FF5F57'><span class='date'>{day}</span></td>"
                     elif presence.presenceType == 2:
-                        return f"<td id='days' style='background-color: green'><span class='date'>{day}</span></td>"
+                        return f"<td id='days' style='background-color: #A5FE90'><span class='date'>{day}</span></td>"
                     elif presence.presenceType == 3:
-                        return f"<td id='days' style='background-color: grey'><span class='date table-info'>{day}</span></td>"
+                        return f"<td id='days' style='background-color: #B4F3F5'><span class='date table-info'>{day}</span></td>"
             return f"<td id='days'><span class='date'>{day}</span></td>"
-        return '<td></td>'
+        return f'<td></td>'
 
     # formats a week as a tr
     def formatweek(self, theweek, events):
         week = ''
         for d, weekday in theweek:
             week += self.formatday(d, events)
-        return f"<tr> {week} </tr></div>"
+        return f"<tr class='test'> {week} </tr>"
 
     # formats a month as a table
     # filter events by year and month
@@ -73,7 +71,7 @@ class Calendar(HTMLCalendar):
         events = FreeDaysModel.objects.filter(principal=self.director).filter(start_time__year=self.year,
                                                                               start_time__month=self.month)
 
-        cal = f'<table border="0" cellpadding="0" cellspacing="0" class="calendar">\n'
+        cal = f'<table border="0" cellpadding="21" cellspacing="21" align="center" class="calendar">\n'
         cal += f'{self.formatmonthname(self.year, self.month, withyear=withyear)}\n'
         cal += f'{self.formatweekheader()}\n'
         for week in self.monthdays2calendar(self.year, self.month):
@@ -82,33 +80,49 @@ class Calendar(HTMLCalendar):
 
 
 class CalendarKid(LoginRequiredMixin, View):
-    def get(self, request, pk):
+    def get(self, request, pk, month, year):
         permissions = request.user.get_user_permissions()
-        kid = Kid.objects.filter(is_active=True).filter(id=int(pk)).first()
-        month_number = int(timezone.now().month)
-        year = int(timezone.now().year)
+        kid = get_object_or_404(Kid, id=int(pk))
+        month_number = int(month)
+        year_number = int(year)
         day_current = int(timezone.now().day)
-        cal = Calendar(year=year, month=month_number, kid=kid).formatmonth(
+        month_next = month_number + 1
+        year_previous = year_number
+        year_next = year_number
+        month_previous = month_number - 1
+        if month_number == 12:
+            month_next = 1
+            year_next = year_number + 1
+        elif month_number == 1:
+            year_previous = year_number - 1
+            month_previous = 12
+        cal = Calendar(year=year_number, month=month_number, kid=kid).formatmonth(
             withyear=True)
-        if not kid:
+        context = {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid, 'month': month_number,
+                   'year': year, 'month_next': month_next, 'year_next': year_next,
+                   'month_previous': month_previous, 'year_previous': year_previous}
+        if not kid.is_active:
             raise PermissionDenied
         elif permissions == {'director.is_director'}:
             director = get_object_or_404(Director, user=request.user.id)
             if kid.principal == director:
-                return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
+                return render(request, 'calendar.html',
+                              context=context)
         elif permissions == {'teacher.is_teacher'}:
             teacher = get_object_or_404(Employee, user=request.user.id)
             kids = list(teacher.group.kid_set.filter(is_active=True))
             if kid in kids:
-                return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
-        elif permissions == {'parent.is_parent'}:
-            parent = get_object_or_404(ParentA, user=request.user.id)
-            parent_kids = list(parent.kids.filter(is_active=True))
-            if kid in parent_kids:
-                return render(request, 'calendar.html', {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid})
-        raise PermissionDenied
+                return render(request, 'calendar.html',
+                              context=context)
+            elif permissions == {'parent.is_parent'}:
+                parent = get_object_or_404(ParentA, user=request.user.id)
+                parent_kids = list(parent.kids.filter(is_active=True))
+                if kid in parent_kids:
+                    return render(request, 'calendar.html',
+                                  context=context)
+                raise PermissionDenied
 
-    def post(self, request, pk):
+    def post(self, request, pk, month, year):
         presence = request.POST.get('presence')
         presence = presence.split(' ')
         presence_type = presence.pop(-1)
@@ -126,7 +140,7 @@ class CalendarKid(LoginRequiredMixin, View):
         else:
             PresenceModel.objects.create(day=presence, kid=kid, presenceType=presence_type)
         messages.success(request, f"Zmieniono obecnosc")
-        return redirect('calendar', pk=pk)
+        return redirect('calendar', pk=pk, month=month, year=year)
 
 
 class Home(View):
@@ -162,7 +176,8 @@ class PresenceCalendarView(LoginRequiredMixin, View):
             presenceType=2)
         kids_absent = PresenceModel.objects.filter(day=timezone.now()).filter(kid__principal=director).filter(
             presenceType=1)
-        kids_planned_absent = PresenceModel.objects.filter(day=timezone.now()).filter(kid__principal=director).filter(
+        kids_planned_absent = PresenceModel.objects.filter(day=timezone.now()).filter(
+            kid__principal=director).filter(
             presenceType=3)
         today = timezone.now().strftime("%Y-%m-%d")
         dict = {}
