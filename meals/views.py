@@ -5,7 +5,7 @@ from django.contrib import messages
 from .models import Meals
 from django.core.exceptions import PermissionDenied
 from director.models import Director, MealPhotos
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.views.generic import (
     ListView,
 )
@@ -34,7 +34,7 @@ class MealAddView(PermissionRequiredMixin, View):
         image = get_object_or_404(MealPhotos, id=int(photo_id))
         if image and name and description and per_day:
             new_meal = Meals.objects.create(name=name, description=description, principal=director,
-                                            per_day=float(per_day),  photo=image)
+                                            per_day=float(per_day), photo=image)
 
         elif image and name and per_day:
             new_meal = Meals.objects.create(name=name, principal=director, per_day=float(per_day), photo=image)
@@ -47,15 +47,15 @@ class MealAddView(PermissionRequiredMixin, View):
         return redirect('list_meals')
 
 
-class MealsListView(PermissionRequiredMixin, ListView):
+class MealsListView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
-    model = Meals
-    template_name = 'meals-list.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["meals"] = Director.objects.get(user=self.request.user.id).meals_set.filter(is_active=True)
-        return context
+    def get(self, request):
+        meals = Meals.objects.filter(principal__user=request.user).filter(is_active=True)
+        paginator = Paginator(meals, 8)
+        page = request.GET.get('page')
+        page_obj = paginator.get_page(page)
+        return render(request, 'meals-list.html', {'page_obj': page_obj})
 
 
 class MealsUpdateView(PermissionRequiredMixin, View):
