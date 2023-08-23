@@ -75,7 +75,7 @@
                                         <article style="text-align: center">
                                             <h3>
                                                 <button type="button" class="btn"
-                                                        style="font-size: 20px; color: white; background-color: #75736B; text-decoration:none; width: auto">{{ meal.name }}</button>
+                                                        style="font-size: 20px; color: white; background-color: #75736B; text-decoration:none; width: auto" onclick="location.href='{% url 'meal_details' meal.id %}'">{{ meal.name }}</button>
                                             </h3>
                                         </article>
                                     </div>

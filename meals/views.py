@@ -96,6 +96,17 @@ class MealsUpdateView(PermissionRequiredMixin, View):
         raise PermissionDenied
 
 
+class MealDetailsView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request, pk):
+        director = Director.objects.get(user=request.user.id)
+        meal = get_object_or_404(Meals, id=int(pk))
+        if meal.principal == director:
+            return render(request, 'meal-details.html', {'meal': meal})
+        raise PermissionDenied
+
+
 class MealDeleteView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 

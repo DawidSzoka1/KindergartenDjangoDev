@@ -185,6 +185,8 @@ class PresenceCalendarView(LoginRequiredMixin, View):
             presence = PresenceModel.objects.filter(kid=kid).filter(day=timezone.now()).first()
             dict[kid] = presence
 
+        month = int(timezone.now().month)
+        year = int(timezone.now().year)
         paginator = Paginator(kids, 10)
         page = request.GET.get('page')
         page_obj = paginator.get_page(page)
@@ -194,7 +196,9 @@ class PresenceCalendarView(LoginRequiredMixin, View):
                        'kids_presence': kids_presence,
                        'kids_absent': kids_absent,
                        'kids_planned_absent': kids_planned_absent,
-                       'dict': dict
+                       'dict': dict,
+                       'year': year,
+                       'month': month
                        })
 
     def post(self, request):

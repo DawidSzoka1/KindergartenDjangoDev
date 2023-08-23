@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" href="{% static 'carousel.css' %}">
+    <link rel="stylesheet" href="{% static 'input_foucs.css' %}">
     <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
         <!-- Container wrapper -->
         <div class="container-fluid">
@@ -47,74 +47,79 @@
         </div>
         <!-- Container wrapper -->
     </nav>
+    <div class="justify-content-center">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
 
-    <div class="container text-center">
-        <div class="row" style="margin-top: 12%">
-            <div id="recipeCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner" role="listbox">
-                    <input type="hidden" value="{{ groups.count }}" id="amount">
-                    {% for group in groups %}
+    <div class="container" style="margin-top: 85px;">
+        <div class="row row-cols-1 row-cols-md-3  g-4">
+            {% for group in page_obj %}
 
-                        {% if forloop.first %}
-                            <div class="carousel-item active">
-                                <div class="col-md-3">
-                                    <div class="card" style="background-color: #BAB1AB; height: 450px">
-                                        <div class="card-body">
-                                            <div class="card-img mt-5">
-                                                <img src="{{ group.photo }}" style="height: 225px"
-                                                     class="img-fluid">
-                                            </div>
-                                        </div>
-                                        <div class="card-text" style="margin-bottom: 20%">
-                                            <button class="btn" style="background-color: #E6DCD3; color: #75736B"
-                                                    onclick="location.href='{% url 'group_details' pk=group.id %}'">
-                                                <b>{{ group.name.upper }}</b></button>
-                                        </div>
-                                    </div>
+
+                <div class="col-2 mt-4">
+                    <div class="card"
+                         style="background-color: #BAB1AB; border-color: #BAB1AB; height: 600px; width: 400px;">
+                        <div class="card-body text-white">
+                            <div class="card-image mt-5">
+                                <article class="photo" style="text-align: center">
+                                    <img src="{{ group.photo }}" alt="zdjecie"
+                                         style="text-align: center; height: 300px;">
+                                </article>
+                            </div>
+                            <div class="col-4 mt-5">
+                                <div class="text-align-center">
+                                    <article style="text-align: center; bottom: 0">
+                                        <h3>
+                                            <button type="button" class="btn"
+                                                    style="position: absolute;font-size: 20px; color:
+                                                    white; background-color: #75736B; text-decoration:none; width: 250px; height: 80px;
+                                                     bottom: 5%; left: auto; right: auto"
+                                                    onclick="location.href='{% url 'group_details' pk=group.id %}'"
+                                            >{{ group.name }}</button>
+                                        </h3>
+                                    </article>
                                 </div>
                             </div>
-                        {% else %}
-                            <div class="carousel-item">
-                                <div class="col-md-3">
-                                    <div class="card" style="background-color: #BAB1AB; height: 450px">
-                                        <div class="card-body">
-                                            <div class="card-img mt-5">
-                                                <img src="{{ group.photo.first }}" style="height: 225px"
-                                                     class="rounded-circle">
-                                            </div>
-                                        </div>
-                                        <div class="card-text" style="margin-bottom: 20%">
-                                            <button class="btn" style="background-color: #E6DCD3; color: #75736B"
-                                                    onclick="location.href='{% url 'group_details' pk=group.id %}'">
-                                                <b>{{ group.name.upper }}</b></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+
+                        </div>
+
+                    </div>
 
                 </div>
-                <button class="carousel-control-prev bg-transparent w-aut" style="margin-left: -9%;"
-                        data-bs-target="#recipeCarousel"
-                        type="button" data-bs-slide="prev">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor"
-                         style="color: black"
-                         class="bi bi-caret-left-fill" viewBox="0 0 16 16">
-                        <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                    </svg>
 
-                </button>
-                <button class="carousel-control-next bg-transparent w-aut" data-bs-target="#recipeCarousel"
-                        type="button" data-bs-slide="next" style="margin-right: -9%;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor"
-                         style="color: black"
-                         class="bi bi-caret-right-fill" viewBox="0 0 16 16">
-                        <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                    </svg>
-                </button>
-            </div>
+            {% endfor %}
         </div>
     </div>
-    <script src="{% static 'carousel.js' %}"></script>
+
+
+
+    <div style="display: flex;">
+        {% if page_obj.has_previous %}
+
+            <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
+               style="position: absolute;font-size: 100px; color:#75736B; left: 0; bottom: 30%">
+                <svg xmlns="http://www.w3.org/2000/svg" width="200"
+                     height="200"
+                     fill="currentColor" class="bi bi-caret-left-fill"
+                     viewBox="0 0 16 16">
+                    <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+                </svg>
+            </a>
+        {% endif %}
+        {% if page_obj.has_next %}
+            <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
+               style="position: absolute;font-size: 100px; color:#75736B; right: 0; bottom: 30%">
+                <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="currentColor"
+                     class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+                    <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+                </svg>
+            </a>
+        {% endif %}
+    </div>
 {% endblock %}
