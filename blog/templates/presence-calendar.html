@@ -75,9 +75,9 @@
 
             <div class="container-fluid mb-1 mt-5"
                  style="background-color: white">
-                <div class="row align-item-center" style="padding-top: 10px;">
-                    <div class="col mb-3"
-                         style="justify-content: start">
+                <div class="row align-item-end" style="padding-top: 10px;">
+                    <div class="col mb-3 mr-2"
+                         style="justify-content: end">
                         {% if kid.gender == 2 %}
                             <img class="img"
                                  style="height: 150px;"
@@ -90,20 +90,20 @@
                                  alt="">
                         {% endif %}
                     </div>
-                    <div class="col-7 md-5 mt-5">
+                    <div class="col-7 md-5 mt-5 ml-5">
 
                         <a href="{% url 'kid_details' pk=kid.id %}"
                            style="font-size: 20px; text-decoration:none; color: #75736B ">{{ kid.first_name.title }} {{ kid.last_name.title }}</a>
 
                     </div>
-                    <div class="col-3 mt-5 ml-5 mb-4">
+                    <div class="col-3 mt-5  ml-5">
 
                         {% if perms.teacher.is_teacher or perms.director.is_director %}
                             {% if presence.presenceType == 2 %}
 
                                 <label>
                                     <input type="submit" value="{{ kid.id }}1" name="data"
-                                           style="background-image: url('{% static 'check2-square.svg' %}'); border: none; width: 50px; height: 50px; font-size: 0"
+                                           style="background-image: url('{% static 'check2-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0"
                                            onclick="return confirm('Jestes pewny ze chcesz cofnąć obecność dziecka {{ kid }}');"
                                     >
 
@@ -114,7 +114,7 @@
                             {% else %}
                                 <label>
                                     <input type="submit" value="{{ kid.id }}2" name="data"
-                                           style="background-image: url('{% static 'x-square.svg' %}'); border: none; width: 50px; height: 50px; font-size: 0">
+                                           style="background-image: url('{% static 'x-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0">
 
                                 </label>
                             {% endif %}
