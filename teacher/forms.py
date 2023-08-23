@@ -14,7 +14,8 @@ class TeacherUpdateForm(forms.ModelForm):
             'city': 'Miasto:',
             'address': 'Adres:',
             'zip_code': 'Kod pocztowy:',
-            'phone': 'Numer telefonu:'
+            'phone': 'Numer telefonu:',
+            'gender': 'Płeć:'
                   }
 
 

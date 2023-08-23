@@ -56,7 +56,7 @@
                             </li>
                         {% elif perms.parent.is_parent %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'parent_profile' %}"
+                                <a class="nav-link" href="{% url 'parent_profile' user.parenta.id %}"
                                    style="font-size: 20px; color: white; text-decoration:none">MÓJ PROFIL</a>
                             </li>
                             {% elif perms.teacher.is_teacher %}

@@ -10,10 +10,12 @@
                     <div class="text-left ml-4 mr-4 mt-5"
                          style="font-size: 35px; margin-left: 30px; margin-right: 100px">
                         <label class="mb-4" for="birth">LOKALIZACJA:</label>
-                        <button class="btn mb-4" onclick="location.href='{% url 'contact-update' pk=contact.id %}'"
-                                style="color: white; background-color: #8D847B; width: 30%; height: 70px; font-size: 30px; margin-left: 43%">
-                            EDYTUJ DANE
-                        </button>
+                        {% if perms.director.is_director %}
+                            <button class="btn mb-4" onclick="location.href='{% url 'contact-update' pk=contact.id %}'"
+                                    style="color: white; background-color: #8D847B; width: 30%; height: 70px; font-size: 30px; margin-left: 43%">
+                                EDYTUJ DANE
+                            </button>
+                        {% endif %}
                         <input class="form-control" style="font-size: 25px;" name="birth"
                                type="text"
                                id="birth"

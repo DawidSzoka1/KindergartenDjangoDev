@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator
 
 from teacher.models import Employee
-from .forms import ParentUpdateForm, UserUpdateForm
+from .forms import ParentUpdateForm
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
@@ -116,15 +116,8 @@ class ParentProfileView(LoginRequiredMixin, View):
     def get(self, request, pk):
         user = request.user
         parent = get_object_or_404(ParentA, id=int(pk))
-        p_form = ParentUpdateForm(instance=parent)
-        u_form = UserUpdateForm(instance=parent.user)
-        parent_kids = parent.kids.filter(is_active=True)
-
         context = {
-            'p_form': p_form,
-            'u_form': u_form,
-            'parent_logged': parent,
-            'parent_kids': parent_kids,
+            'parent': parent
 
         }
         if user.get_user_permissions() == {'parent.is_parent'}:
@@ -142,16 +135,25 @@ class ParentProfileView(LoginRequiredMixin, View):
         raise PermissionDenied
 
 
-    # def post(self, request):
-    #     p_form = ParentUpdateForm(request.POST, instance=request.user.parenta)
-    #     u_form = UserUpdateForm(request.POST, instance=request.user)
-    #
-    #     if p_form.is_valid() and u_form.is_valid():
-    #         p_form.save()
-    #         u_form.save()
-    #         return redirect('parent_profile')
-    #     messages.error(request, f'{u_form.errors} i {p_form.errors}')
-    #     return redirect('parent_profile')
+class ParentUpdateView(PermissionRequiredMixin, View):
+    permission_required = 'parent.is_parent'
+
+    def get(self, request, pk):
+        parent = get_object_or_404(ParentA, id=int(pk))
+        form = ParentUpdateForm(instance=parent)
+        if parent.user.email == request.user.email:
+            return render(request, 'parent-update.html', {'form': form, 'parent': parent})
+        raise PermissionDenied
+
+    def post(self, request, pk):
+        parent = get_object_or_404(ParentA, id=int(pk))
+        form = ParentUpdateForm(request.POST, instance=parent)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Poprawnie zmieniona dane')
+            return redirect('parent_profile', pk=parent.id)
+        messages.error(request, f'{form.errors}')
+        return redirect('parent_update', pk=parent.id)
 
 
 class ParentDeleteView(PermissionRequiredMixin, View):

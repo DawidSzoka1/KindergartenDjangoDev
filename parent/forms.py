@@ -1,15 +1,18 @@
 from django import forms
-from accounts.models import User
 from .models import ParentA
-
-
-class UserUpdateForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['email']
 
 
 class ParentUpdateForm(forms.ModelForm):
     class Meta:
         model = ParentA
-        fields = ['first_name', 'last_name', 'phone', 'city', 'address', 'zip_code', ]
+        fields = '__all__'
+
+        labels = {
+            'first_name': "Imie:",
+            'last_name': "Nazwisko:",
+            'city': 'Miasto:',
+            'address': 'Adres:',
+            'zip_code': 'Kod pocztowy:',
+            'phone': 'Numer telefonu:',
+            'gender': 'Płeć'
+        }

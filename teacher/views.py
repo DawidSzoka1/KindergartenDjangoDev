@@ -158,7 +158,7 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
                     form.save()
                     messages.success(request, f'Udalo sie zmienic dane')
                     return redirect('teacher-profile', pk=pk)
-                messages.success(request, f'{form.errors}')
+                messages.error(request, f'{form.errors}')
                 return redirect('teacher_update', pk=pk)
         elif request.user.get_user_permissions() == {'director.is_director'}:
             role = int(request.POST.get('role'))
