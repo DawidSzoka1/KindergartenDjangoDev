@@ -114,13 +114,13 @@ class CalendarKid(LoginRequiredMixin, View):
             if kid in kids:
                 return render(request, 'calendar.html',
                               context=context)
-            elif permissions == {'parent.is_parent'}:
-                parent = get_object_or_404(ParentA, user=request.user.id)
-                parent_kids = list(parent.kids.filter(is_active=True))
-                if kid in parent_kids:
-                    return render(request, 'calendar.html',
-                                  context=context)
-                raise PermissionDenied
+        elif permissions == {'parent.is_parent'}:
+            parent = get_object_or_404(ParentA, user=request.user.id)
+            parent_kids = list(parent.kids.filter(is_active=True))
+            if kid in parent_kids:
+                return render(request, 'calendar.html',
+                              context=context)
+            raise PermissionDenied
 
     def post(self, request, pk, month, year):
         presence = request.POST.get('presence')

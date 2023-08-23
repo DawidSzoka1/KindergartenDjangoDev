@@ -90,13 +90,13 @@
                                  alt="">
                         {% endif %}
                     </div>
-                    <div class="col-8 md-5 mt-5">
+                    <div class="col-7 md-5 mt-5">
 
                         <a href="{% url 'kid_details' pk=kid.id %}"
                            style="font-size: 20px; text-decoration:none; color: #75736B ">{{ kid.first_name.title }} {{ kid.last_name.title }}</a>
 
                     </div>
-                    <div class="col-2 mt-5 ml-5">
+                    <div class="col-3 mt-5 ml-5 mb-4">
 
                         {% if perms.teacher.is_teacher or perms.director.is_director %}
                             {% if presence.presenceType == 2 %}
@@ -118,6 +118,12 @@
 
                                 </label>
                             {% endif %}
+                        {% elif perms.parent.is_parent %}
+                            <label>
+                                <input type="submit" value="{{ kid.id }}3" name="data"
+                                       style="background-image: url('{% static 'nieobecnosc-2.jpg' %}'); border: none; width: 293px; height: 85px; font-size: 0">
+
+                            </label>
                         {% endif %}
 
                     </div>

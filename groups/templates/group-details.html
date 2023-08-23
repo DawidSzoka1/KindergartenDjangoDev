@@ -98,29 +98,39 @@
                                                             <label for="teacher"><a
                                                                     href="{% url 'teacher-profile' pk=teacher.id %}">NAUCZYCIEL/KA
                                                                 GRUPY:</a></label>
-                                                            {% if teacher.first_name or teacher.last_name %}
-                                                                <input readonly class="form-control" name="teacher"
-                                                                       type="text"
-                                                                       value="{{ teacher.first_name }} {{ teacher.last_name }}">
-                                                            {% else %}
-                                                                <input readonly class="form-control" name="teacher"
-                                                                       type="text"
-                                                                       value="{{ teacher.user.email }}">
-                                                            {% endif %}
+                                                            <a href="{% url 'teacher-profile' pk=teacher.id %}"
+                                                               style="text-decoration: none">
+                                                                {% if teacher.first_name or teacher.last_name %}
+                                                                    <input readonly class="form-control" name="teacher"
+                                                                           type="text"
+                                                                           value="{{ teacher.first_name }} {{ teacher.last_name }}">
+                                                                {% else %}
+                                                                    <input readonly class="form-control" name="teacher"
+                                                                           type="text"
+                                                                           value="{{ teacher.user.email }}">
+                                                                {% endif %}
+                                                            </a>
                                                         </div>
                                                     {% elif forloop.counter == 1 %}
                                                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                                             <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
+                                                            <a href="{% url 'teacher-profile' pk=teacher.id %}"
+                                                               style="text-decoration: none">
+                                                                {% if teacher.first_name or teacher.last_name %}
 
-                                                            {% if teacher.first_name or teacher.last_name %}
-                                                                <input readonly class="form-control" name="teacher"
-                                                                       type="text"
-                                                                       value="{{ teacher.first_name }} {{ teacher.last_name }}">
-                                                            {% else %}
-                                                                <input readonly class="form-control" name="teacher"
-                                                                       type="text"
-                                                                       value="{{ teacher }}">
-                                                            {% endif %}
+                                                                    <input readonly class="form-control" name="teacher"
+                                                                           type="text"
+                                                                           value="{{ teacher.first_name }} {{ teacher.last_name }}">
+
+                                                                {% else %}
+
+                                                                    <input readonly class="form-control" name="teacher"
+                                                                           type="text"
+                                                                           value="{{ teacher }}">
+
+
+                                                                {% endif %}
+                                                            </a>
                                                         </div>
                                                         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
                                                             <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>

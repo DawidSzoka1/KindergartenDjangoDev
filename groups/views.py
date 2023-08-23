@@ -63,13 +63,14 @@ class GroupsListView(LoginRequiredMixin, View):
 class GroupDetailsView(LoginRequiredMixin, View):
     def get(self, request, pk):
         group = get_object_or_404(Groups, id=int(pk))
-        teachers = list(group.employee_set.values_list("user__email", flat=True))
+        teachers_test = list(group.employee_set.values_list("user__email", flat=True))
+        teachers = group.employee_set.all()
         kids = group.kid_set.filter(is_active=True)
         month = int(timezone.now().month)
         year = int(timezone.now().year)
         if request.user.get_user_permissions() == {'teacher.is_teacher'}:
             teacher_email = Employee.objects.get(user=request.user.id).user.email
-            if teacher_email in teachers:
+            if teacher_email in teachers_test:
                 return render(request, 'group-details.html',
                               {'group': group, 'teachers': teachers, 'kids': kids, 'month': month, 'year': year})
         elif request.user.get_user_permissions() == {'director.is_director'}:
