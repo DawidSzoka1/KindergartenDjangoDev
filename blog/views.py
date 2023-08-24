@@ -1,6 +1,6 @@
 import calendar
 from django.core.paginator import Paginator
-from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
 from parent.models import ParentA
@@ -45,7 +45,7 @@ class Calendar(HTMLCalendar):
             if calendar.weekday(year=self.year, month=self.month, day=day) == 5 or calendar.weekday(year=self.year,
                                                                                                     month=self.month,
                                                                                                     day=day) == 6:
-                return f"<td id='freeday' style='color: grey'><span class='date'>{day}</span></td>"
+                return f"<td id='freeday' style='color: #E6DCD3'><span class='date'>{day}</span></td>"
             for presence in presences:
 
                 if day == presence.day.day and self.month == presence.day.month and self.year == presence.day.year:
@@ -226,12 +226,39 @@ class PresenceCalendarView(LoginRequiredMixin, View):
         return redirect('presence_calendar')
 
 
-class PostListView(ListView):
-    model = Post
-    template_name = 'post_list.html'
-    context_object_name = 'posts'
-    ordering = ['-date_posted']
-    paginate_by = 5
+class PostListView(LoginRequiredMixin, View):
+    def get(self, request):
+        user = request.user.get_user_permissions()
+
+        if user == {'director.is_director'}:
+            posts = Director.objects.get(user=request.user.id).post_set.filter(is_active=True)
+
+        elif user == {'teacher.is_teacher'}:
+            employee = Employee.objects.get(user=request.user.id)
+            posts = employee.principal.first().post_set.filter(is_active=True)
+        elif user == {'parent.is_parent'}:
+            parent = ParentA.objects.get(user=request.user.id)
+            kids = parent.kids.filter(is_active=True)
+            groups = kids.values_list('group__name', flat=True)
+            posts = Post.objects.filter(group__name__in=groups)
+        else:
+            raise PermissionDenied
+        paginator = Paginator(posts, 3)
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+        return render(request, 'post_list.html', {'page_obj': page_obj})
+
+    def post(self, request):
+        group = request.POST.get('groups')
+        content = request.POST.get('content')
+        if not group:
+            messages.error(request, 'Wybierz jakie grupy mają widzieć tę wydarzenie')
+            return redirect('post_list_view')
+        if not content:
+            messages.error(request, 'Wydarzenie musi mieć treść')
+            return redirect('post_list_view')
+
+        Post.objects.create(author=request.user, )
 
 
 class PostDetailView(DetailView):

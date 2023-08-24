@@ -56,8 +56,8 @@
     <link rel="stylesheet" href="{% static 'calendar.css' %}">
     <form method="POST" action="">
         {% csrf_token %}
-        <a href="{% url 'calendar' kid.id month_previous year_previous %}">previous</a>
-        <a href="{% url 'calendar' kid.id month_next year_next %}">next</a>
+        <a href="{% url 'calendar' kid.id month_previous year_previous %}" style="position: absolute; left: 36%; bottom: 74%; font-size: 30px"><</a>
+        <a href="{% url 'calendar' kid.id month_next year_next %}" style="position: absolute; right: 36%; bottom: 74%; font-size: 30px">> </a>
         {{ cal }}
 
 
