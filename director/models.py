@@ -36,6 +36,7 @@ class GroupPhotos(models.Model):
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=64, null=True)
     is_active = models.BooleanField(default=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -56,6 +57,7 @@ class MealPhotos(models.Model):
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=64, null=True)
     is_active = models.BooleanField(default=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
@@ -11,6 +12,8 @@ from .forms import ContactAddForm, DirectorUpdateForm
 from teacher.models import Employee
 from parent.models import ParentA
 from django.core.exceptions import PermissionDenied
+from itertools import chain
+from operator import attrgetter
 
 
 class PhotosListView(PermissionRequiredMixin, View):
@@ -19,7 +22,17 @@ class PhotosListView(PermissionRequiredMixin, View):
     def get(self, request):
         group_photos = GroupPhotos.objects.filter(principal=request.user.director).filter(is_active=True)
         meal_photos = MealPhotos.objects.filter(principal=request.user.director).filter(is_active=True)
-        return render(request, 'photos-list.html', {'group_photos': group_photos, 'meal_photos': meal_photos})
+        list_obj = sorted(
+            chain(group_photos, meal_photos),
+            key=attrgetter('date_created'),
+            reverse=True
+
+        )
+
+        paginator = Paginator(list_obj, 10)
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+        return render(request, 'photos-list.html', {'page_obj': page_obj})
 
 
 class PhotosAddView(PermissionRequiredMixin, View):
@@ -45,7 +58,7 @@ class PhotosAddView(PermissionRequiredMixin, View):
             GroupPhotos.objects.create(group_photos=file, principal=request.user.director, name=name)
         elif photo_type == 'meal':
             MealPhotos.objects.create(meal_photos=file, principal=request.user.director, name=name)
-        messages.success(request, 'udalo sie')
+        messages.success(request, 'Poprawnie dodano ikonkę')
         return redirect('photos_list')
 
 
