@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}"
+                 style="color: white; text-align: center; font-size: 30px">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
     {% if user.is_authenticated %}
         {% if perms.director.is_director %}
             <div class="row">
@@ -123,9 +131,12 @@
                         </button>
                     </div>
                 </div>
-                <img src="{% static 'teacher_home_2.jpg' %}" alt="" style="position: absolute; bottom: 0; width: 25%; left: 5%">
-                <img src="{% static 'teacher_home_1.jpg' %}" alt="" style="position: absolute; bottom: 0; left: 30%; width: 40%">
-                <img src="{% static 'teacher_home_3.jpg' %}" alt="" style="position: absolute; bottom: 0; right: 5%;  width: 25%;">
+                <img src="{% static 'teacher_home_2.jpg' %}" alt=""
+                     style="position: absolute; bottom: 0; width: 25%; left: 5%">
+                <img src="{% static 'teacher_home_1.jpg' %}" alt=""
+                     style="position: absolute; bottom: 0; left: 30%; width: 40%">
+                <img src="{% static 'teacher_home_3.jpg' %}" alt=""
+                     style="position: absolute; bottom: 0; right: 5%;  width: 25%;">
             {% endif %}
         {% elif perms.parent.is_parent %}
             <section class="">

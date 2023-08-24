@@ -19,10 +19,10 @@
                             <div class="row g-0">
                                 <div class="col">
                                     <div class="card-body p-md-5" style="color: #75736B">
-                                        {% if messages %}
+                                       {% if messages %}
                                             {% for message in messages %}
-                                                <div class="alert alert-error"
-                                                     style="background-color: #ff5f57; color: white">
+                                                <div class="alert alert-{{ message.tags }}"
+                                                     style="background-color: #FF5F57; color: white; text-align: center; font-size: 30px">
                                                     {{ message }}
                                                 </div>
                                             {% endfor %}

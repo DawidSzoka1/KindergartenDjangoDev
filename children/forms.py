@@ -19,9 +19,9 @@ class KidAddForm(forms.ModelForm):
                   'principal', 'date_of_birth']
 
         widgets = {
-            'start': forms.DateInput(attrs={'type': 'date'}),
-            'end': forms.DateInput(attrs={'type': 'date'}),
-            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
+            'start': forms.DateInput(format=('%Y-%m-%d'), attrs={'type': 'date'}),
+            'end': forms.DateInput(format=('%Y-%m-%d'), attrs={'type': 'date'}),
+            'date_of_birth': forms.DateInput(format=('%Y-%m-%d'), attrs={'type': 'date'}),
             'principal': forms.HiddenInput,
 
         }

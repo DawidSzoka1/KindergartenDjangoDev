@@ -21,7 +21,8 @@
                                     <div class="card-body p-md-5" style="color: #75736B">
                                         {% if messages %}
                                             {% for message in messages %}
-                                                <div class="alert alert-error" style="background-color: #ff5f57; color: white">
+                                                <div class="alert alert-{{ message.tags }}"
+                                                     style="color: white; text-align: center; font-size: 20px">
                                                     {{ message }}
                                                 </div>
                                             {% endfor %}

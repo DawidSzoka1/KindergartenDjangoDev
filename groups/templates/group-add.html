@@ -22,14 +22,14 @@
                                     <div class="card-body p-md-5" style="color: #75736B">
                                         <div class="row">
                                             <div class="col-9 justify-content-center">
-                                                {% if messages %}
-                                                    {% for message in messages %}
-                                                        <div class="alert alert-error" style="background-color: red; color: black">
-                                                            {{ message }}
-                                                        </div>
-                                                    {% endfor %}
-
-                                                {% endif %}
+                                               {% if messages %}
+                                            {% for message in messages %}
+                                                <div class="alert alert-{{ message.tags }}"
+                                                     style="background-color: #FF5F57; color: white; text-align: center; font-size: 30px">
+                                                    {{ message }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
                                             </div>
                                         </div>
                                         <div class="row">

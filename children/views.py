@@ -27,7 +27,7 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMix
     template_name = 'kid-add.html'
     form_class = KidAddForm
     success_url = reverse_lazy('list_kids')
-    success_message = "Dodano poprawni dziecko"
+    success_message = "Dodano poprawnie dziecko"
 
     def get_initial(self):
         initial = super(AddKidView, self).get_initial()
@@ -149,8 +149,10 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
     model = Kid
     template_name = 'kid-update-info.html'
     form_class = KidAddForm
-    success_url = reverse_lazy('list_kids')
-    success_message = "poprawni zmieniono informacje"
+    success_message = "Poprawnie zmieniono informacje"
+
+    def get_success_url(self):
+        return reverse_lazy('kid_details', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self, **kwargs):
         """ Passes the request object to the form class.

@@ -30,24 +30,34 @@
                 <!-- Navbar brand -->
                 <!-- Left links -->
                 <ul class="navbar-nav mb-2 mb-lg-0">
-                    <li class="nav-item" style="font-size: 35px; color:#75736B; margin-left: 100px"><b>KALENDARZ OBECNOŚCI</b></li>
+                    <li class="nav-item" style="font-size: 35px; color:#75736B; margin-left: 100px"><b>KALENDARZ
+                        OBECNOŚCI</b></li>
                 </ul>
             </div>
             {% if perms.director.is_director %}
                 <ul class="navbar-nav d-flex flex-row me-1">
                     <li class="nav-item" style="font-size: 35px; ">
-                        <a href="{% url 'kid_details' kid.id %}" style="text-decoration: none;color:#75736B;">{{ kid }}</a>
+                        <a href="{% url 'kid_details' kid.id %}"
+                           style="text-decoration: none;color:#75736B;">{{ kid }}</a>
                     </li>
                 </ul>
             {% endif %}
         </div>
         <!-- Container wrapper -->
     </nav>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}"
+                 style="color: white; text-align: center; font-size: 30px">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
     <link rel="stylesheet" href="{% static 'calendar.css' %}">
     <form method="POST" action="">
-    {% csrf_token %}
-    <a href="{% url 'calendar' kid.id month_previous year_previous %}">previous</a>
-    <a href="{% url 'calendar' kid.id month_next year_next %}">next</a>
+        {% csrf_token %}
+        <a href="{% url 'calendar' kid.id month_previous year_previous %}">previous</a>
+        <a href="{% url 'calendar' kid.id month_next year_next %}">next</a>
         {{ cal }}
 
 

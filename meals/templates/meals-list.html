@@ -47,49 +47,49 @@
         </div>
         <!-- Container wrapper -->
     </nav>
-    <div class="justify-content-center">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}"
+                 style="color: white; text-align: center; font-size: 30px">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
 
-        <div class="container" style="margin-top: 85px">
-            <div class="row justify-content-start">
-                {% for meal in page_obj %}
+    <div class="container" style="margin-top: 85px">
+        <div class="row justify-content-start">
+            {% for meal in page_obj %}
 
 
-                    <div class="col-3 mt-4">
-                        <div class="card h-70" style="background-color: #BAB1AB; border-color: #BAB1AB">
-                            <div class="card-body text-white">
-                                <div class="card-image mt-3">
-                                    <article class="photo" style="text-align: center">
-                                        <img src="{{ meal.photo }}" alt="zdjecie" style="text-align: center">
+                <div class="col-3 mt-4">
+                    <div class="card h-70" style="background-color: #BAB1AB; border-color: #BAB1AB">
+                        <div class="card-body text-white">
+                            <div class="card-image mt-3">
+                                <article class="photo" style="text-align: center">
+                                    <img src="{{ meal.photo }}" alt="zdjecie" style="text-align: center">
+                                </article>
+                            </div>
+                            <div class="col mt-4">
+                                <div class="text-align-center">
+                                    <article style="text-align: center">
+                                        <h3>
+                                            <button type="button" class="btn"
+                                                    style="font-size: 20px; color: white; background-color: #75736B; text-decoration:none; width: auto"
+                                                    onclick="location.href='{% url 'meal_details' meal.id %}'">{{ meal.name }}</button>
+                                        </h3>
                                     </article>
                                 </div>
-                                <div class="col mt-4">
-                                    <div class="text-align-center">
-                                        <article style="text-align: center">
-                                            <h3>
-                                                <button type="button" class="btn"
-                                                        style="font-size: 20px; color: white; background-color: #75736B; text-decoration:none; width: auto" onclick="location.href='{% url 'meal_details' meal.id %}'">{{ meal.name }}</button>
-                                            </h3>
-                                        </article>
-                                    </div>
-                                </div>
-
                             </div>
 
                         </div>
 
                     </div>
 
-                {% endfor %}
-            </div>
+                </div>
+
+            {% endfor %}
         </div>
+    </div>
 
 
 

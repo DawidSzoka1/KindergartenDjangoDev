@@ -49,6 +49,14 @@
         </div>
         <!-- Container wrapper -->
     </nav>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}"
+                 style="color: white; text-align: center; font-size: 30px">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
     {% if perms.director.is_director %}
         <div class="justify-content-center">
             <form class="d-flex" method="POST" action="#"
