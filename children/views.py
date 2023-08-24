@@ -115,7 +115,9 @@ class KidsListView(LoginRequiredMixin, View):
             paginator = Paginator(kids, 10)
             page = request.GET.get('page')
             page_obj = paginator.get_page(page)
-            return render(request, 'kids-list.html', {'page_obj': page_obj})
+            month = int(timezone.now().month)
+            year = int(timezone.now().year)
+            return render(request, 'kids-list.html', {'page_obj': page_obj, 'month': month, 'year': year})
         return redirect('list_kids')
 
 

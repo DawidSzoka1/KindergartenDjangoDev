@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMix
 from django.views.generic import CreateView, UpdateView
 
 from .models import ContactModel, Director, MealPhotos, GroupPhotos
-from .forms import ContactAddForm
+from .forms import ContactAddForm, DirectorUpdateForm
 from teacher.models import Employee
 from parent.models import ParentA
 from django.core.exceptions import PermissionDenied
@@ -93,7 +93,28 @@ class DirectorProfileView(PermissionRequiredMixin, View):
 
     def get(self, request):
         director = get_object_or_404(Director, user=request.user.id)
-        return render(request, 'director-profile.html', {'director': director})
+        groups = director.groups_set.filter(is_active=True)
+        kids = director.kid_set.filter(is_active=True)
+        return render(request, 'director-profile.html', {'director': director, 'groups': groups, 'kids': kids})
+
+
+class DirectorUpdateView(PermissionRequiredMixin, View):
+    permission_required = 'director.is_director'
+
+    def get(self, request):
+        director = Director.objects.get(user=request.user.id)
+        form = DirectorUpdateForm(instance=director)
+        return render(request, 'director-update.html', {'form': form})
+
+    def post(self, request):
+        director = Director.objects.get(user=request.user.id)
+        form = DirectorUpdateForm(request.POST, instance=director)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Poprawnie zmieniono dane')
+            return redirect('director_profile')
+        messages.error(request, f'{form.errors}')
+        return redirect('director_update')
 
 
 class ContactView(LoginRequiredMixin, View):

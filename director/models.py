@@ -6,9 +6,11 @@ from django.utils.html import format_html
 
 
 class Director(models.Model):
+    gender_choices = ((1, 'Mezczyzna'), (2, 'Kobieta'))
     first_name = models.CharField(max_length=128, null=True)
     last_name = models.CharField(max_length=128, null=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    gender = models.IntegerField(choices=gender_choices, null=True)
 
     class Meta:
         permissions = [

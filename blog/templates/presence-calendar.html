@@ -35,16 +35,7 @@
                         OBECNOŚCI</b></li>
                 </ul>
             </div>
-            {% if perms.director.is_director %}
-                <ul class="navbar-nav d-flex flex-row me-1">
-                    <li class="nav-item">
-                        <button class="btn" onclick="location.href='{% url 'add_kid' %}'"
-                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
-                            DODAJ DZIECKO
-                        </button>
-                    </li>
-                </ul>
-            {% endif %}
+
         </div>
         <!-- Container wrapper -->
     </nav>
@@ -97,34 +88,38 @@
 
                     </div>
                     <div class="col-3 mt-5  ml-5">
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            {% if perms.teacher.is_teacher or perms.director.is_director %}
+                                {% if presence.presenceType == 2 %}
 
-                        {% if perms.teacher.is_teacher or perms.director.is_director %}
-                            {% if presence.presenceType == 2 %}
+                                    <label>
+                                        <input type="submit" value="{{ kid.id }}1" name="data"
+                                               style="background-image: url('{% static 'check2-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0"
+                                               onclick="return confirm('Jestes pewny ze chcesz cofnąć obecność dziecka {{ kid }}');"
+                                        >
 
+                                    </label>
+                                {% elif presence.presenceType == 3 %}
+                                    <b style="color: #BAF3F5 ; border: solid 1px #BAF3F5; font-size: 20px">ZAPLANOWANA
+                                        NIEOBECNOŚĆ</b>
+                                {% else %}
+
+                                    <label>
+                                        <input type="submit" value="{{ kid.id }}2" name="data"
+                                               style="background-image: url('{% static 'x-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0">
+
+                                    </label>
+
+                                {% endif %}
+                            {% elif perms.parent.is_parent %}
                                 <label>
-                                    <input type="submit" value="{{ kid.id }}1" name="data"
-                                           style="background-image: url('{% static 'check2-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0"
-                                           onclick="return confirm('Jestes pewny ze chcesz cofnąć obecność dziecka {{ kid }}');"
-                                    >
-
-                                </label>
-                            {% elif presence.presenceType == 3 %}
-                                <b style="color: #BAF3F5 ; border: solid 1px #BAF3F5; font-size: 20px">ZAPLANOWANA
-                                    NIEOBECNOŚĆ</b>
-                            {% else %}
-                                <label>
-                                    <input type="submit" value="{{ kid.id }}2" name="data"
-                                           style="background-image: url('{% static 'x-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0">
+                                    <input type="submit" value="{{ kid.id }}3" name="data"
+                                           style="background-image: url('{% static 'nieobecnosc-2.jpg' %}'); border: none; width: 293px; height: 85px; font-size: 0">
 
                                 </label>
                             {% endif %}
-                        {% elif perms.parent.is_parent %}
-                            <label>
-                                <input type="submit" value="{{ kid.id }}3" name="data"
-                                       style="background-image: url('{% static 'nieobecnosc-2.jpg' %}'); border: none; width: 293px; height: 85px; font-size: 0">
-
-                            </label>
-                        {% endif %}
+                        </form>
 
                     </div>
 
