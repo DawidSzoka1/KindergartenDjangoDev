@@ -1,17 +1,43 @@
 {% extends "base.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 {% block content %}
     <section class="">
         <div class="container-fluid">
             <div class="row">
 
                 <div class="col vh-100" style="background-color: white; ">
-                    <form method="POST" action="">
-                        {% csrf_token %}
-                        {% if perms.director.is_director %}
-                        {% endif %}
-                    </form>
-                    <img style="position: absolute; margin-left: -10%; bottom: 0"
+                    {% if perms.director.is_director %}
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            <div class="col mt-5">
+
+                                <div class="dropdown">
+                                    <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
+                                       href="#"
+                                       id="navbarDropdownMenuAvatar"
+                                       role="button"
+                                       data-bs-toggle="dropdown"
+                                       aria-expanded="false"
+                                       style="font-size: 20px;  text-decoration:none; color: #75736B; ">
+                                        GRUPY
+                                    </a>
+                                    <ul
+                                            class="dropdown-menu dropdown-menu-start"
+                                            aria-labelledby="navbarDropdownMenuAvatar"
+                                    >
+                                        {{ form.group|as_crispy_field }}
+
+                                    </ul>
+                                </div>
+                            </div>
+
+                            {{ form.content|as_crispy_field }}
+                            <button type="submit">Post</button>
+
+                        </form>
+                    {% endif %}
+                    <img style="position: absolute; margin-left: -20%; bottom: 0"
                          src="{% static 'trawa z kwiatkami.jpg' %}"
                          alt="zdjecie"
                     >

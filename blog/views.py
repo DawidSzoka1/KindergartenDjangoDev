@@ -5,6 +5,7 @@ from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
 from parent.models import ParentA
 from teacher.models import Employee
+from .forms import PostAddForm
 from .models import Post
 from director.models import FreeDaysModel, Director
 from children.models import PresenceModel, Kid, presenceChoices
@@ -229,24 +230,29 @@ class PresenceCalendarView(LoginRequiredMixin, View):
 class PostListView(LoginRequiredMixin, View):
     def get(self, request):
         user = request.user.get_user_permissions()
-
+        form = None
         if user == {'director.is_director'}:
-            posts = Director.objects.get(user=request.user.id).post_set.filter(is_active=True)
+            posts = Director.objects.get(user=request.user.id).post_set.filter(is_active=True).order_by('-date_posted')
+            groups = Director.objects.get(user=request.user.id).groups_set.filter(is_active=True)
+            form = PostAddForm(director=Director.objects.get(user=request.user.id))
 
         elif user == {'teacher.is_teacher'}:
             employee = Employee.objects.get(user=request.user.id)
-            posts = employee.principal.first().post_set.filter(is_active=True)
+            posts = employee.principal.first().post_set.filter(is_active=True).order_by('-date_posted')
+            form = PostAddForm(employee=employee)
+            groups = employee.group
         elif user == {'parent.is_parent'}:
             parent = ParentA.objects.get(user=request.user.id)
             kids = parent.kids.filter(is_active=True)
             groups = kids.values_list('group__name', flat=True)
-            posts = Post.objects.filter(group__name__in=groups)
+            posts = Post.objects.filter(group__name__in=groups).order_by('-date_posted')
         else:
             raise PermissionDenied
+
         paginator = Paginator(posts, 3)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
-        return render(request, 'post_list.html', {'page_obj': page_obj})
+        return render(request, 'post_list.html', {'page_obj': page_obj, 'groups': groups, 'form': form})
 
     def post(self, request):
         group = request.POST.get('groups')
