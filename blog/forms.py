@@ -26,7 +26,11 @@ class PostAddForm(forms.ModelForm):
         widgets = {
             'author': forms.HiddenInput,
             'director': forms.HiddenInput,
+            'content': forms.Textarea(attrs={'placeholder': 'Zacznij wpis..'})
+        }
 
+        labels = {
+            'content': ''
         }
 
     group = CustomModelMultipleChoiceField(

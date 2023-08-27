@@ -251,7 +251,7 @@ class PostListView(LoginRequiredMixin, View):
         else:
             raise PermissionDenied
 
-        paginator = Paginator(posts, 3)
+        paginator = Paginator(posts, 4)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
         return render(request, 'post_list.html', {'page_obj': page_obj, 'groups': groups, 'form': form})

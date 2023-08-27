@@ -13,7 +13,7 @@
                             {{ form.director }}
                             {{ form.author }}
                             {{ form.is_active.as_hidden }}
-                            <div class="col mt-5">
+                            <div class="col mt-5 mb-3">
 
                                 <div class="dropdown">
                                     <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
@@ -36,7 +36,8 @@
                             </div>
 
                             {{ form.content|as_crispy_field }}
-                            <button type="submit">Post</button>
+                            <button type="submit" class="btn" style="color: white; background-color: #75736B;">Post
+                            </button>
 
                         </form>
                     {% endif %}
@@ -46,7 +47,7 @@
                     >
 
                 </div>
-                <div class="col-lg-8 vh-100 ml-3" style="background-color: #E6DCD3; color: #8D847B;">
+                <div class="col-lg-8 vh-100 ml-3 justify-content-center" style="background-color: #E6DCD3; color: #8D847B;">
                     {% if messages %}
                         {% for message in messages %}
                             <div class="alert alert-{{ message.tags }}"
@@ -56,9 +57,93 @@
                         {% endfor %}
                     {% endif %}
                     {% for post in page_obj %}
-                        {{ post }}
-                    {% endfor %}
+                        <div class="card mt-4">
+                            <div class="row mt-2 mb-2">
+                                <div class="col-sm-2 mb-3 mb-sm-0">
 
+                                    {% if post.author.director %}
+                                        {% if post.author.director.gender == 2 %}
+
+                                            <img src="{% static 'DYREKTORKA.jpg' %}" alt=""
+                                                 style="height: 150px; display: block; margin-left: auto; margin-right: auto">
+                                        {% elif post.author.director.gender == 1 %}
+                                            <img src="{% static 'DYREKTOR.jpg' %}" alt=""
+                                                 style="height: 150px; display: block; margin-left: auto; margin-right: auto">
+                                        {% else %}
+                                            <img src="{% static 'gander_null.jpg' %}" alt=""
+                                                 style="height: 150px; display: block; margin-left: auto; margin-right: auto">
+
+                                        {% endif %}
+                                    {% elif post.author.employee %}
+                                        {% if post.author.employee.gender == 2 %}
+                                            <img class="img"
+                                                 style="height: 150px; display: block; margin-left: auto; margin-right: auto"
+                                                 src="{% static 'employee_female.jpg' %}"
+                                                 alt="">
+                                        {% elif post.author.employee.gender == 1 %}
+                                            <img class="img"
+                                                 style="height: 150px; display: block; margin-left: auto; margin-right: auto"
+                                                 src="{% static 'employee_male.jpg' %}"
+                                                 alt="">
+                                        {% else %}
+                                            <img class="img"
+                                                 style="height: 150px; display: block; margin-left: auto; margin-right: auto"
+                                                 src="{% static 'gander_null.jpg' %}"
+                                                 alt="">
+                                        {% endif %}
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="col ">
+
+                                    <div class="card-body" style="color: #75736B">
+                                        <small class="card-title" style="color: #75736B">
+                                            {{ post.author }}, {{ post.date_posted }},
+                                            {% for group in post.group.all %}
+                                                {{ group }},
+                                            {% endfor %}
+                                        </small>
+                                        <h2 class="card-text mt-2">
+                                            {{ post }}
+
+                                        </h2>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% if page_obj.has_other_pages %}
+                        <div class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+
+                                <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
+                                   style=" font-size: 50px; color:#75736B">< </a>
+                            {% else %}
+                                <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
+                                   style=" font-size: 50px; color:#75736B">< </a>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <a class="btn mb-4" href="?page={{ num }}"
+                                       style=" font-size: 50px; color:#75736B">{{ num }}</a>
+                                {% endif %}
+
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
+                                   style=" text-decoration: none; font-size: 50px; color:#75736B"> ></a>
+                            {% else %}
+
+                                <a class="btn mb-4" href="?page=1"
+                                   style=" font-size: 50px; color:#75736B"> > </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
