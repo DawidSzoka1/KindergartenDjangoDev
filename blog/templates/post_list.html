@@ -10,6 +10,9 @@
                     {% if perms.director.is_director %}
                         <form method="POST" action="">
                             {% csrf_token %}
+                            {{ form.director }}
+                            {{ form.author }}
+                            {{ form.is_active.as_hidden }}
                             <div class="col mt-5">
 
                                 <div class="dropdown">
@@ -44,7 +47,16 @@
 
                 </div>
                 <div class="col-lg-8 vh-100 ml-3" style="background-color: #E6DCD3; color: #8D847B;">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}"
+                                 style="color: white; text-align: center; font-size: 30px">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                     {% for post in page_obj %}
+                        {{ post }}
                     {% endfor %}
 
                 </div>

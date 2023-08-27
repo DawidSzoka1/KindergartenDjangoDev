@@ -232,14 +232,16 @@ class PostListView(LoginRequiredMixin, View):
         user = request.user.get_user_permissions()
         form = None
         if user == {'director.is_director'}:
-            posts = Director.objects.get(user=request.user.id).post_set.filter(is_active=True).order_by('-date_posted')
-            groups = Director.objects.get(user=request.user.id).groups_set.filter(is_active=True)
-            form = PostAddForm(director=Director.objects.get(user=request.user.id))
+            director = Director.objects.get(user=request.user.id)
+            posts = director.post_set.filter(is_active=True).order_by('-date_posted')
+            groups = director.groups_set.filter(is_active=True)
+            form = PostAddForm(director=Director.objects.get(user=request.user.id),
+                               initial={'author': director.user, 'director': director})
 
         elif user == {'teacher.is_teacher'}:
             employee = Employee.objects.get(user=request.user.id)
             posts = employee.principal.first().post_set.filter(is_active=True).order_by('-date_posted')
-            form = PostAddForm(employee=employee)
+            form = PostAddForm(employee=employee, initial={'author': employee, 'director': employee.principal})
             groups = employee.group
         elif user == {'parent.is_parent'}:
             parent = ParentA.objects.get(user=request.user.id)
@@ -255,16 +257,21 @@ class PostListView(LoginRequiredMixin, View):
         return render(request, 'post_list.html', {'page_obj': page_obj, 'groups': groups, 'form': form})
 
     def post(self, request):
-        group = request.POST.get('groups')
-        content = request.POST.get('content')
-        if not group:
-            messages.error(request, 'Wybierz jakie grupy mają widzieć tę wydarzenie')
-            return redirect('post_list_view')
-        if not content:
-            messages.error(request, 'Wydarzenie musi mieć treść')
-            return redirect('post_list_view')
+        user = request.user.get_user_permissions()
+        form = None
+        if user == {'director.is_director'}:
+            user = Director.objects.get(user=request.user.id)
+            form = PostAddForm(request.POST, director=Director.objects.get(user=request.user.id),
+                               initial={'author': user.user, 'director': user})
 
-        Post.objects.create(author=request.user, )
+        elif user == {'teacher.is_teacher'}:
+            employee = Employee.objects.get(user=request.user.id)
+            form = PostAddForm(request.POST, employee=employee,
+                               initial={'author': employee, 'director': employee.principal})
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Dodano')
+            return redirect('post_list_view')
 
 
 class PostDetailView(DetailView):

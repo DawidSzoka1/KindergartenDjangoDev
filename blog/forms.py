@@ -14,14 +14,10 @@ class PostAddForm(forms.ModelForm):
         self.director = kwargs.pop("director", None)
         self.employee = kwargs.pop("employee", None)
         super().__init__(*args, **kwargs)
-        if self.director:
+        if self.director is not None:
             self.fields['group'].queryset = self.director.groups_set.filter(is_active=True)
-            self.fields['director'].initial = self.director
-            self.fields['author'].initial = self.director.user
-        elif self.employee:
+        elif self.employee is not None:
             self.fields['group'].queryset = self.employee.principal.first().groups_set.filter(is_active=True)
-            self.fields['director'].initial = self.employee.principal.first()
-            self.fields['author'].initial = self.employee.user
 
     class Meta:
         model = Post
@@ -29,7 +25,6 @@ class PostAddForm(forms.ModelForm):
 
         widgets = {
             'author': forms.HiddenInput,
-            'principal': forms.HiddenInput,
             'director': forms.HiddenInput,
 
         }
