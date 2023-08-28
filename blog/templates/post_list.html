@@ -8,7 +8,7 @@
 
                 <div class="col vh-100" style="background-color: white; ">
                     {% if perms.director.is_director %}
-                        <form method="POST" action="">
+                        <form method="POST" action="{% url 'post_list_view' %}">
                             {% csrf_token %}
                             {{ form.director }}
                             {{ form.author }}
@@ -47,7 +47,8 @@
                     >
 
                 </div>
-                <div class="col-lg-8 vh-100 ml-3 justify-content-center" style="background-color: #E6DCD3; color: #8D847B;">
+                <div class="col-lg-8 vh-100 ml-3 justify-content-center"
+                     style="background-color: #E6DCD3; color: #8D847B;">
                     {% if messages %}
                         {% for message in messages %}
                             <div class="alert alert-{{ message.tags }}"
@@ -56,6 +57,16 @@
                             </div>
                         {% endfor %}
                     {% endif %}
+                    <div class="justify-content-center">
+                        <form class="d-flex" method="POST" action="{% url 'post_search' %}"
+                              style="border: 7px solid #BAB1AB;border-radius: 25px; width: auto; margin-left: auto; margin-top: 20px">
+                            {% csrf_token %}
+                            <input class="form-control" type="search" placeholder="Wpisz słowo klucz "
+                                   aria-label="Wpisz imie dziecka" name="search">
+                            <span><button class="btn " type="submit"
+                                          style="margin-left: -8px; background-color: #BAB1AB; color: white">SZUKAJ</button></span>
+                        </form>
+                    </div>
                     {% for post in page_obj %}
                         <div class="card mt-4">
                             <div class="row mt-2 mb-2">

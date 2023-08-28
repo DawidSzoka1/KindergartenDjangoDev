@@ -15,13 +15,6 @@ from datetime import datetime
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from calendar import HTMLCalendar
-from django.views.generic import (
-    ListView,
-    DetailView,
-    CreateView,
-    UpdateView,
-    DeleteView
-)
 
 
 class Calendar(HTMLCalendar):
@@ -247,7 +240,7 @@ class PostListView(LoginRequiredMixin, View):
             parent = ParentA.objects.get(user=request.user.id)
             kids = parent.kids.filter(is_active=True)
             groups = kids.values_list('group__name', flat=True)
-            posts = Post.objects.filter(group__name__in=groups).order_by('-date_posted')
+            posts = Post.objects.filter(director=parent.principal).filter(group__name__in=groups).order_by('-date_posted')
         else:
             raise PermissionDenied
 
@@ -274,59 +267,38 @@ class PostListView(LoginRequiredMixin, View):
             return redirect('post_list_view')
 
 
-class PostDetailView(DetailView):
-    model = Post
-    template_name = 'post_detail.html'
-    context_object_name = 'post'
+class PostSearchView(LoginRequiredMixin, View):
+    def get(self, request):
+        return redirect('post_list_view')
 
+    def post(self, request):
+        search = request.POST.get('search')
+        user = request.user
+        form = None
+        if user.director:
+            director = Director.objects.get(user=request.user.id)
+            posts = Post.objects.filter(director=user.director).filter(content__icontains=search).order_by(
+                '-date_posted')
+            form = PostAddForm(director=Director.objects.get(user=request.user.id),
+                               initial={'author': director.user, 'director': director})
+            groups = director.groups_set.filter(is_active=True)
+        elif user.employee:
+            employee = Employee.objects.get(user=request.user.id)
+            form = PostAddForm(employee=employee, initial={'author': employee, 'director': employee.principal})
+            groups = employee.group
+            posts = Post.objects.filter(director=user.employee.principal).filter(content__icontains=search).order_by(
+                '-date_posted')
+        elif user.parenta:
+            posts = Post.objects.filter(director=user.parenta.principal).filter(content__icontains=search).order_by(
+                '-date_posted')
+            parent = ParentA.objects.get(user=request.user.id)
+            kids = parent.kids.filter(is_active=True)
+            groups = kids.values_list('group__name', flat=True)
 
-class PostCreateView(PermissionRequiredMixin, CreateView):
-    permission_required = ("director.is_director", 'teacher.is_teacher')
-    model = Post
-    fields = ['title', 'content', 'image']
-    template_name = 'post_form.html'
+        else:
+            raise PermissionDenied
+        paginator = Paginator(posts, 4)
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+        return render(request, 'post_list.html', {'page_obj': page_obj, 'groups': groups, 'form': form})
 
-    def get_form(self, form_class=None):
-        form = super(PostCreateView, self).get_form(form_class)
-        form.fields['image'].required = False
-        return form
-
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
-
-
-class PostUpdateView(PermissionRequiredMixin, UserPassesTestMixin, UpdateView):
-    permission_required = ("director.is_director", 'teacher.is_teacher')
-    model = Post
-    fields = ['title', 'content', 'image']
-    template_name = 'post_form.html'
-
-    def get_form(self, form_class=None):
-        form = super(PostUpdateView, self).get_form(form_class)
-        form.fields['image'].required = False
-        return form
-
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
-
-    def test_func(self):
-        post = self.get_object()
-        if self.request.user == post.author:
-            return True
-        return False
-
-
-class PostDeleteView(PermissionRequiredMixin, UserPassesTestMixin, DeleteView):
-    permission_required = "director.is_director"
-    model = Post
-    template_name = 'post_delete_confirm.html'
-    context_object_name = 'post'
-    success_url = '/wydarzenia/'
-
-    def test_func(self):
-        post = self.get_object()
-        if self.request.user == post.author:
-            return True
-        return False
