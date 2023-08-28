@@ -109,15 +109,59 @@
                                 <div class="col ">
 
                                     <div class="card-body" style="color: #75736B">
-                                        <small class="card-title" style="color: #75736B">
-                                            {{ post.author }}, {{ post.date_posted }},
-                                            {% for group in post.group.all %}
-                                                {{ group }},
-                                            {% endfor %}
-                                        </small>
+                                        <div class="row">
+                                            <div class="col-9">
+                                                <small class="card-title" style="color: #75736B">
+                                                    {{ post.author }}, {{ post.date_posted }},
+                                                    {% for group in post.group.all %}
+                                                        {{ group }},
+                                                    {% endfor %}
+                                                </small>
+                                            </div>
+                                            <div class="col">
+                                                {% if post.author == user %}
+                                                    <div class="dropdown">
+                                                        <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
+                                                           href="#"
+                                                           id="navbarDropdownMenuAvatar"
+                                                           role="button"
+                                                           data-bs-toggle="dropdown"
+                                                           aria-expanded="false"
+                                                           style="font-size: 20px;  text-decoration:none; color: #75736B; ">
+                                                            Opcje
+                                                        </a>
+                                                        <ul
+                                                                class="dropdown-menu dropdown-menu-start"
+                                                                aria-labelledby="navbarDropdownMenuAvatar"
+                                                        >
+                                                            <li>
+                                                                <a href="{% url 'post_update' pk=post.id %}"
+                                                                   class="dropdown-item">Zmiana wydarzenia
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <form method="POST"
+                                                                      action="{% url 'post_delete' pk=post.id %}">
+                                                                    {% csrf_token %}
+                                                                    <button class="dropdown-item"
+                                                                            type="submit"
+                                                                            name="delete"
+                                                                            value="Usuń"
+                                                                            onclick="return confirm('Jestes pewny ze chcesz usunac wydarzenie');"
+                                                                    >Usuń wydarzenie
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+
+                                        </div>
+
                                         <h2 class="card-text mt-2">
                                             {{ post }}
-                                            {{ post.id }}
+
 
                                         </h2>
                                     </div>

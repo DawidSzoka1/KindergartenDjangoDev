@@ -10,11 +10,16 @@ class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 
 class PostAddForm(forms.ModelForm):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, current_user=None, **kwargs):
         self.director = kwargs.pop("director", None)
         self.employee = kwargs.pop("employee", None)
         super().__init__(*args, **kwargs)
-        if self.director is not None:
+        if current_user is not None:
+            if current_user.director:
+                self.fields['group'].queryset = current_user.director.groups_set.filter(is_active=True)
+            elif current_user.employee:
+                self.fields['group'].queryset = current_user.employee.principal.first().groups_set.filter(is_active=True)
+        elif self.director is not None:
             self.fields['group'].queryset = self.director.groups_set.filter(is_active=True)
         elif self.employee is not None:
             self.fields['group'].queryset = self.employee.principal.first().groups_set.filter(is_active=True)

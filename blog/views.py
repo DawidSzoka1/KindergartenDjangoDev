@@ -1,7 +1,12 @@
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
+from django.views.generic import UpdateView
+
+from groups.models import Groups
 from parent.models import ParentA
 from teacher.models import Employee
 from .forms import PostAddForm
@@ -48,7 +53,7 @@ class PostListView(LoginRequiredMixin, View):
         else:
             raise PermissionDenied
 
-        paginator = Paginator(posts, 4)
+        paginator = Paginator(posts, 3)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
         return render(request, 'post_list.html', {'page_obj': page_obj, 'groups': groups, 'form': form})
@@ -101,21 +106,35 @@ class PostSearchView(LoginRequiredMixin, View):
 
         else:
             raise PermissionDenied
-        paginator = Paginator(posts, 4)
+        paginator = Paginator(posts, 3)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
         return render(request, 'post_list.html', {'page_obj': page_obj, 'groups': groups, 'form': form})
 
 
-class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
-    def get(self, request, pk):
-        post = get_object_or_404(Post, id=int(pk))
-        groups = post.director.groups_set.filter(is_active=True)
-        return render(request, 'post_update.html', {'post': post, 'groups': groups})
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
+    model = Post
+    template_name = 'post_update.html'
+    form_class = PostAddForm
+    success_message = "Poprawnie zmieniono informacje"
+
+    def get_success_url(self):
+        return reverse_lazy('post_list_view')
+
+    def get_form_kwargs(self, **kwargs):
+        """ Passes the request object to the form class.
+         This is necessary to only display members that belong to a given user"""
+
+        kwargs = super(PostUpdateView, self).get_form_kwargs()
+        kwargs.update({'current_user': self.request.user})
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.save()
+        return super().form_valid(form)
 
     def test_func(self):
-        pk = self.kwargs['pk']
-        post = get_object_or_404(Post, id=int(pk))
+        post = self.get_object()
         try:
             if self.request.user == post.author:
                 if post.is_active:
@@ -123,3 +142,17 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
         except Exception:
             return False
         return False
+
+
+class PostDeleteView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        return redirect('post_list_view')
+
+    def post(self, request, pk):
+        post = get_object_or_404(Post, id=int(pk))
+        if post.author == request.user:
+            post.is_active = False
+            post.save()
+            messages.success(request, 'Poprawnie usunięto wydarzenie')
+            return redirect('post_list_view')
+        raise PermissionDenied
