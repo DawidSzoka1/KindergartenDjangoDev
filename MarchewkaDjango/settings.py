@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "groups",
     "meals",
     "payments_plans",
+    "calendar_app"
 ]
 
 MIDDLEWARE = [

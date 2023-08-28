@@ -2,8 +2,6 @@ from django.db import models
 from accounts.models import User
 from director.models import Director
 from children.models import Groups
-from django.urls import reverse
-
 # Create your models here.
 
 
@@ -18,5 +16,4 @@ class Post(models.Model):
     def __str__(self):
         return self.content
 
-    def get_absolute_url(self):
-        return reverse('post_detail_view', kwargs={'pk': self.pk})
+
