@@ -7,12 +7,12 @@
             background-color: #E9DAD7;
         }
     </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5% ">
+    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90%">
     <form method="post" action="#">
         {% csrf_token %}
         <section class="h-100">
 
-            <div class="container py-5 h-100" style="width: 40%; float: right; margin-right: 35px">
+            <div class="container h-100" style="width: 40%; float: right; margin-right: 35px">
                 <div class="row d-flex h-100">
                     <div class="col">
                         <div class="card card-registration my-4">
@@ -27,7 +27,7 @@
                                         {% endif %}
                                         <div class="row">
 
-                                            <div class="col mb-4">
+                                            <div class="col mb-2">
                                                 <div class="d-flex justify-content-start noPadding">
                                                     <h2>
                                                         <a href="{% url 'kid_details' pk=kid.id %}"
@@ -51,7 +51,7 @@
 
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-6 mb-4">
+                                            <div class="col-md-6 ">
                                                 <div class="form-outline">
                                                     {{ form.principal }}
                                                 </div>
@@ -73,19 +73,19 @@
 
 
                                         <div class="row">
-                                            <div class="col-md-6 mb-4">
+                                            <div class="col-md-6 mb-2">
                                                 {{ form.payment_plan|as_crispy_field }}
 
                                             </div>
-                                            <div class="col-md-6 mb-4">
+                                            <div class="col-md-6 mb-2">
                                                 {{ form.gender|as_crispy_field }}
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-6 mb-4">
+                                            <div class="col-md-6 mb-2">
                                                 {{ form.kid_meals|as_crispy_field }}
                                             </div>
-                                            <div class="col-md-6 mb-4">
+                                            <div class="col-md-6 mb-2">
                                                 <div class="form-outline">
                                                     {% if form.group %}
                                                         {{ form.group|as_crispy_field }}
@@ -94,12 +94,12 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-6 mb-4">
+                                            <div class="col-md-6 mb-2">
                                                 {{ form.date_of_birth|as_crispy_field }}
 
                                             </div>
                                         </div>
-                                        <div class="form-outline mb-4">
+                                        <div class="form-outline mb-2">
                                             {{ form.start|as_crispy_field }}
                                             <div>
                                                 <label class="form-check-label mb-0 me-4" for="mySwitch">Umowa na czas

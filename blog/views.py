@@ -105,3 +105,21 @@ class PostSearchView(LoginRequiredMixin, View):
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
         return render(request, 'post_list.html', {'page_obj': page_obj, 'groups': groups, 'form': form})
+
+
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def get(self, request, pk):
+        post = get_object_or_404(Post, id=int(pk))
+        groups = post.director.groups_set.filter(is_active=True)
+        return render(request, 'post_update.html', {'post': post, 'groups': groups})
+
+    def test_func(self):
+        pk = self.kwargs['pk']
+        post = get_object_or_404(Post, id=int(pk))
+        try:
+            if self.request.user == post.author:
+                if post.is_active:
+                    return True
+        except Exception:
+            return False
+        return False
