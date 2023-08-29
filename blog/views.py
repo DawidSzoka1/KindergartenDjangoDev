@@ -102,7 +102,7 @@ class PostSearchView(LoginRequiredMixin, View):
                 '-date_posted')
             parent = ParentA.objects.get(user=request.user.id)
             kids = parent.kids.filter(is_active=True)
-            groups = kids.values_list('group__name', flat=True)
+            groups = kids.values_list('group', flat=True)
 
         else:
             raise PermissionDenied

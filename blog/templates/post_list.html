@@ -7,7 +7,7 @@
             <div class="row">
 
                 <div class="col vh-100" style="background-color: white; ">
-                    {% if perms.director.is_director %}
+                    {% if perms.director.is_director or perms.teacher.is_teacher %}
                         <form method="POST" action="{% url 'post_list_view' %}">
                             {% csrf_token %}
                             {{ form.director }}
@@ -40,6 +40,21 @@
                             </button>
 
                         </form>
+                    {% elif perms.parent.is_parent %}
+                        {% for group in groups %}
+                            <div class="card">
+                                <div class="row">
+                                    <div class="col-sm-2 mb-3 mb-sm-0">
+                                        <img src="{{ group.photo }}" alt="">
+                                    </div>
+                                    <div class="col">
+                                        {{ group.name }}
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        {% endfor %}
                     {% endif %}
                     <img style="position: absolute; margin-left: -20%; bottom: 0"
                          src="{% static 'trawa z kwiatkami.jpg' %}"
@@ -106,7 +121,7 @@
 
                                 </div>
 
-                                <div class="col ">
+                                <div class="col">
 
                                     <div class="card-body" style="color: #75736B">
                                         <div class="row">
