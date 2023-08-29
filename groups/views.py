@@ -46,9 +46,9 @@ class GroupsListView(LoginRequiredMixin, View):
     def get(self, request):
         user = request.user
         if user.get_user_permissions() == {'director.is_director'}:
-            groups = Director.objects.get(user=user.id).groups_set.filter(is_active=True)
+            groups = Director.objects.get(user=user.id).groups_set.filter(is_active=True).order_by('-id')
         elif user.get_user_permissions() == {'parent.is_parent'}:
-            kids = ParentA.objects.get(user=user.id).kids.filter(is_active=True)
+            kids = ParentA.objects.get(user=user.id).kids.filter(is_active=True).order_by('-id')
             groups = []
             for kid in kids:
                 groups.append(kid.group)

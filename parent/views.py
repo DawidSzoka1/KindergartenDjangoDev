@@ -1,8 +1,9 @@
 from django.core.paginator import Paginator
 
+from children.models import Kid
 from teacher.models import Employee
 from .forms import ParentUpdateForm
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
@@ -15,14 +16,6 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from .models import ParentA
 from django.core.exceptions import PermissionDenied
-from children.models import Kid
-from django.views.generic import (
-    ListView,
-    DetailView,
-    CreateView,
-    UpdateView,
-    DeleteView
-)
 
 
 class InviteParentView(PermissionRequiredMixin, View):
@@ -75,6 +68,15 @@ class InviteParentView(PermissionRequiredMixin, View):
         else:
             messages.error(request, 'wypelnij formularz')
             return redirect('invite_parent', pk=pk)
+
+
+# class AddParentToKidView(PermissionRequiredMixin, View):
+#     permission_required = "director.is_director"
+#
+#     def get(self, request, pk):
+#         parent = get_object_or_404(ParentA, id=int(pk))
+#         kids = Director.objects.get(user=request.user.id).kid_set.filter(is_active=True)
+#         return render(request, 'parent-kid_add.html', {'kids': kids, 'parent': parent})
 
 
 class ParentListView(LoginRequiredMixin, View):
