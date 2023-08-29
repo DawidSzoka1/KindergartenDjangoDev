@@ -42,7 +42,8 @@ class PostListView(LoginRequiredMixin, View):
         elif user == {'teacher.is_teacher'}:
             employee = Employee.objects.get(user=request.user.id)
             posts = employee.principal.first().post_set.filter(is_active=True).order_by('-date_posted')
-            form = PostAddForm(employee=employee, initial={'author': employee, 'director': employee.principal})
+            form = PostAddForm(employee=employee,
+                               initial={'author': employee.user, 'director': employee.principal.first()})
             groups = employee.group
         elif user == {'parent.is_parent'}:
             parent = ParentA.objects.get(user=request.user.id)
@@ -69,11 +70,13 @@ class PostListView(LoginRequiredMixin, View):
         elif user == {'teacher.is_teacher'}:
             employee = Employee.objects.get(user=request.user.id)
             form = PostAddForm(request.POST, employee=employee,
-                               initial={'author': employee, 'director': employee.principal})
+                               initial={'author': employee.user, 'director': employee.principal.first()})
         if form.is_valid():
             form.save()
             messages.success(request, f'Dodano')
             return redirect('post_list_view')
+        messages.error(request, f'{form.errors}')
+        return redirect('post_list_view')
 
 
 class PostSearchView(LoginRequiredMixin, View):

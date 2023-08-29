@@ -140,16 +140,16 @@ class PresenceCalendarView(LoginRequiredMixin, View):
         user = request.user
         if user.get_user_permissions() == {'director.is_director'}:
             director = get_object_or_404(Director, user=user.id)
-            kids = director.kid_set.filter(is_active=True)
+            kids = director.kid_set.filter(is_active=True).order_by('-id')
 
         elif user.get_user_permissions() == {'teacher.is_teacher'}:
             teacher = get_object_or_404(Employee, user=user.id)
             director = teacher.principal.first()
-            kids = teacher.group.kid_set.filter(is_active=True)
+            kids = teacher.group.kid_set.filter(is_active=True).order_by('-id')
         elif user.get_user_permissions() == {'parent.is_parent'}:
             parent = get_object_or_404(ParentA, user=user.id)
             director = parent.principal.first()
-            kids = parent.kids.filter(is_active=True)
+            kids = parent.kids.filter(is_active=True).order_by('-id')
         else:
             raise PermissionDenied
         kids_presence = PresenceModel.objects.filter(day=timezone.now()).filter(kid__principal=director).filter(

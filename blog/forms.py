@@ -1,5 +1,6 @@
 from django import forms
 from .models import Post, Director
+from groups.models import Groups
 
 
 class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
@@ -15,10 +16,12 @@ class PostAddForm(forms.ModelForm):
         self.employee = kwargs.pop("employee", None)
         super().__init__(*args, **kwargs)
         if current_user is not None:
-            if current_user.director:
+            if current_user.get_user_permissions() == {'director.is_director'}:
                 self.fields['group'].queryset = current_user.director.groups_set.filter(is_active=True)
-            elif current_user.employee:
+
+            elif current_user.get_user_permissions() == {'teacher.is_teacher'}:
                 self.fields['group'].queryset = current_user.employee.principal.first().groups_set.filter(is_active=True)
+
         elif self.director is not None:
             self.fields['group'].queryset = self.director.groups_set.filter(is_active=True)
         elif self.employee is not None:

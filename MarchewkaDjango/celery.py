@@ -23,7 +23,7 @@ app.conf.beat_schedule = {
 
     'add-every-day-morning': {
         'task': 'calendar_app.tasks.add',
-        'schedule': crontab(hour=18, minute=45, day_of_week=2),
+        'schedule': crontab(hour=00, minute=00, day_of_week='mon,tue,wed,thu,fri'),
     },
 }
 
