@@ -90,14 +90,13 @@ class KidsListView(LoginRequiredMixin, View):
             kids = get_object_or_404(ParentA, user=request.user.id).kids.filter(is_active=True).order_by('-id')
         else:
             raise PermissionDenied
-        if kids:
-            paginator = Paginator(kids, 10)
-            page = request.GET.get('page')
-            page_obj = paginator.get_page(page)
-            month = int(timezone.now().month)
-            year = int(timezone.now().year)
-            return render(request, 'kids-list.html', {'page_obj': page_obj, 'month': month, 'year': year})
-        raise PermissionDenied
+
+        paginator = Paginator(kids, 10)
+        page = request.GET.get('page')
+        page_obj = paginator.get_page(page)
+        month = int(timezone.now().month)
+        year = int(timezone.now().year)
+        return render(request, 'kids-list.html', {'page_obj': page_obj, 'month': month, 'year': year})
 
     def post(self, request):
         search = request.POST.get('search')
@@ -127,8 +126,9 @@ class DetailsKidView(LoginRequiredMixin, View):
         kid = Kid.objects.filter(id=int(pk)).filter(is_active=True).first()
         if kid:
             meals = None
-            if kid.kid_meals.is_active == True:
-                meals = kid.kid_meals
+            if kid.kid_meals:
+                if kid.kid_meals.is_active == True:
+                    meals = kid.kid_meals
 
             if request.user.get_user_permissions() == {'director.is_director'}:
                 if kid.principal.user.email == request.user.email:

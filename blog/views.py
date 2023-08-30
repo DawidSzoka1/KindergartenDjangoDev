@@ -19,12 +19,12 @@ from django.core.exceptions import PermissionDenied
 class Home(View):
     def get(self, request):
         if request.user.get_user_permissions() == {'parent.is_parent'}:
-
             kids = get_object_or_404(ParentA, user=request.user.id).kids.filter(is_active=True)
             return render(request, 'home.html', {'kids': kids})
         elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
             teacher = get_object_or_404(Employee, user=request.user.id)
             return render(request, 'home.html', {'teacher': teacher})
+
         return render(request, 'home.html')
 
 

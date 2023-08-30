@@ -16,7 +16,7 @@ class Kid(models.Model):
     last_name = models.CharField(max_length=128)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True)
     gender = models.IntegerField(choices=gender_choices, default=1)
-    start = models.DateField(default=timezone.now)
+    start = models.DateField(auto_created=True)
     end = models.DateField(null=True)
     payment_plan = models.ForeignKey(PaymentPlan, on_delete=models.CASCADE, null=True)
     amount = models.DecimalField(max_digits=20, decimal_places=2, null=True)
