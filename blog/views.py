@@ -89,7 +89,7 @@ class PostSearchView(LoginRequiredMixin, View):
         form = None
         if user.director:
             director = Director.objects.get(user=request.user.id)
-            posts = Post.objects.filter(director=user.director).filter(content__icontains=search).order_by(
+            posts = Post.objects.filter(director=user.director).filter(is_active=True).filter(content__icontains=search).order_by(
                 '-date_posted')
             form = PostAddForm(director=Director.objects.get(user=request.user.id),
                                initial={'author': director.user, 'director': director})
@@ -98,10 +98,10 @@ class PostSearchView(LoginRequiredMixin, View):
             employee = Employee.objects.get(user=request.user.id)
             form = PostAddForm(employee=employee, initial={'author': employee, 'director': employee.principal})
             groups = employee.group
-            posts = Post.objects.filter(director=user.employee.principal).filter(content__icontains=search).order_by(
+            posts = Post.objects.filter(director=user.employee.principal).filter(is_active=True).filter(content__icontains=search).order_by(
                 '-date_posted')
         elif user.parenta:
-            posts = Post.objects.filter(director=user.parenta.principal).filter(content__icontains=search).order_by(
+            posts = Post.objects.filter(director=user.parenta.principal).filter(is_active=True).filter(content__icontains=search).order_by(
                 '-date_posted')
             parent = ParentA.objects.get(user=request.user.id)
             kids = parent.kids.filter(is_active=True)
