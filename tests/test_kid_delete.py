@@ -1,5 +1,4 @@
 import pytest
-
 from children.models import Kid
 
 
@@ -14,9 +13,8 @@ def test_delete_access(client_director):
     assert response.status_code == 302
 
 
-
 @pytest.mark.django_db
-def test_delete_access(client_director):
+def test_delete(client_director):
     assert Kid.objects.filter(id=client_director['kid'].id).first().is_active
     response = client_director['client'].post(f"/kid/delete/{client_director['kid'].id}/")
     assert response.status_code == 302

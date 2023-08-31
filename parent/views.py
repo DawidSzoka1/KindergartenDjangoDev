@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
-from director.models import Director
+from director.models import Director, ContactModel
 from django.core.mail import EmailMultiAlternatives
 from MarchewkaDjango.settings import EMAIL_HOST_USER
 from django.template.loader import render_to_string
@@ -42,6 +42,8 @@ class InviteParentView(PermissionRequiredMixin, View):
             try:
                 password = User.objects.make_random_password()
                 parent_user = User.objects.create_user(email=parent_email, password=password)
+                ContactModel.objects.get(director__user__email=parent_email).delete()
+                Director.objects.get(user__email=parent_email).delete()
                 content_type = ContentType.objects.get_for_model(ParentA)
                 permission = Permission.objects.get(content_type=content_type, codename='is_parent')
                 par_user = ParentA.objects.create(user=parent_user)

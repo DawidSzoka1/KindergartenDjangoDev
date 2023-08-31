@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from children.models import Groups
 from django.views import View
 from django.contrib import messages
-from director.models import Director
+from director.models import Director, ContactModel
 from parent.models import ParentA
 from .models import Employee, roles
 from .forms import TeacherUpdateForm
@@ -99,6 +99,8 @@ class EmployeeAddView(PermissionRequiredMixin, View):
             try:
                 password = User.objects.make_random_password()
                 teacher_user = User.objects.create_user(email=teacher_email, password=password)
+                ContactModel.objects.get(director__user__email=teacher_email).delete()
+                Director.objects.get(user__email=teacher_email).delete()
                 content_type = ContentType.objects.get_for_model(Employee)
                 permission = Permission.objects.get(content_type=content_type, codename='is_teacher')
                 teacher_object = Employee.objects.create(user=teacher_user, role=role, salary=float(salary))
