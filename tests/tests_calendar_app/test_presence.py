@@ -5,6 +5,7 @@ from children.models import PresenceModel, Kid
 from director.models import Director
 
 
+
 @pytest.mark.django_db
 def test_presence(client_conf, client_director):
     response = client_conf.get(f"/presence/calendar/")
