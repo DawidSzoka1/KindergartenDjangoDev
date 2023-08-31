@@ -190,18 +190,26 @@ class PresenceCalendarView(LoginRequiredMixin, View):
         kid = Kid.objects.filter(id=int(kid_id)).filter(is_active=True).first()
         check = PresenceModel.objects.filter(kid=kid).filter(day=day).first()
         if user == {'parent.is_parent'}:
-            if request.user.email in kid.parenta_set.values_list('user__email', flat=True):
-                day = (timezone.now() + timedelta(days=1)).strftime("%Y-%m-%d")
-                check = PresenceModel.objects.filter(kid=kid).filter(day=day).first()
-                if check:
-                    check.presenceType = int(type)
-                    check.save()
-                else:
-                    PresenceModel.objects.create(day=day, kid=kid, presenceType=int(type))
-        elif user == {'director.is_director'} or user == {'teacher.is_teacher'}:
-
-            if kid in request.user.director.kid_set.filter(
-                    is_active=True) or kid in request.user.employee.group.kid_set.filter(is_active=True):
+            if kid:
+                if request.user.email in kid.parenta_set.values_list('user__email', flat=True):
+                    day = (timezone.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+                    check = PresenceModel.objects.filter(kid=kid).filter(day=day).first()
+                    if check:
+                        check.presenceType = int(type)
+                        check.save()
+                    else:
+                        PresenceModel.objects.create(day=day, kid=kid, presenceType=int(type))
+        elif user == {'director.is_director'}:
+            director = Director.objects.get(user=request.user.id)
+            if kid:
+                if kid.id in director.kid_set.filter(is_active=True).values_list('id', flat=True):
+                    if check:
+                        check.presenceType = int(type)
+                        check.save()
+                    else:
+                        PresenceModel.objects.create(day=day, kid=kid, presenceType=int(type))
+        elif user == {'teacher.is_teacher'}:
+            if kid in request.user.employee.group.kid_set.filter(is_active=True):
                 if check:
                     check.presenceType = int(type)
                     check.save()
