@@ -9,7 +9,7 @@ from director.models import FreeDaysModel, Director
 from children.models import PresenceModel, Kid, presenceChoices
 from django.utils.safestring import mark_safe
 from django.contrib import messages
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from calendar import HTMLCalendar
@@ -190,14 +190,18 @@ class PresenceCalendarView(LoginRequiredMixin, View):
         kid = Kid.objects.filter(id=int(kid_id)).filter(is_active=True).first()
         check = PresenceModel.objects.filter(kid=kid).filter(day=day).first()
         if user == {'parent.is_parent'}:
-            if kid:
+            if request.user.email in kid.parenta_set.values_list('user__email', flat=True):
+                day = (timezone.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+                check = PresenceModel.objects.filter(kid=kid).filter(day=day).first()
                 if check:
                     check.presenceType = int(type)
                     check.save()
                 else:
                     PresenceModel.objects.create(day=day, kid=kid, presenceType=int(type))
         elif user == {'director.is_director'} or user == {'teacher.is_teacher'}:
-            if kid:
+
+            if kid in request.user.director.kid_set.filter(
+                    is_active=True) or kid in request.user.employee.group.kid_set.filter(is_active=True):
                 if check:
                     check.presenceType = int(type)
                     check.save()

@@ -1,7 +1,6 @@
 import pytest
 
 
-
 def test_home(client_conf):
     response = client_conf.get('')
     assert response.status_code == 200
@@ -14,6 +13,3 @@ def test_home_user(client_director):
     client_director['client'].logout()
     response_logout = client_director['client'].get('')
     assert response.content != response_logout.content
-
-
-
