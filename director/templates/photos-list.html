@@ -104,13 +104,23 @@
                                     <form method="POST"
                                           action="{% url 'photo_delete' pk=photo.id %}">
                                         {% csrf_token %}
-                                        <button class="dropdown-item"
-                                                type="submit"
-                                                name="delete"
-                                                value="Usuń"
-                                                onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ photo }}');"
-                                        >Usuń
-                                        </button>
+                                        {% if photo.meal_photos %}
+                                            <button class="dropdown-item"
+                                                    type="submit"
+                                                    name="delete"
+                                                    value="2"
+                                                    onclick="return confirm('Jestes pewny ze chcesz usunac zdjecie {{ photo.name }}');"
+                                            >Usuń
+                                            </button>
+                                        {% else %}
+                                            <button class="dropdown-item"
+                                                    type="submit"
+                                                    name="delete"
+                                                    value="1"
+                                                    onclick="return confirm('Jestes pewny ze chcesz usunac zdjecie {{ photo.name }}');"
+                                            >Usuń
+                                            </button>
+                                        {% endif %}
                                     </form>
                                 </li>
                             {% endif %}

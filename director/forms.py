@@ -11,6 +11,7 @@ class ContactAddForm(forms.ModelForm):
             'phone': 'NR KONTAKTOWY:',
             'email_address': 'E-MAIL KONTAKTOWY:',
             'localization': 'LOKALIZACJA:',
+
         }
 
 

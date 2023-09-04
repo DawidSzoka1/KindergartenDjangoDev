@@ -39,7 +39,7 @@ class PhotosAddView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
 
     def get(self, request):
-        return render(request, 'photo-add.html', )
+        return render(request, 'photo-add.html')
 
     def post(self, request):
         photo_type = request.POST.get('type')

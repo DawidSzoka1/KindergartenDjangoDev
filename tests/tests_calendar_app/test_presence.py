@@ -5,7 +5,6 @@ from children.models import PresenceModel, Kid
 from director.models import Director
 
 
-
 @pytest.mark.django_db
 def test_presence(client_conf, client_director):
     response = client_conf.get(f"/presence/calendar/")
@@ -29,7 +28,7 @@ def test_presence_2(client_director):
 
 
 @pytest.mark.django_db
-def test_presence_parent(client_parent, client_director):
+def test_presence_parent(client_parent):
     response = client_parent['client'].get(f"/presence/calendar/")
     assert response.status_code == 200
     response = client_parent['client'].post(f"/presence/calendar/",
