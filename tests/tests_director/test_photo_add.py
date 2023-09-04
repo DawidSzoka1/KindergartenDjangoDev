@@ -1,6 +1,8 @@
 import pytest
 from io import BytesIO
 from director.models import GroupPhotos
+import os
+import shutil
 
 
 @pytest.mark.django_db
@@ -31,3 +33,7 @@ def test_photo_add_access_post(client_director):
     assert response.status_code == 302
     assert GroupPhotos.objects.get(name='add')
     GroupPhotos.objects.get(name='add').group_photos.delete(save=True)
+    parent = '/home/dawid/django/MarchewkaDjango/media'
+    director = f"director_{client_director['director'].id}"
+    path = os.path.join(parent, director)
+    shutil.rmtree(path)

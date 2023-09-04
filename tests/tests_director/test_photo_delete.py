@@ -1,3 +1,6 @@
+import os
+import shutil
+
 import pytest
 from io import BytesIO
 from director.models import GroupPhotos
@@ -27,6 +30,10 @@ def test_photo_delete_access(client_director, client_conf, client_parent):
     response = client_parent['client'].get(f'/photo/delete/{photo.id}/')
     assert response.status_code == 403
     photo.group_photos.delete(save=True)
+    parent = '/home/dawid/django/MarchewkaDjango/media'
+    director = f"director_{client_director['director'].id}"
+    path = os.path.join(parent, director)
+    shutil.rmtree(path)
 
 
 @pytest.mark.django_db
@@ -53,4 +60,7 @@ def test_photo_delete_access_post(client_director, client_parent):
     assert not GroupPhotos.objects.get(name='to_delete').is_active
 
     photo.group_photos.delete(save=True)
-
+    parent = '/home/dawid/django/MarchewkaDjango/media'
+    director = f"director_{client_director['director'].id}"
+    path = os.path.join(parent, director)
+    shutil.rmtree(path)
