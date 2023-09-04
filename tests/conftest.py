@@ -21,6 +21,7 @@ def client_conf():
 @pytest.fixture
 def client_director():
     client = Client()
+
     user = User.objects.create(email='test_pytest_director_3@gmail.com', password='password')
     director = Director.objects.get(user__email='test_pytest_director_3@gmail.com')
     group = Groups.objects.create(name='pytest', capacity=3, principal=director)
@@ -43,7 +44,8 @@ def client_parent():
     director = Director.objects.get(user__email='test_pytest_director_4@gmail.com')
     user = User.objects.create(email='panret@gmail.com', password='password')
     parent = ParentA.objects.create(user=user)
-    kid = Kid.objects.create(first_name='l', last_name='s', principal=director, start='2023-09-26')
+    group = Groups.objects.create(name='pytest', capacity=3, principal=director)
+    kid = Kid.objects.create(first_name='l', last_name='s', principal=director, group=group, start='2023-09-26')
     parent.kids.add(kid)
     content_type = ContentType.objects.get_for_model(ParentA)
     permission = Permission.objects.get(content_type=content_type, codename='is_parent')
@@ -52,5 +54,5 @@ def client_parent():
     parent.user.user_permissions.add(permission)
     user.parenta.save()
     client.force_login(user=user)
-    context = {'client': client, 'director': director, 'kid': kid}
+    context = {'client': client, 'director': director, 'kid': kid, 'group': group}
     return context
