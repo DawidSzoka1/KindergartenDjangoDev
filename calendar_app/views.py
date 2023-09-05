@@ -138,7 +138,15 @@ class CalendarKid(LoginRequiredMixin, View):
 class PresenceCalendarView(LoginRequiredMixin, View):
     def get(self, request):
         user = request.user
-        if user.get_user_permissions() == {'director.is_director'}:
+        month = int(timezone.now().month)
+        year = int(timezone.now().year)
+        day = int(timezone.now().day)
+        if calendar.weekday(year=year, month=month, day=day) == 5 or calendar.weekday(year=year,
+                                                                                      month=month,
+                                                                                      day=day) == 6:
+            return render(request, 'presence-calendar.html',
+                          {'weekend': True})
+        elif user.get_user_permissions() == {'director.is_director'}:
             director = get_object_or_404(Director, user=user.id)
             kids = director.kid_set.filter(is_active=True).order_by('-id')
 
@@ -165,11 +173,10 @@ class PresenceCalendarView(LoginRequiredMixin, View):
             presence = PresenceModel.objects.filter(kid=kid).filter(day=timezone.now()).first()
             dict[kid] = presence
 
-        month = int(timezone.now().month)
-        year = int(timezone.now().year)
         paginator = Paginator(kids, 10)
         page = request.GET.get('page')
         page_obj = paginator.get_page(page)
+        tomorrow = (timezone.now() + timedelta(days=1)).weekday()
         return render(request, 'presence-calendar.html',
                       {'page_obj': page_obj,
                        'today': today,
@@ -178,7 +185,8 @@ class PresenceCalendarView(LoginRequiredMixin, View):
                        'kids_planned_absent': kids_planned_absent,
                        'dict': dict,
                        'year': year,
-                       'month': month
+                       'month': month,
+                       'tomorrow': tomorrow
                        })
 
     def post(self, request):

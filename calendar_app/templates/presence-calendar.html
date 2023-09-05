@@ -59,163 +59,165 @@
             </form>
         </div>
     {% endif %}
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-error">
-                {{ message }}
-            </div>
-        {% endfor %}
-
-    {% endif %}
-    <form action="" method="POST">
-        {% csrf_token %}
-        {% for kid, presence in dict.items %}
+    {% if weekend %}
+        <h1 style="text-align: center; margin-top: 20px">Dzień wolny od zajęć</h1>
+    {% else %}
+        <form action="" method="POST">
+            {% csrf_token %}
+            {% for kid, presence in dict.items %}
 
 
-            <div class="container-fluid mb-1 mt-5"
-                 style="background-color: white">
-                <div class="row align-item-end" style="padding-top: 10px;">
-                    <div class="col mb-3 mr-2"
-                         style="justify-content: end">
-                        {% if kid.gender == 2 %}
-                            <img class="img"
-                                 style="height: 150px;"
-                                 src="{% static 'girl.jpg' %}"
-                                 alt="">
-                        {% else %}
-                            <img class="img"
-                                 style="height: 150px; margin-left: 3%; margin-right: 2%"
-                                 src="{% static 'boy.jpg' %}"
-                                 alt="">
-                        {% endif %}
-                    </div>
-                    <div class="col-7 md-5 mt-5 ml-5">
-
-                        <a href="{% url 'kid_details' pk=kid.id %}"
-                           style="font-size: 20px; text-decoration:none; color: #75736B ">{{ kid.first_name.title }} {{ kid.last_name.title }}</a>
-
-                    </div>
-                    <div class="col-3 mt-5  ml-5">
-                        <form method="POST" action="">
-                            {% csrf_token %}
-                            {% if perms.teacher.is_teacher or perms.director.is_director %}
-                                {% if presence.presenceType == 2 %}
-
-                                    <label>
-                                        <input type="submit" value="{{ kid.id }}1" name="data"
-                                               style="background-image: url('{% static 'check2-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0"
-                                               onclick="return confirm('Jestes pewny ze chcesz cofnąć obecność dziecka {{ kid }}');"
-                                        >
-
-                                    </label>
-                                {% elif presence.presenceType == 3 %}
-                                    <b style="color: #BAF3F5 ; border: solid 1px #BAF3F5; font-size: 20px">ZAPLANOWANA
-                                        NIEOBECNOŚĆ</b>
-                                {% else %}
-
-                                    <label>
-                                        <input type="submit" value="{{ kid.id }}2" name="data"
-                                               style="background-image: url('{% static 'x-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0">
-
-                                    </label>
-
-                                {% endif %}
-                            {% elif perms.parent.is_parent %}
-                                <label>
-                                    <input type="submit" value="{{ kid.id }}3" name="data"
-                                           style="background-image: url('{% static 'nieobecnosc-2.jpg' %}'); border: none; width: 293px; height: 85px; font-size: 0">
-
-                                </label>
+                <div class="container-fluid mb-1 mt-5"
+                     style="background-color: white">
+                    <div class="row align-item-end" style="padding-top: 10px;">
+                        <div class="col mb-3 mr-2"
+                             style="justify-content: end">
+                            {% if kid.gender == 2 %}
+                                <img class="img"
+                                     style="height: 150px;"
+                                     src="{% static 'girl.jpg' %}"
+                                     alt="">
+                            {% else %}
+                                <img class="img"
+                                     style="height: 150px; margin-left: 3%; margin-right: 2%"
+                                     src="{% static 'boy.jpg' %}"
+                                     alt="">
                             {% endif %}
-                        </form>
+                        </div>
+                        <div class="col-7 md-5 mt-5 ml-5">
 
-                    </div>
+                            <a href="{% url 'kid_details' pk=kid.id %}"
+                               style="font-size: 20px; text-decoration:none; color: #75736B ">{{ kid.first_name.title }} {{ kid.last_name.title }}</a>
 
-                    <div class="col mt-5">
+                        </div>
+                        <div class="col-3 mt-5  ml-5" style="color: #75736B;">
+                            <form method="POST" action="">
+                                {% csrf_token %}
 
-                        <div class="drodown">
-                            <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                               href="#"
-                               id="navbarDropdownMenuAvatar"
-                               role="button"
-                               data-bs-toggle="dropdown"
-                               aria-expanded="false"
-                               style="font-size: 20px;  text-decoration:none; color: #75736B; ">
-                                Opcje
-                            </a>
-                            <ul
-                                    class="dropdown-menu dropdown-menu-end"
-                                    aria-labelledby="navbarDropdownMenuAvatar"
-                            >
-                                <li>
-                                    <a href="{% url 'kid_details' pk=kid.id %}"
-                                       class="dropdown-item">Konto
-                                        dziecka
-                                    </a>
-                                </li>
+                                {% if perms.teacher.is_teacher or perms.director.is_director %}
+                                    {% if presence.presenceType == 2 %}
 
-                                <li>
-                                    <a href="{% url 'calendar' kid.id month year %}"
-                                       class="dropdown-item">Kalendarz
-                                    </a>
-                                </li>
-                                {% if perms.director.is_director %}
-                                    <li>
-                                        <a href="{% url 'change_kid_info' pk=kid.id %}"
-                                           class="dropdown-item">Zmien
-                                            informacje</a>
-                                    </li>
-                                    <li>
-                                        <form method="POST"
-                                              action="{% url 'kid_delete' pk=kid.id %}">
-                                            {% csrf_token %}
-                                            <button class="dropdown-item"
-                                                    type="submit"
-                                                    name="delete"
-                                                    value="Usuń"
-                                                    onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}');"
-                                            >Usuń dziecko
-                                            </button>
-                                        </form>
-                                    </li>
+                                        <label>
+                                            <input type="submit" value="{{ kid.id }}1" name="data"
+                                                   style="background-image: url('{% static 'check2-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0"
+                                                   onclick="return confirm('Jestes pewny ze chcesz cofnąć obecność dziecka {{ kid }}');"
+                                            >
+
+                                        </label>
+                                    {% elif presence.presenceType == 3 %}
+                                        <b style="color: #BAF3F5 ; border: solid 1px #BAF3F5; font-size: 20px">ZAPLANOWANA
+                                            NIEOBECNOŚĆ</b>
+                                    {% else %}
+
+                                        <label>
+                                            <input type="submit" value="{{ kid.id }}2" name="data"
+                                                   style="background-image: url('{% static 'x-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0">
+
+                                        </label>
+
+                                    {% endif %}
+                                {% elif perms.parent.is_parent %}
+                                    {% if tomorrow == 5 or tomorrow == 6 %}
+                                        Kolejny dzień jest dniem wolnym od zajęć
+                                    {% else %}
+                                        <label>
+                                            <input type="submit" value="{{ kid.id }}3" name="data"
+                                                   style="background-image: url('{% static 'nieobecnosc-2.jpg' %}'); border: none; width: 293px; height: 85px; font-size: 0">
+
+                                        </label>
+                                    {% endif %}
                                 {% endif %}
-                            </ul>
+                            </form>
+
+                        </div>
+
+                        <div class="col mt-5">
+
+                            <div class="drodown">
+                                <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
+                                   href="#"
+                                   id="navbarDropdownMenuAvatar"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false"
+                                   style="font-size: 20px;  text-decoration:none; color: #75736B; ">
+                                    Opcje
+                                </a>
+                                <ul
+                                        class="dropdown-menu dropdown-menu-end"
+                                        aria-labelledby="navbarDropdownMenuAvatar"
+                                >
+                                    <li>
+                                        <a href="{% url 'kid_details' pk=kid.id %}"
+                                           class="dropdown-item">Konto
+                                            dziecka
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="{% url 'calendar' kid.id month year %}"
+                                           class="dropdown-item">Kalendarz
+                                        </a>
+                                    </li>
+                                    {% if perms.director.is_director %}
+                                        <li>
+                                            <a href="{% url 'change_kid_info' pk=kid.id %}"
+                                               class="dropdown-item">Zmien
+                                                informacje</a>
+                                        </li>
+                                        <li>
+                                            <form method="POST"
+                                                  action="{% url 'kid_delete' pk=kid.id %}">
+                                                {% csrf_token %}
+                                                <button class="dropdown-item"
+                                                        type="submit"
+                                                        name="delete"
+                                                        value="Usuń"
+                                                        onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}');"
+                                                >Usuń dziecko
+                                                </button>
+                                            </form>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <hr>
-
-        {% endfor %}
-    </form>
-
-    {% if page_obj.has_other_pages %}
-        <div style="position: absolute; bottom: auto; left:45%">
-            {% if page_obj.has_previous %}
-
-                <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
-                   style=" font-size: 50px; color:#75736B">< </a>
-            {% else %}
-                <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
-                   style=" font-size: 50px; color:#75736B">< </a>
-            {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <a class="btn mb-4" href="?page={{ num }}"
-                       style=" font-size: 50px; color:#75736B">{{ num }}</a>
-                {% endif %}
+                <hr>
 
             {% endfor %}
+        </form>
 
-            {% if page_obj.has_next %}
-                <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
-                   style=" text-decoration: none; font-size: 50px; color:#75736B"> ></a>
-            {% else %}
 
-                <a class="btn mb-4" href="?page=1"
-                   style=" font-size: 50px; color:#75736B"> > </a>
-            {% endif %}
-        </div>
+        {% if page_obj.has_other_pages %}
+            <div style="position: absolute; bottom: auto; left:45%">
+                {% if page_obj.has_previous %}
+
+                    <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
+                       style=" font-size: 50px; color:#75736B">< </a>
+                {% else %}
+                    <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
+                       style=" font-size: 50px; color:#75736B">< </a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <a class="btn mb-4" href="?page={{ num }}"
+                           style=" font-size: 50px; color:#75736B">{{ num }}</a>
+                    {% endif %}
+
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
+                       style=" text-decoration: none; font-size: 50px; color:#75736B"> ></a>
+                {% else %}
+
+                    <a class="btn mb-4" href="?page=1"
+                       style=" font-size: 50px; color:#75736B"> > </a>
+                {% endif %}
+            </div>
+        {% endif %}
     {% endif %}
 {% endblock %}
