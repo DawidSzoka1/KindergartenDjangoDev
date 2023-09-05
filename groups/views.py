@@ -20,6 +20,7 @@ class GroupAddView(PermissionRequiredMixin, View):
         photos = director.groupphotos_set.filter(is_active=True)
         if photos:
             return render(request, 'group-add.html', {'photos': photos})
+        messages.info(request, 'Najpierwsz musisz dodac jakas iconke')
         return redirect('photo_add')
 
     def post(self, request):
