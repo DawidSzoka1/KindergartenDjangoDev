@@ -54,5 +54,5 @@ def client_parent():
     parent.user.user_permissions.add(permission)
     user.parenta.save()
     client.force_login(user=user)
-    context = {'client': client, 'director': director, 'kid': kid, 'group': group}
+    context = {'client': client, 'director': director, 'kid': kid, 'group': group, 'parent': parent}
     return context

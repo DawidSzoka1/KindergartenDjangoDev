@@ -23,53 +23,58 @@ class InviteParentView(PermissionRequiredMixin, View):
 
     def get(self, request, pk):
         user = Director.objects.get(user=request.user.id)
-        kid = user.kid_set.get(id=int(pk))
-        return render(request, 'parent-invite.html', {'kid': kid})
+        kid = user.kid_set.filter(id=int(pk)).first()
+        if kid:
+            return render(request, 'parent-invite.html', {'kid': kid})
+        else:
+            raise PermissionDenied
 
     def post(self, request, pk):
         user = Director.objects.get(user=request.user.id)
-        kid = user.kid_set.get(id=int(pk))
+        kid = user.kid_set.filter(id=int(pk)).first()
         parent_email = request.POST.get('email')
+        if kid:
+            if parent_email:
+                try:
+                    test = User.objects.get(email=parent_email)
+                except User.DoesNotExist:
+                    test = None
+                if test:
+                    messages.error(request, 'Ten rodzic juz istnieje')
+                    return redirect('invite_parent', pk=pk)
+                try:
+                    password = User.objects.make_random_password()
+                    parent_user = User.objects.create_user(email=parent_email, password=password)
+                    ContactModel.objects.get(director__user__email=parent_email).delete()
+                    Director.objects.get(user__email=parent_email).delete()
+                    content_type = ContentType.objects.get_for_model(ParentA)
+                    permission = Permission.objects.get(content_type=content_type, codename='is_parent')
+                    par_user = ParentA.objects.create(user=parent_user)
+                    par_user.principal.add(user)
+                    par_user.kids.add(kid)
+                    par_user.user.user_permissions.clear()
+                    par_user.user.user_permissions.add(permission)
+                    parent_user.parenta.save()
+                except Exception as e:
+                    User.objects.filter(email=parent_email).first().delete()
+                    messages.error(request, f'Wystąpił blad {e}')
+                    return redirect('invite_parent', pk=pk)
 
-        if parent_email:
-            try:
-                test = User.objects.get(email=parent_email)
-            except User.DoesNotExist:
-                test = None
-            if test:
-                messages.error(request, 'Ten rodzic juz istnieje')
+                subject = f"Zaproszenie na konto przedszkola dla rodzica {kid.first_name}"
+                from_email = EMAIL_HOST_USER
+                text_content = "Marchewka zaprasza do korzystania z konto do ubslugi dzieci"
+                html_content = render_to_string('email_to_parent.html', {'password': password, 'email': parent_email})
+                msg = EmailMultiAlternatives(subject, text_content, from_email, [parent_email])
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+                messages.success(request, f"Udalo sie zaprosic rodzica o emailu {parent_email} ")
+                return redirect('list_kids')
+
+            else:
+                messages.error(request, 'wypelnij formularz')
                 return redirect('invite_parent', pk=pk)
-            try:
-                password = User.objects.make_random_password()
-                parent_user = User.objects.create_user(email=parent_email, password=password)
-                ContactModel.objects.get(director__user__email=parent_email).delete()
-                Director.objects.get(user__email=parent_email).delete()
-                content_type = ContentType.objects.get_for_model(ParentA)
-                permission = Permission.objects.get(content_type=content_type, codename='is_parent')
-                par_user = ParentA.objects.create(user=parent_user)
-                par_user.principal.add(user)
-                par_user.kids.add(kid)
-                par_user.user.user_permissions.clear()
-                par_user.user.user_permissions.add(permission)
-                parent_user.parenta.save()
-            except Exception as e:
-                User.objects.filter(email=parent_email).first().delete()
-                messages.error(request, f'Wystąpił blad {e}')
-                return redirect('invite_parent', pk=pk)
-
-            subject = f"Zaproszenie na konto przedszkola dla rodzica {kid.first_name}"
-            from_email = EMAIL_HOST_USER
-            text_content = "Marchewka zaprasza do korzystania z konto do ubslugi dzieci"
-            html_content = render_to_string('email_to_parent.html', {'password': password, 'email': parent_email})
-            msg = EmailMultiAlternatives(subject, text_content, from_email, [parent_email])
-            msg.attach_alternative(html_content, "text/html")
-            msg.send()
-            messages.success(request, f"Udalo sie zaprosic rodzica o emailu {parent_email} ")
-            return redirect('list_kids')
-
         else:
-            messages.error(request, 'wypelnij formularz')
-            return redirect('invite_parent', pk=pk)
+            raise PermissionDenied
 
 
 # class AddParentToKidView(PermissionRequiredMixin, View):
@@ -163,10 +168,13 @@ class ParentUpdateView(PermissionRequiredMixin, View):
 class ParentDeleteView(PermissionRequiredMixin, View):
     permission_required = 'director.is_director'
 
+    def get(self, request, pk):
+        raise PermissionDenied
+
     def post(self, request, pk):
         parent = get_object_or_404(ParentA, id=int(pk))
         if parent.principal.first().user.email == request.user.email:
-            user = User.objects.get(parent=parent.id)
+            user = User.objects.get(id=parent.user.id)
             user.delete()
             messages.success(request, f'Rodzic {user} został usniety')
             return redirect('list_parent')
@@ -182,7 +190,7 @@ class ParentSearchView(LoginRequiredMixin, View):
         if search:
             parents = ParentA.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
                 user__email__icontains=search
-            )
+            ).order_by('-id')
             paginator = Paginator(parents, 5)
             page_number = request.POST.get('page')
             page_obj = paginator.get_page(page_number)
