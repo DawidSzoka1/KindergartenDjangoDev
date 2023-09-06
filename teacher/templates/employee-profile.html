@@ -73,19 +73,22 @@
                                     <img src="{% static 'gander_null.jpg' %}" alt=""
                                          style="height: 80%; display: block; margin-left: auto; margin-right: auto">
                                 {% endif %}
-                                {% if employee.first_name and employee.last_name %}
-                                    <figcaption
-                                            style="text-align: center; margin-top: 20px; font-size: 50px">{{ employee.first_name }} {{ employee.last_name }}
-                                        {% if perms.teacher.is_teacher %}
+                                <figcaption style="text-align: center; margin-top: 20px; font-size: 50px">
+                                    {% if employee.first_name and employee.last_name %}
+                                        <div>
+                                            {{ employee.first_name }} {{ employee.last_name }}
+                                        </div>
+                                    {% endif %}
+                                    {% if perms.teacher.is_teacher %}
+                                        {% if user.email == employee.user.email %}
                                             <button type="button" class="btn me-3"
                                                     style="color: white; background-color: #8D847B; width: 50%; height: 70px; font-size: 30px; margin-top: 2%"
                                                     onclick="location.href='{% url 'password_change' %}'">
                                                 <b>ZMIEŃ HASŁO</b>
                                             </button>
                                         {% endif %}
-                                    </figcaption>
-
-                                {% endif %}
+                                    {% endif %}
+                                </figcaption>
                             </figure>
                         </div>
                     </div>

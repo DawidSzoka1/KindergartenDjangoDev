@@ -31,32 +31,19 @@
                                             class="dropdown-menu dropdown-menu-start"
                                             aria-labelledby="navbarDropdownMenuAvatar"
                                     >
+
                                         {{ form.group|as_crispy_field }}
+
 
                                     </ul>
                                 </div>
+
+
+                                {{ form.content|as_crispy_field }}
+                                <button type="submit" class="btn" style="color: white; background-color: #75736B;">Post
+                                </button>
                             </div>
-
-                            {{ form.content|as_crispy_field }}
-                            <button type="submit" class="btn" style="color: white; background-color: #75736B;">Post
-                            </button>
-
                         </form>
-                    {% elif perms.parent.is_parent %}
-                        {% for group in groups %}
-                            <div class="card">
-                                <div class="row">
-                                    <div class="col-sm-2 mb-3 mb-sm-0">
-                                        <img src="{{ group.photo }}" alt="">
-                                    </div>
-                                    <div class="col">
-                                        {{ group.name }}
-                                    </div>
-                                </div>
-
-
-                            </div>
-                        {% endfor %}
                     {% endif %}
                     <img style="position: absolute; margin-left: -20%; bottom: 0"
                          src="{% static 'trawa z kwiatkami.jpg' %}"

@@ -95,11 +95,13 @@
                                     </div>
                                 {% endif %}
                                 {% if perms.parent.is_parent %}
-                                    <button type="button" class="btn me-3"
-                                            style="color: white; background-color: #8D847B; width: 50%; height: 70px; font-size: 30px; margin-top: 2%"
-                                            onclick="location.href='{% url 'password_change' %}'">
-                                        <b>ZMIEŃ HASŁO</b>
-                                    </button>
+                                    {% if user.email == parent.user.email %}
+                                        <button type="button" class="btn me-3"
+                                                style="color: white; background-color: #8D847B; width: 50%; height: 70px; font-size: 30px; margin-top: 2%"
+                                                onclick="location.href='{% url 'password_change' %}'">
+                                            <b>ZMIEŃ HASŁO</b>
+                                        </button>
+                                    {% endif %}
                                 {% endif %}
                             </figcaption>
                         </figure>

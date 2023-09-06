@@ -3,10 +3,8 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
-from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.views.generic import UpdateView
-
-from groups.models import Groups
 from parent.models import ParentA
 from teacher.models import Employee
 from .forms import PostAddForm
@@ -48,8 +46,9 @@ class PostListView(LoginRequiredMixin, View):
         elif user == {'parent.is_parent'}:
             parent = ParentA.objects.get(user=request.user.id)
             kids = parent.kids.filter(is_active=True)
-            groups = kids.values_list('group__name', flat=True)
-            posts = Post.objects.filter(director=parent.principal).filter(group__name__in=groups).order_by(
+            groups = kids.values_list('group__id', flat=True)
+            posts = Post.objects.filter(director=parent.principal.first().id).filter(group__id__in=groups).filter(
+                is_active=True).order_by(
                 '-date_posted')
         else:
             raise PermissionDenied
@@ -86,24 +85,32 @@ class PostSearchView(LoginRequiredMixin, View):
     def post(self, request):
         search = request.POST.get('search')
         user = request.user
+        user_perm = user.get_user_permissions()
         form = None
-        if user.director:
+        if user_perm == {'director.is_director'}:
             director = Director.objects.get(user=request.user.id)
-            posts = Post.objects.filter(director=user.director).filter(is_active=True).filter(content__icontains=search).order_by(
+            posts = Post.objects.filter(director=user.director).filter(is_active=True).filter(
+                content__icontains=search).order_by(
                 '-date_posted')
             form = PostAddForm(director=Director.objects.get(user=request.user.id),
                                initial={'author': director.user, 'director': director})
             groups = director.groups_set.filter(is_active=True)
-        elif user.employee:
+        elif user_perm == {'teacher.is_teacher'}:
             employee = Employee.objects.get(user=request.user.id)
-            form = PostAddForm(employee=employee, initial={'author': employee, 'director': employee.principal})
+            form = PostAddForm(employee=employee, initial={'author': employee, 'director': employee.principal.first()})
             groups = employee.group
-            posts = Post.objects.filter(director=user.employee.principal).filter(is_active=True).filter(content__icontains=search).order_by(
+            posts = Post.objects.filter(director=user.employee.principal.first().id).filter(is_active=True).filter(
+                content__icontains=search).order_by(
                 '-date_posted')
-        elif user.parenta:
-            posts = Post.objects.filter(director=user.parenta.principal).filter(is_active=True).filter(content__icontains=search).order_by(
-                '-date_posted')
+        elif user_perm == {'parent.is_parent'}:
             parent = ParentA.objects.get(user=request.user.id)
+            kids = parent.kids.filter(is_active=True)
+            groups = kids.values_list('group__id', flat=True)
+            posts = Post.objects.filter(director=user.parenta.principal.first().id).filter(is_active=True).filter(
+                group__id__in=groups).filter(
+                content__icontains=search).order_by(
+                '-date_posted')
+
             kids = parent.kids.filter(is_active=True)
             groups = kids.values_list('group', flat=True)
 
