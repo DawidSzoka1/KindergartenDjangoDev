@@ -1,6 +1,4 @@
 import pytest
-
-from payments_plans.models import PaymentPlan
 from teacher.models import Employee
 
 

@@ -9,14 +9,19 @@ from django.contrib import messages
 
 class Register(View):
     def get(self, request):
+        if request.user.is_active:
+            messages.info(request, 'Masz juz konto')
+            return redirect('home_page')
         form = UserRegisterForm()
         return render(request, "register.html", {'form': form})
 
     def post(self, request):
+        if request.user.is_active:
+            messages.info(request, 'Masz juz konto')
+            return redirect('home_page')
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             form.save()
-            username = form.cleaned_data.get('username')
             return redirect('login')
         else:
             form = UserRegisterForm()

@@ -5,7 +5,7 @@ from teacher.models import Employee
 
 @pytest.mark.django_db
 def test_teacher_delete_access_1(client_conf, client_parent, client_director):
-    response = client_director['client'].post('/add/teacher/', {
+    client_director['client'].post('/add/teacher/', {
         'email': 'tests_add@gmail.com',
         'role': 2,
         'salary': 20,
@@ -26,7 +26,7 @@ def test_teacher_delete_access_1(client_conf, client_parent, client_director):
 
 @pytest.mark.django_db
 def test_teacher_delete_access_2(client_director, client_parent):
-    response = client_director['client'].post('/add/teacher/', {
+    client_director['client'].post('/add/teacher/', {
         'email': 'tests_add@gmail.com',
         'role': 2,
         'salary': 20,

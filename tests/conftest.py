@@ -22,7 +22,9 @@ def client_conf():
 def client_director():
     client = Client()
 
-    user = User.objects.create(email='test_pytest_director_3@gmail.com', password='password')
+    user = User.objects.create(email='test_pytest_director_3@gmail.com')
+    user.set_password('password123')
+    user.save()
     director = Director.objects.get(user__email='test_pytest_director_3@gmail.com')
     group = Groups.objects.create(name='pytest', capacity=3, principal=director)
     meal = Meals.objects.create(name='py', per_day=3, principal=director)
@@ -40,7 +42,9 @@ def client_director():
 @pytest.fixture
 def client_parent():
     client = Client()
-    dir_user = User.objects.create(email='test_pytest_director_4@gmail.com', password='password')
+    dir_user = User.objects.create(email='test_pytest_director_4@gmail.com')
+    dir_user.set_password('password123')
+    dir_user.save()
     director = Director.objects.get(user__email='test_pytest_director_4@gmail.com')
     user = User.objects.create(email='panret@gmail.com', password='password')
     parent = ParentA.objects.create(user=user)
