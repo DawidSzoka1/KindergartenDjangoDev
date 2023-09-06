@@ -7,7 +7,8 @@
             background-color: #E9DAD7;
         }
     </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90% ">
+    <img src="{% static  'add_form_picture.jpg' %}" alt=""
+         style="position: absolute; bottom: 0; left: -5%; height: 90% ">
     <form method="post" action="#">
         {% csrf_token %}
         <section class="h-100">
@@ -112,7 +113,9 @@
                                                     <label class="form-label" for="role">Posada:</label>
                                                     <select class="form-select form-select-lg" name="role" id="id_role">
                                                         {% for role in roles %}
-                                                            <option value="{{ role.0 }}">{{ role.1 }}</option>
+                                                            {% if role.1 == 'nauczyciel' %}
+                                                                <option value="{{ role.0 }}">{{ role.1 }}</option>
+                                                            {% endif %}
                                                         {% endfor %}
                                                     </select>
                                                 </div>
@@ -121,6 +124,7 @@
                                                     <label class="form-label" for="salary">Miesieczne
                                                         wynagrodzenie:</label>
                                                     <input type="number" id="salary" min="1"
+                                                           placeholder="{{ employee.salary }}"
                                                            class="form-control form-control-lg" name="salary"/>
                                                 </div>
 
@@ -129,11 +133,18 @@
                                             <div class="row">
 
 
-                                                <div class="col-md-6 mb-4" id="group" style="display: none">
+                                                <div class="col-md-6 mb-4" id="group">
                                                     <label class="mr-2 mb-2">Wybierz grupe:</label><br>
                                                     <select class="form-select form-select-lg" name="group">
+                                                        {% if employee.group %}
+                                                            <option value="{{ employee.group.id }}">{{ employee.group.name }}</option>
+                                                        {% endif %}
                                                         {% for group in groups %}
+                                                            {% if employee.group == group %}
+
+                                                            {% else %}
                                                             <option value="{{ group.id }}">{{ group.name }}</option>
+                                                            {% endif %}
                                                         {% endfor %}
                                                     </select>
 

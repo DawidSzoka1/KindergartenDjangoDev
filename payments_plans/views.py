@@ -6,13 +6,10 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import PaymentPlanForm
 from .models import PaymentPlan
-
-
 from django.core.exceptions import PermissionDenied
 from director.models import Director
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import (
-    ListView,
     CreateView,
 )
 

@@ -26,7 +26,7 @@ class EmployeeProfileView(LoginRequiredMixin, View):
             if employee.principal.first() == user.director:
                 return render(request, 'employee-profile.html',
                               {'employee': employee})
-            messages.error(request, f"Nie masz na to pozwolenia")
+            messages.error(request, f"Nie ma takiego nauczyciela")
             return redirect('list_teachers')
         elif user.get_user_permissions() == {'teacher.is_teacher'}:
             if user.employee == employee:
@@ -86,7 +86,9 @@ class EmployeeAddView(PermissionRequiredMixin, View):
         group_id = request.POST.get('group')
         group = None
         if group_id:
-            group = user.groups_set.get(id=int(group_id))
+            group = user.groups_set.filter(id=int(group_id)).first()
+            if not group:
+                raise PermissionDenied
         teacher_email = request.POST.get('email')
         if teacher_email:
             try:
@@ -167,7 +169,6 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
             salary = request.POST.get('salary')
             group = request.POST.get('group')
             teacher = Employee.objects.get(id=pk)
-            teacher.group.clear()
             if role == 2:
                 if group and salary:
                     teacher.salary = float(salary)
@@ -180,6 +181,7 @@ class EmployeeUpdateView(LoginRequiredMixin, View):
             elif role != 2:
                 if salary and role:
                     teacher.salary = float(salary)
+                    teacher.group = None
                     teacher.role = role
                     teacher.save()
                     messages.success(request, 'Udalo sie zmienic informacje')
