@@ -98,7 +98,7 @@
                                     {% if presence.presenceType == 2 %}
 
                                         <label>
-                                            <input type="submit" value="{{ kid.id }}1" name="data"
+                                            <input type="submit" value="{{ kid.id }} 1" name="data"
                                                    style="background-image: url('{% static 'check2-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0"
                                                    onclick="return confirm('Jestes pewny ze chcesz cofnąć obecność dziecka {{ kid }}');"
                                             >
@@ -110,7 +110,7 @@
                                     {% else %}
 
                                         <label>
-                                            <input type="submit" value="{{ kid.id }}2" name="data"
+                                            <input type="submit" value="{{ kid.id }} 2" name="data"
                                                    style="background-image: url('{% static 'x-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0">
 
                                         </label>
@@ -121,7 +121,7 @@
                                         Kolejny dzień jest dniem wolnym od zajęć
                                     {% else %}
                                         <label>
-                                            <input type="submit" value="{{ kid.id }}3" name="data"
+                                            <input type="submit" value="{{ kid.id }} 3" name="data"
                                                    style="background-image: url('{% static 'nieobecnosc-2.jpg' %}'); border: none; width: 293px; height: 85px; font-size: 0">
 
                                         </label>

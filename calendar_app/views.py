@@ -191,6 +191,7 @@ class PresenceCalendarView(LoginRequiredMixin, View):
 
     def post(self, request):
         data = request.POST.get('data')
+        data = data.split()
         user = request.user.get_user_permissions()
         kid_id = data[0]
         type = data[1]
@@ -223,4 +224,5 @@ class PresenceCalendarView(LoginRequiredMixin, View):
                     check.save()
                 else:
                     PresenceModel.objects.create(day=day, kid=kid, presenceType=int(type))
+
         return redirect('presence_calendar')

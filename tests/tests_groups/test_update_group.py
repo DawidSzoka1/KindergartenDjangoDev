@@ -1,9 +1,7 @@
 import os
 import shutil
 from io import BytesIO
-
 import pytest
-
 from director.models import GroupPhotos
 from groups.models import Groups
 

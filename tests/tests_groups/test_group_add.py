@@ -23,12 +23,18 @@ def test_group_add_access_get(client_director, client_parent, client_conf):
                                                    'file': img,
                                                    'name': 'add'
                                                    })
+    photo = GroupPhotos.objects.get(name='add')
     response = client_director['client'].get('/add/group/')
     assert response.status_code == 200
     response_parent = client_parent['client'].get('/add/group/')
     assert response_parent.status_code == 403
     response = client_conf.get('/add/group/')
     assert response.status_code == 302
+    photo.group_photos.delete(save=True)
+    parent = '/home/dawid/django/MarchewkaDjango/media'
+    director = f"director_{client_director['director'].id}"
+    path = os.path.join(parent, director)
+    shutil.rmtree(path)
 
 
 @pytest.mark.django_db
