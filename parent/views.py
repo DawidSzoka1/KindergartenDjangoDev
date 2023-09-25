@@ -77,13 +77,15 @@ class InviteParentView(PermissionRequiredMixin, View):
             raise PermissionDenied
 
 
-# class AddParentToKidView(PermissionRequiredMixin, View):
-#     permission_required = "director.is_director"
-#
-#     def get(self, request, pk):
-#         parent = get_object_or_404(ParentA, id=int(pk))
-#         kids = Director.objects.get(user=request.user.id).kid_set.filter(is_active=True)
-#         return render(request, 'parent-kid_add.html', {'kids': kids, 'parent': parent})
+class AddParentToKidView(PermissionRequiredMixin, View):
+    permission_required = "director.is_director"
+
+    def get(self, request, pk):
+        parent = get_object_or_404(ParentA, id=int(pk))
+        if parent.principal.user.email == request.user.email:
+            kids = Director.objects.get(user=request.user.id).kid_set.filter(is_active=True)
+            return render(request, 'parent-kid-add.html', {'kids': kids, 'parent': parent})
+        raise PermissionDenied
 
 
 class ParentListView(LoginRequiredMixin, View):

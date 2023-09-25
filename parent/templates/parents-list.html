@@ -36,6 +36,16 @@
                     </li>
                 </ul>
             </div>
+            {% if perms.director.is_director %}
+                <ul class="navbar-nav d-flex flex-row me-1">
+                    <li class="nav-item">
+                        <button class="btn" onclick="location.href='{% url 'add_kid' %}'"
+                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
+                            DODAJ RODZICA
+                        </button>
+                    </li>
+                </ul>
+            {% endif %}
         </div>
         <!-- Container wrapper -->
     </nav>
@@ -123,6 +133,11 @@
                                 </a>
                             </li>
                             {% if perms.director.is_director %}
+                                <li>
+                                    <button class="btn dropdown-item" onclick="location.href='{% url 'add_parent_to_kid' parent.id %}'">
+                                        DODAJ DZIECKO
+                                    </button>
+                                </li>
                                 <li>
                                     <form method="POST"
                                           action="{% url 'parent_delete' pk=parent.id %}">
