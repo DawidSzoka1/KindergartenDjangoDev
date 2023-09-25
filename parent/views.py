@@ -82,10 +82,23 @@ class AddParentToKidView(PermissionRequiredMixin, View):
 
     def get(self, request, pk):
         parent = get_object_or_404(ParentA, id=int(pk))
-        if parent.principal.user.email == request.user.email:
-            kids = Director.objects.get(user=request.user.id).kid_set.filter(is_active=True)
+        if parent.principal.first().user.email == request.user.email:
+            kids = Director.objects.get(user=request.user.id).kid_set.filter(is_active=True).exclude(parenta=parent)
             return render(request, 'parent-kid-add.html', {'kids': kids, 'parent': parent})
         raise PermissionDenied
+
+    def post(self, request, pk):
+        director = Director.objects.get(user=request.user.id)
+        parent = get_object_or_404(ParentA, id=int(pk))
+        if parent.principal.first().user.email == director.user.email:
+            kids = request.POST.getlist('kids')
+            for kid in kids:
+                kid = get_object_or_404(Kid, id=int(kid))
+                if kid.id in director.kid_set.filter(is_active=True).values_list('id', flat=True):
+                    parent.kids.add(kid)
+                    parent.save()
+            messages.success(request, f'Poprawnie dodano wybrane dzieci do {parent.user.email}')
+            return redirect('list_parent')
 
 
 class ParentListView(LoginRequiredMixin, View):

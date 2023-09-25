@@ -7,7 +7,8 @@
             background-color: #E9DAD7;
         }
     </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90% ">
+    <img src="{% static  'add_form_picture.jpg' %}" alt=""
+         style="position: absolute; bottom: 0; left: -5%; height: 90% ">
     <form method="post" action="#">
         {% csrf_token %}
         <section class="h-100">
@@ -52,31 +53,48 @@
                                         <div class="row">
                                             <div class="col-md-6 mb-4">
                                                 <div class="form-outline">
+                                                    <div class="dropdown">
+                                                        <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
+                                                           href="#"
+                                                           id="navbarDropdownMenuAvatar"
+                                                           role="button"
+                                                           data-bs-toggle="dropdown"
+                                                           aria-expanded="false"
+                                                           style="font-size: 20px;  text-decoration:none; color: #75736B; ">
+                                                            DZIECI
+                                                        </a>
+                                                        <ul
+                                                                class="dropdown-menu dropdown-menu-start"
+                                                                aria-labelledby="navbarDropdownMenuAvatar"
+                                                        >
+                                                            {% for kid in kids %}
+                                                                <li>
 
-                                                    <label class="form-label" for="form3Example1n">Imię
-                                                        dziecka:</label>
-                                                    <input type="text" id="form3Example1n" readonly
-                                                           class="form-control form-control-lg"
-                                                           value="{{ kid.first_name }}"/>
+                                                                    <input type="checkbox" id="kid_{{ kid.id }}"
+                                                                           name="kids"
+                                                                           class="form-check-input"
+                                                                           value="{{ kid.id }}"/>
+                                                                    <label for="kid_{{ kid.id }}"
+                                                                           class="form-check-label">{{ kid.first_name }} {{ kid.last_name }}</label>
+                                                                </li>
+                                                            {% endfor %}
+
+                                                        </ul>
+                                                    </div>
+
+
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-4">
-                                                <label class="form-label" for="form3Example1n">Nazwisko
-                                                    dziecka:</label>
-                                                <input type="text" id="form3Example1n" readonly
-                                                       class="form-control form-control-lg"
-                                                       value="{{ kid.last_name }}"/>
-
+                                                <div class="form-outline">
+                                                    <label class="form-label" for="parent">
+                                                        RODZIC:
+                                                    </label>
+                                                    <input id="parent" class="form-control form-control-lg" type="text" readonly value="{{ parent.user.email }}">
+                                                </div>
                                             </div>
 
-                                        </div>
-                                        <div class="col-md-6 mb-4">
-                                            <div class="form-outline">
-                                                <label class="form-label" for="form3Example1n">Email rodzica:</label>
-                                                <input type="email" id="form3Example1n"
-                                                       class="form-control form-control-lg" name="email"/>
 
-                                            </div>
                                         </div>
                                         <div class="d-flex justify-content-end pt-3">
                                             <button type="submit" class="btn"
@@ -88,7 +106,7 @@
                                                                   "M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"
                                                     />
                                                 </svg>
-                                                <i class="bi bi-envelope-fill"></i>WYŚLIJ ZAPROSZENIE
+                                                <i class="bi bi-envelope-fill"></i>DODAJ DZIECKO/I
                                             </button>
                                         </div>
 
