@@ -6,5 +6,4 @@ Used tools:
 1. Django
 2. Html
 3. Java Script
-4. Sql
-5. pytest
+4. pytest
