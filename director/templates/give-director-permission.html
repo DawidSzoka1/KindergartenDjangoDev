@@ -13,22 +13,23 @@
     {% endif %}
     {% if perms.director.is_director %}
         <div class="justify-content-center">
-            <form class="d-flex" method="POST" action="#"
-                  style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">
-                {% csrf_token %}
+{#            <form class="d-flex" method="POST" action="#"#}
+{#                  style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">#}
+{#                {% csrf_token %}#}
                 <input class="form-control" type="search" placeholder="Wpisz mail"
                        aria-label="Wpisz imie dziecka" name="search">
-                <span><button class="btn " type="submit"
+                <span><button class="btn " type="submit" id="search-button"
                               style="margin-left: -8px; background-color: #BAB1AB; color: white">SZUKAJ</button></span>
-            </form>
+{#            </form>#}
 
 
         </div>
     {% endif %}
     {% for teacher in page_obj %}
 
+        <div hidden="hidden" class="pk">{{ teacher.id }}</div>
 
-        <div class="container-fluid mt-3"
+        <div class="container-fluid mt-3" id="teacher"
              style="background-color: white">
             <div class="row align-item-center" style="padding-top: 10px;">
                 <div class="col mb-1"
@@ -148,5 +149,5 @@
 
 
 
-
+<script src="{% static 'script-dir.js' %}"></script>
 {% endblock %}
