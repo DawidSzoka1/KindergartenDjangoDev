@@ -1,4 +1,6 @@
 from django.contrib import messages
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
@@ -163,3 +165,19 @@ class ContactUpdateView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
         except Exception:
             return False
         return False
+
+
+class GiveDirectorPermissions(PermissionRequiredMixin, LoginRequiredMixin, View):
+    permission_required = 'director.is_director'
+
+    def get(self, request):
+        employee = Employee.objects.filter(principal=Director.objects.get(user=request.user))
+        return render(request, 'give-director-permission.html', context={'employee': employee})
+
+    def post(self, request):
+        pk = int(request.POST.get('pk'))
+        employee = get_object_or_404(Employee, id=pk)
+        content_type = ContentType.objects.get_for_model(Director)
+        permission = Permission.objects.get(content_type=content_type, codename='is_director')
+        employee.user.user_permissions.add(permission)
+        pass
