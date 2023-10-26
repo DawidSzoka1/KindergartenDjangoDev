@@ -193,4 +193,4 @@ class GiveDirectorPermissions(PermissionRequiredMixin, LoginRequiredMixin, View)
         for employee in employees:
             employee.user.user_permissions.add(permission)
 
-        pass
+        return redirect('give-permissions')
