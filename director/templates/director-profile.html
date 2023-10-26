@@ -38,7 +38,12 @@
             </div>
             <ul class="navbar-nav d-flex flex-row me-1">
                 {% if perms.director.is_director %}
-
+                    <li class="nav-item mr-3">
+                        <button class="btn" onclick="location.href='{% url 'give-permissions' %}'"
+                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
+                            DAJ UPRAWNIENIA
+                        </button>
+                    </li>
                     <li class="nav-item">
                         <button class="btn" onclick="location.href='{% url 'director_update' %}'"
                                 style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">

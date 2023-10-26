@@ -2,4 +2,148 @@
 {% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
+
+      {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}"
+                 style="color: white; text-align: center; font-size: 30px">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% if perms.director.is_director %}
+        <div class="justify-content-center">
+            <form class="d-flex" method="POST" action="#"
+                  style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">
+                {% csrf_token %}
+                <input class="form-control" type="search" placeholder="Wpisz mail"
+                       aria-label="Wpisz imie dziecka" name="search">
+                <span><button class="btn " type="submit"
+                              style="margin-left: -8px; background-color: #BAB1AB; color: white">SZUKAJ</button></span>
+            </form>
+        </div>
+    {% endif %}
+    {% for teacher in page_obj %}
+
+
+        <div class="container-fluid mt-3"
+             style="background-color: white">
+            <div class="row align-item-center" style="padding-top: 10px;">
+                <div class="col mb-1"
+                     style="justify-content: start">
+                    {% if teacher.gender == 2 %}
+                        <img class="img"
+                             style="height: 150px;"
+                             src="{% static 'employee_female.jpg' %}"
+                             alt="">
+                    {% elif teacher.gender == 1 %}
+                        <img class="img"
+                             style="height: 150px; margin-left: 3%; margin-right: 2%"
+                             src="{% static 'employee_male.jpg' %}"
+                             alt="">
+                    {% else %}
+                        <img class="img"
+                             style="height: 150px; margin-left: 3%; margin-right: 2%"
+                             src="{% static 'gander_null.jpg' %}"
+                             alt="">
+                    {% endif %}
+                </div>
+                <div class="col-8" style="margin-top: 80px">
+
+                    <a href="{% url 'teacher-profile' pk=teacher.id %}"
+                       style="font-size: 20px; text-decoration:none; color: #75736B ">{{ teacher.user.email }}</a>
+
+                </div>
+                <div class="col-2 ml-5"
+                     style="font-size: 20px; text-decoration:none; color: #75736B; margin-top: 80px ">
+
+                    {% if teacher.first_name and teacher.last_name %}
+                        {{ teacher.first_name.title }} {{ teacher.last_name.title }}
+                    {% endif %}
+
+                </div>
+                <div class="col" style="margin-top: 80px">
+
+                    <div class="drodown">
+                        <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
+                           href="#"
+                           id="navbarDropdownMenuAvatar"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false"
+                           style="font-size: 20px;  text-decoration:none; color: #75736B; ">
+                            Opcje
+                        </a>
+                        <ul
+                                class="dropdown-menu dropdown-menu-end"
+                                aria-labelledby="navbarDropdownMenuAvatar"
+                        >
+                            <li>
+                                <a href="{% url 'teacher-profile' pk=teacher.id %}"
+                                   class="dropdown-item">PROFIL
+
+                                </a>
+                            </li>
+                            {% if perms.director.is_director %}
+                                <li>
+
+                                    <form method="POST"
+                                          action="{% url 'teacher_delete' pk=teacher.id %}">
+                                        {% csrf_token %}
+                                        <button class="dropdown-item"
+                                                type="submit"
+                                                name="delete"
+                                                value="Usuń"
+                                                onclick="return confirm('Jestes pewny ze chcesz usunac pracownika {{ teacher.user.email }}');"
+                                        >USUŃ
+                                        </button>
+
+                                    </form>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <hr>
+            </div>
+
+        </div>
+
+
+    {% endfor %}
+
+
+    {% if page_obj.has_other_pages %}
+        <div style="position: absolute; bottom: auto; left:45%">
+            {% if page_obj.has_previous %}
+
+                <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
+                   style=" font-size: 50px; color:#75736B">< </a>
+            {% else %}
+                <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
+                   style=" font-size: 50px; color:#75736B">< </a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <a class="btn mb-4" href="?page={{ num }}"
+                       style=" font-size: 50px; color:#75736B">{{ num }}</a>
+                {% endif %}
+
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
+                   style=" text-decoration: none; font-size: 50px; color:#75736B"> ></a>
+            {% else %}
+
+                <a class="btn mb-4" href="?page=1"
+                   style=" font-size: 50px; color:#75736B"> > </a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+
+
+
 {% endblock %}

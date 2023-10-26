@@ -171,13 +171,26 @@ class GiveDirectorPermissions(PermissionRequiredMixin, LoginRequiredMixin, View)
     permission_required = 'director.is_director'
 
     def get(self, request):
-        employee = Employee.objects.filter(principal=Director.objects.get(user=request.user))
-        return render(request, 'give-director-permission.html', context={'employee': employee})
+        employees = Employee.objects.filter(principal=Director.objects.get(user=request.user)).order_by('-id')
+        paginator = Paginator(employees, 10)
+        page = request.GET.get('page')
+        page_obj = paginator.get_page(page)
+        return render(request, 'give-director-permission.html', context={'page_obj': page_obj})
 
     def post(self, request):
-        pk = int(request.POST.get('pk'))
-        employee = get_object_or_404(Employee, id=pk)
+        search = request.POST.get('search')
+        if search:
+            employees = Employee.objects.filter(principal=Director.objects.get(user=request.user)).filter(
+                user__email__icontains=search).order_by('-id')
+            paginator = Paginator(employees, 10)
+            page = request.GET.get('page')
+            page_obj = paginator.get_page(page)
+            return render(request, 'give-director-permission.html', context={'page_obj': page_obj})
         content_type = ContentType.objects.get_for_model(Director)
         permission = Permission.objects.get(content_type=content_type, codename='is_director')
-        employee.user.user_permissions.add(permission)
+        pk = list(map(int, request.POST.getlist('pk')))
+        employees = Employee.objects.filter(id__in=pk)
+        for employee in employees:
+            employee.user.user_permissions.add(permission)
+
         pass
