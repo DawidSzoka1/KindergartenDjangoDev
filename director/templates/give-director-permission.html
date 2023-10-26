@@ -13,14 +13,14 @@
     {% endif %}
     {% if perms.director.is_director %}
         <div class="justify-content-center">
-{#            <form class="d-flex" method="POST" action="#"#}
-{#                  style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">#}
-{#                {% csrf_token %}#}
+            <div class="d-flex"
+                  style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">
+                {% csrf_token %}
                 <input class="form-control" type="search" placeholder="Wpisz mail"
                        aria-label="Wpisz imie dziecka" name="search">
                 <span><button class="btn " type="submit" id="search-button"
                               style="margin-left: -8px; background-color: #BAB1AB; color: white">SZUKAJ</button></span>
-{#            </form>#}
+            </div>
 
 
         </div>
