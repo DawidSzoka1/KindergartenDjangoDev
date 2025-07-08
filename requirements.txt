@@ -13,6 +13,7 @@ crispy==0.7.4
 crispy-bootstrap5==0.7
 cron-descriptor==1.4.5
 cycler==0.11.0
+dj-database-url==3.0.1
 Django==4.2.14
 django-bootstrap-icons==0.8.3
 django-celery-beat==2.8.1
