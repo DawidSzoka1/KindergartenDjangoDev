@@ -26,7 +26,7 @@ SECRET_KEY = SECRET
 DEBUG = False
 
 ALLOWED_HOSTS = ['kindergartendjangodev-production.up.railway.app', 'https://kindergartendjangodev-production.up.railway.app']
-CSRF_TRUSTED_ORIGINS = ['kindergartendjangodev-production.up.railway.app', 'https://kindergartendjangodev.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://kindergartendjangodev.up.railway.app']
 
 # Application definition
 
