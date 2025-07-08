@@ -26,8 +26,8 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['kindergartendjangodev-production.up.railway.app', 'https://kindergartendjangodev-production.up.railway.app/']
-CSRF_TRUSTED_ORIGINS = ['https://kindergartendjangodev-production.up.railway.app/']
+ALLOWED_HOSTS = ['kindergartendjangodev-production.up.railway.app', 'https://kindergartendjangodev-production.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://kindergartendjangodev-production.up.railway.app']
 
 # Application definition
 
