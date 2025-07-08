@@ -1,5 +1,4 @@
 amqp==5.1.1
-anyjson==0.3.3
 asgiref==3.7.2
 billiard==3.6.4.0
 celery==5.2.7
@@ -12,13 +11,17 @@ click-repl==0.3.0
 contourpy==1.1.0
 crispy==0.7.4
 crispy-bootstrap5==0.7
+cron-descriptor==1.4.5
 cycler==0.11.0
 Django==4.2.14
 django-bootstrap-icons==0.8.3
-django-celery==3.3.1
+django-celery-beat==2.8.1
 django-crispy-forms==2.0
+django-timezone-field==7.1
+django_celery_results==2.6.0
 fabio==2023.6.0
 fonttools==4.40.0
+gunicorn==23.0.0
 h5py==3.9.0
 idna==3.4
 kiwisolver==1.4.4
@@ -26,13 +29,14 @@ kombu==5.3.1
 matplotlib==3.7.2
 numpy==1.25.0
 packaging==23.1
-Pillow==10.3.0
+pillow==10.3.0
 prompt-toolkit==3.0.39
 psycopg2-binary==2.9.6
 pyparsing==3.0.9
 PyQt5==5.15.9
 PyQt5-Qt5==5.15.2
 PyQt5-sip==12.12.1
+python-crontab==3.2.0
 python-dateutil==2.8.2
 pytz==2023.3
 requests==2.31.0
@@ -45,3 +49,4 @@ tzdata==2023.3
 urllib3==2.0.3
 vine==5.0.0
 wcwidth==0.2.6
+whitenoise==6.9.0
