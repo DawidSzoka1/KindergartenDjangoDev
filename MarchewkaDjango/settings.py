@@ -24,8 +24,8 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['kindergartendjangodev-production.up.railway.app', 'https://kindergartendjangodev-production.up.railway.app']
-CSRF_TRUSTED_ORIGINS = ['https://kindergartendjangodev.up.railway.app']
+ALLOWED_HOSTS = ['kindergartendjangodev-production.up.railway.app', 'https://kindergartendjangodev-production.up.railway.app/']
+CSRF_TRUSTED_ORIGINS = ['https://kindergartendjangodev-production.up.railway.app/']
 
 # Application definition
 
@@ -93,10 +93,10 @@ WSGI_APPLICATION = 'MarchewkaDjango.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ['DB_NAME'],
-        'USER': os.environ['DB_USER'],
+        'NAME': 'railway',
+        'USER': 'postgres',
         'PASSWORD': os.environ['DB_PASSWORD'],
-        'HOST': 'localhost',
+        'HOST': 'postgres.railway.internal',
         'PORT': '5432',
     }
 }
