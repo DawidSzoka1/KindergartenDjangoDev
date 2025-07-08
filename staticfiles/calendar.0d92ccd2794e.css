@@ -1,0 +1,52 @@
+.calendar{
+    width: 55%;
+    margin-top: 3%;
+}
+#days{
+    text-align: center;
+}
+#freeday{
+    text-align: center;
+}
+.month{
+    text-align: center;
+    color:#75736B;
+    font-size: 40px;
+
+}
+.mon{
+    background-color:  #E9DAD7;
+    color: white;
+    text-align: center;
+
+}
+.tue{
+    background-color:  #E9DAD7;
+    color: white;
+    text-align: center;
+}
+.wed{
+    background-color:  #E9DAD7;
+    color: white;
+    text-align: center;
+}
+.thu{
+    background-color:  #E9DAD7;
+    color: white;
+    text-align: center;
+}
+.fri{
+    background-color:  #E9DAD7;
+    color: white;
+    text-align: center;
+}
+.sat{
+    background-color:  #E9DAD7;
+    color:#75736B;
+    text-align: center;
+}
+.sun{
+    background-color:  #E9DAD7;
+    color:#75736B;
+    text-align: center;
+}
