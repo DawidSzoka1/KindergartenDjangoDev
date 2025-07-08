@@ -1,0 +1,2 @@
+web: gunicorn MarchewkaDjango.wsgi --log-file
+web: python manage.py migrate && gunicorn MarchewkaDjango.wsg
