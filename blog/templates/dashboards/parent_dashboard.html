@@ -1,0 +1,150 @@
+<div class="p-8 overflow-y-auto">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Nagłówek powitalny -->
+        <header class="flex flex-wrap justify-between items-center gap-4 mb-8">
+            <div class="flex flex-col">
+                <h1 class="text-[#111811] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
+                    Good Morning, Maria!
+                </h1>
+                <p class="text-[#618961] dark:text-gray-400 text-base font-normal leading-normal">
+                    Here is a summary of Leo's day.
+                </p>
+            </div>
+
+            <button class="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                <span class="material-symbols-outlined text-[#111811] dark:text-white">notifications</span>
+                <span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500"></span>
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Lewa kolumna -->
+            <div class="lg:col-span-2 flex flex-col gap-8">
+
+                <!-- Today's Summary -->
+                <section>
+                    <h2 class="text-[#111811] dark:text-white text-[22px] font-bold mb-4">Today's Summary</h2>
+
+                    <div class="rounded-xl shadow-md bg-white dark:bg-gray-800 overflow-hidden flex flex-col">
+                        <div class="w-full h-48 bg-cover"
+                             style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDTU85qd8-3a0UHmrpXoMR9ShgC4GH8JTZ5Ztyzvls4JKP-O1wtBvkfrFRMdsy-KxxXnLa34aVycM7LrdUYgaDxyCmyXwJOlc-O4kNRBrtzBDC3s-poLZs81JWUfhiVLsTPtNnfMTiequszZO_0ReirxiRg4aVymlk7LuXaQ0lArJYVDlk7_XhEGnh1E7DgbqHQS_E2BD61BopowgVsZRI8b6nmWE6A-ZXXaZgnGZ0unjN4JuxPUEEVuk26EyGgP8TOm5wjWViL-wg");'>
+                        </div>
+
+                        <div class="p-6 flex flex-col gap-3">
+                            <p class="text-sm text-[#618961] dark:text-gray-400">Checked-in at 8:45 AM</p>
+                            <p class="text-lg font-bold text-[#111811] dark:text-white">Leo is having a great day!</p>
+
+                            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                                <div class="flex flex-col gap-1">
+                                    <p class="text-base text-[#618961] dark:text-gray-400">
+                                        He enjoyed his morning snack and is now playing with blocks.
+                                    </p>
+                                    <p class="text-base text-[#618961] dark:text-gray-400">
+                                        Teacher: Ms. Honey
+                                    </p>
+                                </div>
+
+                                <button class="rounded-lg bg-primary text-[#111811] dark:text-black h-10 px-4 text-sm font-bold">
+                                    Message Teacher
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Latest photos -->
+                <section>
+                    <h2 class="text-[#111811] dark:text-white text-[22px] font-bold mb-4">Latest Photos</h2>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                        <!-- 4 zdjęcia (skrócone dla czytelności – zostawiłem oryginalne linki) -->
+
+                        <div class="aspect-square bg-cover rounded-xl"
+                             style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAmKO3JKr1Mx2PSHpOaf2kTIZqjpxF2Eobip2VNIuYcoPAWor_a8RY_d7iqpUGxCnHbZasw65OoOersktcFW3wsohj3vGss6blBg39CiMvUpcjO0_ARMp_lJyyu0qGKO27Z9XXZmik9H7ZpIs9n5PR76faQ7nDRwiuiqvn1k4_aRQT7oLUr5jOQ3_YLW4x1p-qoefq0fECLysEamEknZHE42BS0Re1JRf2oM8ObFfvtP_eMTEq_RY9WUavYg39Q-6NOHxO1dPSKtDE");'>
+                        </div>
+
+                        <div class="aspect-square bg-cover rounded-xl"
+                             style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDrTNbD2CuRCo3mz9P9hwNhQPupM-PgFxUHQ5iftGUM322_6l8B-l-U76D3SDMWJyFe7qwLANBI00v5Yz_jKLFue_xCYAzO5OCPUDIQiUF_2_i-hiHP2TGkXUbzTzMR1yO4L-ZV5QqU1UOejurWnap7myyae4MpiMlCopCB-uuLPIOLz1iCTuoeQPV-SoLV32rBWAw_m_us1F4rF6v2K-cCoKLpznDkafv5kibuL_L558J6AacS5MGKTGWoyzV-EaOXLUERCIgU9S8");'>
+                        </div>
+
+                        <div class="aspect-square bg-cover rounded-xl"
+                             style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAEa92AjKoIKDZCWmIUOKCHZE1SCrpqevX-tmaz-0wLOwVDdiTDVvGm0uagQS9CNmL2uVoZkWApI6OncSPdINGL61nX6gai8n8u6k1VXEorO3c2Ef16uhUNUN6BjlsjChNy_0cEuMXYQYPxMEYP5C8q7ZNUildNTUqf856FdTfg5pHKaDdbTdrA-M5WvLcDqfZn7uJCC5qyrFERKa3UXJU74w5NH8qPdhiEMYPl9eujxCwlMkN9gGxfhRrsrXCDQhpyccL-Ybg68fI");'>
+                        </div>
+
+                        <div class="aspect-square bg-cover rounded-xl"
+                             style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCLa0_8ubGTRydZhX6vRqxTtUD2W6mwNI-fMXaFWQ39I6oC0OatiwFP61kyTrDa-V5oOoEEekUXjJAihM3wTA0BUfugbjHShktn5J45fF8et7UesmiOIEQ_oItGzceVcoZ8Fpw9XQwbZHRt9TSJYF4w2QIgWC_VAZzxFwmxwzqV8ygJRAkJcTMMD7VYcfblutQf9iF0_t4ZAYLpcPcGIdAM137YioC2pC3XhRwL7dZlJFXIc99rLbPSCZySQyv26D7eAnnHYKcnDvs");'>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+
+            <!-- Prawa kolumna -->
+            <div class="flex flex-col gap-8">
+
+                <!-- Announcements -->
+                <section>
+                    <h2 class="text-[#111811] dark:text-white text-[22px] font-bold mb-4">Announcements</h2>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col gap-4">
+
+                        <div class="pb-4 border-b border-gray-200 dark:border-gray-700">
+                            <p class="text-sm font-bold text-[#111811] dark:text-white mb-1">Parent-Teacher Conferences</p>
+                            <p class="text-sm text-[#618961] dark:text-gray-400">
+                                Sign-ups are now available for next month's conferences. Please check your email.
+                            </p>
+                        </div>
+
+                        <div>
+                            <p class="text-sm font-bold text-[#111811] dark:text-white mb-1">School Closure Reminder</p>
+                            <p class="text-sm text-[#618961] dark:text-gray-400">
+                                School will be closed this Friday for a professional development day.
+                            </p>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- Events -->
+                <section>
+                    <h2 class="text-[#111811] dark:text-white text-[22px] font-bold mb-4">Upcoming Events</h2>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col gap-4">
+
+                        <div class="flex items-center gap-4">
+                            <div class="flex flex-col justify-center items-center bg-primary/20 rounded-lg p-2 w-16 h-16">
+                                <span class="text-sm font-bold">OCT</span>
+                                <span class="text-2xl font-black">25</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-[#111811] dark:text-white">Picture Day</p>
+                                <p class="text-sm text-[#618961] dark:text-gray-400">Don't forget to dress up!</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4">
+                            <div class="flex flex-col justify-center items-center bg-primary/20 rounded-lg p-2 w-16 h-16">
+                                <span class="text-sm font-bold">NOV</span>
+                                <span class="text-2xl font-black">12</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-[#111811] dark:text-white">Field Trip to the Farm</p>
+                                <p class="text-sm text-[#618961] dark:text-gray-400">Permission slips due Nov 5th.</p>
+                            </div>
+                        </div>
+
+                        <a href="#" class="text-center text-sm font-bold text-primary hover:underline mt-2">
+                            View Full Calendar
+                        </a>
+                    </div>
+                </section>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

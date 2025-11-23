@@ -1,43 +1,166 @@
-{% extends "base.html" %}
-{% load crispy_forms_tags %}
-{% block content %}
-    <section class="vh-100" style="background-color: #eee;">
-        <div class="container h-100">
-            <div class="row d-flex justify-content-center align-items-center h-100">
-                <div class="col-lg-12 col-xl-11">
-                    <div class="card text-black" style="border-radius: 25px;">
-                        <div class="card-body p-md-5">
-                            <div class="row justify-content-center">
-                                <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
-
-                                    <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Zarejestruj się</p>
-
-                                    <form class="mx-1 mx-md-4" method="POST">
-                                        {% csrf_token %}
-                                        {{ form|crispy }}
-
-
-                                        <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                                            <button type="submit" class="btn  btn-lg" style="background-color: #8D847B; color: white">Zarejestruj się</button>
-                                        </div>
-                                    </form>
-                                    <small class="text-muted ml-2">
-                                        <a href="{% url 'login' %}">Masz już konto?</a>
-                                    </small>
-
-
-                                </div>
-                                <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
-
-                                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp"
-                                         class="img-fluid" alt="Sample image">
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!DOCTYPE html>
+<html class="light" lang="pl">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Zarejestruj się - Kindergarten World</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#a78bfa",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102210",
+                        "text-light": "#111811",
+                        "text-dark": "#e3fde3",
+                        "subtle-light": "#618961",
+                        "subtle-dark": "#a2c2a2",
+                        "border-light": "#dbe6db",
+                        "border-dark": "#3a4c3a",
+                        "card-light": "#ffffff",
+                        "card-dark": "#182c18"
+                    },
+                    fontFamily: { "display": ["Lexend", "sans-serif"] },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+<div class="flex min-h-screen items-center justify-center p-6">
+    <a href="{% url 'home_page' %}" class="">
+        <div class="absolute left-6 top-6 flex items-center gap-3">
+            <div class="size-6 text-primary">
+                <svg fill="none" viewBox="0 0 48 48">
+                    <path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
+                </svg>
             </div>
+            <h2 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                KinderManage
+            </h2>
         </div>
-    </section>
-{% endblock %}
+    </a>
+    <div class="w-full max-w-md bg-card-light dark:bg-card-dark p-8 sm:p-10 rounded-xl shadow-lg">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-black leading-tight tracking-tight">Zarejestruj się</h1>
+            <p class="text-subtle-light dark:text-subtle-dark mt-2">Dołącz do naszej społeczności</p>
+        </div>
+        <form method="POST" class="flex flex-col gap-6">
+            {% csrf_token %}
+
+            <!-- EMAIL -->
+            <label class="flex flex-col w-full">
+                <p class="text-base font-medium leading-normal pb-2">Email Address</p>
+                <input
+                        type="email"
+                        name="email"
+                        value="{{ form.email.value|default_if_none:'' }}"
+                        placeholder="yourname@example.com"
+                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg
+                   text-text-light dark:text-text-dark bg-background-light dark:bg-background-dark
+                   focus:outline-0 focus:ring-2 focus:ring-primary/50 border
+                   {% if form.email.errors %}border-red-500{% else %}border-border-light{% endif %}
+                   dark:border-border-dark h-14 placeholder:text-subtle-light dark:placeholder:text-subtle-dark p-4 text-base"
+                />
+                {% for error in form.email.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
+            </label>
+
+            <!-- PASSWORD -->
+            <label class="flex flex-col w-full">
+                <p class="text-base font-medium leading-normal pb-2">Hasło</p>
+                <div class="relative flex w-full items-center">
+                    <input
+                            type="password"
+                            name="password1"
+                            placeholder="Minimum 8 characters"
+                            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg
+                       text-text-light dark:text-text-dark bg-background-light dark:bg-background-dark
+                       focus:outline-0 focus:ring-2 focus:ring-primary/50 border
+                       {% if form.password1.errors %}border-red-500{% else %}border-border-light{% endif %}
+                       dark:border-border-dark h-14 placeholder:text-subtle-light dark:placeholder:text-subtle-dark p-4 pr-12 text-base"
+                    />
+                    <button type="button" class="absolute right-4 text-subtle-light dark:text-subtle-dark"
+                            onclick="togglePassword('password1', this)">
+                        <span class="material-symbols-outlined">visibility</span>
+                    </button>
+                </div>
+                {% for error in form.password1.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
+            </label>
+
+            <!-- CONFIRM PASSWORD -->
+            <label class="flex flex-col w-full">
+                <p class="text-base font-medium leading-normal pb-2">Powtórz Hasło</p>
+                <div class="relative flex w-full items-center">
+                    <input
+                            type="password"
+                            name="password2"
+                            placeholder="Re-enter your password"
+                            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg
+                       text-text-light dark:text-text-dark bg-background-light dark:bg-background-dark
+                       focus:outline-0 focus:ring-2 focus:ring-primary/50 border
+                       {% if form.password2.errors %}border-red-500{% else %}border-border-light{% endif %}
+                       dark:border-border-dark h-14 placeholder:text-subtle-light dark:placeholder:text-subtle-dark p-4 pr-12 text-base"
+                    />
+                    <button type="button" class="absolute right-4 text-subtle-light dark:text-subtle-dark" onclick="togglePassword('password2', this)">
+                        <span class="material-symbols-outlined">visibility</span>
+                    </button>
+                </div>
+                {% for error in form.password2.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
+            </label>
+
+            <button type="submit" class="flex items-center justify-center whitespace-nowrap h-14 px-8 rounded-lg w-full bg-primary text-black text-base font-bold leading-normal mt-4 transition-transform hover:scale-105">
+                Create Account
+            </button>
+        </form>
+
+        <!-- GLOBAL MESSAGES -->
+        {% if messages %}
+            <div class="mt-4">
+                {% for message in messages %}
+                    <p class="text-sm {% if message.tags == 'error' %}text-red-500{% elif message.tags == 'success' %}text-green-500{% endif %}">
+                        {{ message }}
+                    </p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="mt-6 text-center">
+            <p class="text-sm text-subtle-light dark:text-subtle-dark">
+                Masz już konto?
+                <a href="{% url 'login' %}" class="font-semibold text-primary/80 hover:text-primary">Zaloguj się</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('span');
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.textContent = "visibility_off";
+        } else {
+            input.type = "password";
+            icon.textContent = "visibility";
+        }
+    }
+</script>
+</body>
+</html>

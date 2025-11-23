@@ -4,6 +4,7 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.contrib import messages
 from teacher.models import Employee
+from groups.models import Groups
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import KidAddForm
 from .models import Kid
@@ -79,24 +80,36 @@ class KidsListView(LoginRequiredMixin, View):
     def get(self, request):
         if request.user.get_user_permissions() == {'director.is_director'}:
             kids = get_object_or_404(Director, user=request.user.id).kid_set.filter(is_active=True).order_by('-id')
+            groups_count = Groups.objects.filter(principal=request.user.id, is_active=True).count()
         elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
             groups = get_object_or_404(Employee, user=request.user.id).group
-            if groups.is_active == True:
+            groups_count = groups.filter(is_active=True).count()
+            if groups.is_active:
                 kids = groups.kid_set.filter(is_active=True).order_by('-id')
             else:
                 kids = None
 
         elif request.user.get_user_permissions() == {'parent.is_parent'}:
             kids = get_object_or_404(ParentA, user=request.user.id).kids.filter(is_active=True).order_by('-id')
+            groups_count = get_object_or_404(ParentA, user=request.user.id).kids.group.filter(is_active=True).count()
         else:
             raise PermissionDenied
 
         paginator = Paginator(kids, 10)
+        kids_count = kids.count()
+        avg = 0
+        for kid in kids:
+            print(kid.date_of_birth)
+            avg += kid.years_old()
+        avg /= kids_count
         page = request.GET.get('page')
         page_obj = paginator.get_page(page)
         month = int(timezone.now().month)
         year = int(timezone.now().year)
-        return render(request, 'kids-list.html', {'page_obj': page_obj, 'month': month, 'year': year})
+
+        return render(request, 'kids-list.html',
+                      {'page_obj': page_obj, 'month': month, 'year': year, 'total_kids': kids_count,
+                       'groups_count': groups_count, 'avg_age': avg})
 
     def post(self, request):
         search = request.POST.get('search')
@@ -105,18 +118,27 @@ class KidsListView(LoginRequiredMixin, View):
                 kids = get_object_or_404(Director, user=request.user.id).kid_set.filter(
                     first_name__icontains=search).filter(
                     is_active=True).order_by('-id')
+                groups_count = Groups.objects.filter(principal=request.user.id, is_active=True).count()
             elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
                 group = get_object_or_404(Employee, user=request.user.id).group
                 kids = group.kid_set.filter(first_name__icontains=search).filter(is_active=True).order_by('-id')
+                groups_count = groups.filter(is_active=True).count()
             else:
                 raise PermissionDenied
-
+            kids_count = kids.count()
+            avg = 0
+            for kid in kids:
+                print(kid.date_of_birth)
+                avg += kid.years_old()
+            avg /= kids_count if kids_count > 0 else 1
             paginator = Paginator(kids, 10)
             page = request.GET.get('page')
             page_obj = paginator.get_page(page)
             month = int(timezone.now().month)
             year = int(timezone.now().year)
-            return render(request, 'kids-list.html', {'page_obj': page_obj, 'month': month, 'year': year})
+            return render(request, 'kids-list.html',
+                          {'page_obj': page_obj, 'month': month, 'year': year, 'total_kids': kids_count,
+                           'groups_count': groups_count, 'avg_age': avg})
         return redirect('list_kids')
 
 

@@ -1,45 +1,135 @@
-{% extends "base.html" %}
 {% load crispy_forms_tags %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Logowanie – System Przedszkola</title>
 
-    <section class="vh-100" style="background-color: #eee;">
-        <div class="container h-100">
-            <div class="row d-flex justify-content-center align-items-center h-100">
-                <div class="col-lg-12 col-xl-11">
-                    <div class="card text-black" style="border-radius: 25px;">
-                        <div class="card-body p-md-5">
-                            <div class="row justify-content-center">
-                                <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
-                                    <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Zaloguj się</p>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
 
-                                    <form class="mx-1 mx-md-4" method="POST">
-                                        {% csrf_token %}
-                                        {{ form|crispy }}
+    <!-- Tailwind Custom Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#a78bfa",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#020617",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
 
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 24px;
+        }
+    </style>
+</head>
 
-                                        <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                                            <button type="submit" class="btn  btn-lg" style="background-color: #8D847B; color: white">Zaloguj się</button>
-                                        </div>
-                                    </form>
-                                    <small class="text-muted ml-2">
-                                        <a href="{% url 'password_reset' %}">Zapomniał*ś hasła?</a>
-                                    </small>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200">
 
+<div class="relative flex min-h-screen w-full flex-col items-center justify-center p-4">
 
-                                </div>
-                                <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
+    <!-- Logo -->
+    <a href="{% url 'home_page' %}" class="">
+        <div class="absolute left-6 top-6 flex items-center gap-3">
+            <div class="size-6 text-primary">
+                <svg fill="none" viewBox="0 0 48 48">
+                    <path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
+                </svg>
+            </div>
+            <h2 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                KinderManage
+            </h2>
+        </div>
+    </a>
 
-                                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-registration/draw1.webp"
-                                         class="img-fluid" alt="Sample image">
+    <!-- Główne okno -->
+    <div class="w-full max-w-4xl overflow-hidden rounded-xl shadow-lg md:grid md:grid-cols-2">
 
-                                </div>
-                            </div>
-                        </div>
+        <!-- Lewy obrazek -->
+        <div class="relative hidden h-full md:block">
+            <div class="h-full w-full bg-cover bg-center"
+                 style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDua7J8GBYgrs4AOu2i-mYZv0Fn3CRj9fF301N-A_0rgInBhDGJY4ncjWHFyr01HxcIhZt9FiymLLlnXmnMRkaTA9iiLFY5oAFhA3_yw34ZVtKcb66yK-F6BJChT-hlXGSLYAfRQ51KlfpSIfamkLzQOGF5GfQQeSXyC01rmZVAFdb88uA8xyYukFi-LC-bRo5RusOnSUub88QsOaiFn5Ng1exmdDq_WiuUwudPamZcgqTE16NP-Blr5Xrx7X4n6VTxEjY9cgbE3HI");'>
+            </div>
+            <div class="absolute inset-0 bg-primary/20"></div>
+        </div>
+
+        <!-- Prawy panel logowania -->
+        <div class="flex flex-col justify-center bg-white p-8 dark:bg-slate-900/50 sm:p-12">
+            <div class="w-full max-w-md">
+
+                <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                    Zaloguj się
+                </h1>
+                <p class="mt-2 text-base text-slate-600 dark:text-slate-400">
+                    Wprowadź swoje dane, aby kontynuować.
+                </p>
+
+                <!-- Błędy ogólne formularza -->
+                {% if form.non_field_errors %}
+                    <div class="mt-4 mb-2 rounded-lg bg-red-100 border border-red-300 p-3 text-red-700 text-sm">
+                        <p class="font-semibold">Wystąpiły błędy podczas logowania:</p>
+                        <ul class="list-disc ml-5 mt-1">
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                     </div>
-                </div>
+                {% endif %}
+
+                <form method="POST" class="mt-6 space-y-6">
+                    {% csrf_token %}
+
+                    <!-- Render formularza crispy -->
+                    {{ form|crispy }}
+
+                    <div class="text-right">
+                        <a href="{% url 'password_reset' %}" class="text-sm font-medium text-primary hover:underline">
+                            Zapomniałeś hasła?
+                        </a>
+                    </div>
+
+                    <button type="submit"
+                            class="w-full rounded-lg bg-primary px-4 py-3 text-base font-semibold text-white transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-900">
+                        Zaloguj się
+                    </button>
+
+                    <div class="text-center">
+                        <p class="text-sm text-slate-600 dark:text-slate-400">
+                            Nie masz konta?
+                            <a href="#" class="font-medium text-primary hover:underline">Skontaktuj się z
+                                administracją.</a>
+                        </p>
+                    </div>
+
+                </form>
+
             </div>
         </div>
-    </section>
+    </div>
 
-{% endblock %}
+    <!-- Stopka -->
+    <footer class="absolute bottom-4 text-center text-xs text-slate-500 dark:text-slate-400">
+        <a class="hover:underline" href="#">Pomoc techniczna</a> ·
+        <a class="hover:underline" href="#">Polityka prywatności</a>
+    </footer>
+
+</div>
+
+</body>
+</html>

@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.views.generic import UpdateView
+
+from groups.models import Groups
 from parent.models import ParentA
 from teacher.models import Employee
 from .forms import PostAddForm
@@ -12,6 +14,7 @@ from .models import Post
 from director.models import Director
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from children.models import Kid
 
 
 class Home(View):
@@ -22,7 +25,11 @@ class Home(View):
         elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
             teacher = get_object_or_404(Employee, user=request.user.id)
             return render(request, 'home.html', {'teacher': teacher})
-
+        elif request.user.get_user_permissions() == {'director.is_director'}:
+            kids = Kid.objects.filter(principal=request.user.id, is_active=True).count()
+            groups = Groups.objects.filter(principal=request.user.id, is_active=True).count()
+            teachers = Employee.objects.filter(principal=request.user.id, is_active=True).count()
+            return render(request, 'home.html', {'teachers_count': teachers, 'groups_count': groups, 'kids_count': kids})
         return render(request, 'home.html')
 
 

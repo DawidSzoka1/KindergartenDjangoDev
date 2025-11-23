@@ -5,6 +5,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from .models import User
 
 
 class Register(View):
@@ -21,10 +22,15 @@ class Register(View):
             return redirect('home_page')
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')
+            email = form.cleaned_data.get('email')
+            if User.objects.filter(email=email).exists():
+                form.add_error('email', 'Ten email jest już zajęty.')
+            else:
+                form.save()
+                messages.success(request, 'Konto zostało utworzone. Możesz się teraz zalogować.')
+                return redirect('login')
         else:
-            form = UserRegisterForm()
+            messages.error(request, "W formularzu wystąpiły błędy. Sprawdź pola.")
         return render(request, "register.html", {'form': form})
 
 

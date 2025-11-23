@@ -1,0 +1,82 @@
+
+
+
+
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+    <div class="flex h-full grow flex-col">
+        <div class="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4">
+
+            <header class="flex items-center justify-between border-b border-gray-200/80 dark:border-gray-700/80 py-4">
+
+                <a href="{% url 'home_page' %}" class="">
+                    <div class="absolute left-6 top-6 flex items-center gap-3">
+                        <div class="size-6 text-primary">
+                            <svg fill="none" viewBox="0 0 48 48">
+                                <path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                            KinderManage
+                        </h2>
+                    </div>
+                </a>
+
+                <a href="{% url 'login' %}"
+                   class="flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 bg-primary text-sm font-bold text-gray-900 hover:bg-primary/90">
+                    Zaloguj się
+                </a>
+            </header>
+
+            <main class="flex-grow">
+                <div class="py-16 md:py-24 lg:py-32">
+                    <div class="container mx-auto px-4">
+
+                        <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+
+                            <div class="flex flex-col gap-6 text-center lg:text-left">
+
+                                <div class="flex flex-col gap-3">
+                                    <h1 class="text-4xl font-black leading-tight md:text-5xl lg:text-6xl">
+                                        Zarządzaj przedszkolem w prosty sposób
+                                    </h1>
+
+                                    <h2 class="text-lg text-gray-600 dark:text-gray-300 md:text-xl">
+                                        Zarządzaj obecnością, komunikuj się z rodzicami i śledź postępy dzieci — wszystko w jednym miejscu.
+                                    </h2>
+                                </div>
+
+                                <div class="flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+
+                                    <a href="{% url 'register' %}"
+                                       class="flex w-full sm:w-auto items-center justify-center rounded-lg h-12 px-6 bg-primary text-base font-bold text-gray-900 hover:bg-primary/90">
+                                        Zarejestruj się
+                                    </a>
+
+                                    <a href="{% url 'login' %}"
+                                       class="flex w-full sm:w-auto items-center justify-center rounded-lg h-12 px-6 bg-gray-200 dark:bg-gray-800 text-base font-bold hover:bg-gray-300 dark:hover:bg-gray-700">
+                                        Masz już konto? Zaloguj się
+                                    </a>
+
+                                </div>
+                            </div>
+
+                            <div class="relative flex w-full justify-center">
+                                <div class="aspect-square w-full max-w-md rounded-xl bg-cover bg-center bg-no-repeat"
+                                     style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBeCCf...")'>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </main>
+
+            <footer class="flex flex-col gap-8 border-t border-gray-200/80 dark:border-gray-700/80 py-10 text-center">
+                <p class="text-gray-500 text-sm">© 2025 KinderManage. Wszelkie prawa zastrzeżone.</p>
+            </footer>
+
+        </div>
+    </div>
+</div>
+
