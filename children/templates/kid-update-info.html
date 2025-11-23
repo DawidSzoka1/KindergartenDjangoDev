@@ -1,141 +1,261 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90%">
-    <form method="post" action="#">
-        {% csrf_token %}
-        <section class="h-100">
 
-            <div class="container h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
+    <div class="mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
 
-                                <div class="col" style="color: #75736B">
-                                    <div class="card-body p-md-5 ">
-                                        {% if form.errors %}
-                                            <div class="alert alert-danger">
-                                                {{ form.errors }}
-                                            </div>
-                                        {% endif %}
-                                        <div class="row">
+        <!-- Powrót + nagłówek -->
+        <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'kid_details' pk=kid.id %}"
+                   class="flex items-center gap-2 text-primary hover:underline font-bold">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Powrót do profilu
+                </a>
+            </div>
+            <h1 class="text-4xl font-black tracking-tight text-gray-900 dark:text-white">
+                Edytuj profil dziecka
+            </h1>
+        </div>
 
-                                            <div class="col mb-2">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'kid_details' pk=kid.id %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col mb-4">
-                                                <h2 class="text-uppercase d-flex justify-content-end"
-                                                    style="color: #75736B">Zmień
-                                                    Informacje</h2>
-                                            </div>
+        <!-- Zdjęcie + imię dziecka -->
+        <div class="mb-10 flex flex-col sm:flex-row items-center gap-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8">
+            <div class="w-36 h-36 rounded-full bg-cover bg-center shadow-2xl border-4 border-white dark:border-gray-800"
+                 style="background-image: url('{% if kid.gender == 'M' %}{% static 'boy.jpg' %}{% else %}{% static 'girl.jpg' %}{% endif %}')">
+            </div>
+            <div class="text-center sm:text-left">
+                <h2 class="text-3xl font-black text-gray-900 dark:text-white">{{ kid }}</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 mt-2">
+                    Zapisany: {{ kid.start|date:"d.m.Y" }}
+                </p>
+            </div>
+        </div>
 
+        <form method="post" class="space-y-8">
+            {% csrf_token %}
 
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 ">
-                                                <div class="form-outline">
-                                                    {{ form.principal }}
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                        <div class="row">
-
-                                            <div class="form-group col-lg-6">
-                                                {{ form.first_name|as_crispy_field }}
-
-                                            </div>
-
-                                            <div class="form-group col-lg-6">
-                                                {{ form.last_name|as_crispy_field }}
-                                            </div>
-
-                                        </div>
-
-
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
-                                                {{ form.payment_plan|as_crispy_field }}
-
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                {{ form.gender|as_crispy_field }}
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
-                                                {{ form.kid_meals|as_crispy_field }}
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                <div class="form-outline">
-                                                    {% if form.group %}
-                                                        {{ form.group|as_crispy_field }}
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
-                                                {{ form.date_of_birth|as_crispy_field }}
-
-                                            </div>
-                                        </div>
-                                        <div class="form-outline mb-2">
-                                            {{ form.start|as_crispy_field }}
-                                            <div>
-                                                <label class="form-check-label mb-0 me-4" for="mySwitch">Umowa na czas
-                                                    nieokteślony:</label>
-
-                                                <div class="form-check form-switch">
-
-                                                    <input class="form-check-input" type="checkbox" id="mySwitch"
-                                                           onclick="myFunction()"
-                                                           name="indefinite" value="yes">
-
-                                                </div>
-                                            </div>
-                                            <div id="end">
-                                                {{ form.end|as_crispy_field }}
-                                            </div>
-
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="d-flex justify-content-end pt-3">
-                                                <button type="submit" class="btn"
-                                                        style="background-color: #75736B; color: white; width: 35%">
-                                                    ZATWIERDŹ ZMIANY
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
+            <!-- Błędy ogólne -->
+            {% if form.non_field_errors %}
+                <div class="rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-6">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-red-600 mt-0.5">error</span>
+                        <div class="text-red-800 dark:text-red-300">
+                            {{ form.non_field_errors|join:"<br>" }}
                         </div>
                     </div>
                 </div>
+            {% endif %}
+
+            <!-- Podstawowe informacje -->
+            <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8">
+                <h2 class="mb-6 text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">person</span>
+                    Podstawowe informacje
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Imię *</label>
+                        <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" required
+                               class="w-full h-12 px-4 rounded-xl border {% if form.first_name.errors %}border-red-500 dark:border-red-400{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-gray-50 dark:bg-gray-800 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        {% if form.first_name.errors %}
+                            <p class="mt-1 text-sm text-red-600 flex items-center gap-1"><span class="material-symbols-outlined text-xs">error</span> {{ form.first_name.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Nazwisko *</label>
+                        <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" required
+                               class="w-full h-12 px-4 rounded-xl border {% if form.last_name.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-gray-50 dark:bg-gray-800 focus:border-primary focus:outline-none">
+                        {% if form.last_name.errors %}
+                            <p class="mt-1 text-sm text-red-600 flex items-center gap-1"><span class="material-symbols-outlined text-xs">error</span> {{ form.last_name.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Data urodzenia *</label>
+                        <input type="date" name="date_of_birth" value="{{ form.date_of_birth.value|date:'Y-m-d' }}" required
+                               class="w-full h-12 px-4 rounded-xl border {% if form.date_of_birth.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-gray-50 dark:bg-gray-800 focus:border-primary">
+                        {% if form.date_of_birth.errors %}
+                            <p class="mt-1 text-sm text-red-600 flex items-center gap-1"><span class="material-symbols-outlined text-xs">error</span> {{ form.date_of_birth.errors }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Płeć</label>
+                        <select name="gender" class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 focus:border-primary">
+                            <option value="">--- Wybierz ---</option>
+                            <option value="1" {% if kid.get_gender_display == "Chłopiec" %}selected{% endif %}>Chłopiec</option>
+                            <option value="2" {% if kid.get_gender_display == "Dziewczynka" %}selected{% endif %}>Dziewczynka</option>
+                        </select>
+                    </div>
+
+                </div>
             </div>
-        </section>
-    </form>
-    <script src="{% static 'checkbox.js' %}"></script>
+
+            <!-- Rodzic / Opiekun -->
+            <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-xl border-2 border-primary/20 p-10">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-primary flex items-center gap-4">
+                        <span class="material-symbols-outlined text-5xl">family_restroom</span>
+                        Rodzice / Opiekunowie
+                    </h2>
+                    <button type="button" onclick="openAddParentModal()"
+                            class="flex items-center gap-3 px-8 py-4 bg-primary text-white text-lg font-bold rounded-2xl hover:bg-primary/90 shadow-lg transition transform hover:scale-105">
+                        <span class="material-symbols-outlined text-2xl">person_add</span>
+                        Dodaj rodzica
+                    </button>
+                </div>
+
+                <!-- Lista aktualnie przypisanych rodziców -->
+                {% if kid.parenta_set.all %}
+                    <div class="space-y-5">
+                        {% for parent in kid.parenta_set.all %}
+                            <div class="flex items-center justify-between p-6 bg-gradient-to-r from-primary/5 to-transparent rounded-2xl border-2 {% if parent == kid.principal %}border-primary shadow-lg{% else %}border-gray-200 dark:border-gray-700{% endif %}">
+                                <div class="flex items-center gap-6">
+                                    <div class="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 bg-cover bg-center shadow-md"
+                                         style="background-image: url('{{ parent.user.profile.photo.url|default:'' }}')">
+                                    </div>
+                                    <div>
+                                        <p class="text-xl font-bold text-gray-900 dark:text-white">
+                                            {{ parent.first_name|default:'' }} {{ parent.last_name|default:'' }}
+                                        </p>
+                                        <p class="text-gray-600 dark:text-gray-400">
+                                            {{ parent.user.email }}
+                                            {% if parent.phone %} • {{ parent.phone }}{% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Usuń rodzica z dziecka (tylko jeśli nie jest jedynym) -->
+                                {% if kid.parenta_set.count > 1 and parent != kid.principal %}
+                                    <form method="post" action="{% url 'remove_parent_from_kid' kid.id parent.id %}" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-red-600 hover:text-red-800 font-bold"
+                                                onclick="return confirm('Na pewno usunąć {{ parent.user.get_full_name }} z dziecka?')">
+                                            <span class="material-symbols-outlined">delete</span>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+                        <span class="material-symbols-outlined text-6xl text-gray-400 mb-4">people_alt</span>
+                        <p class="text-xl text-gray-600 dark:text-gray-400">Brak przypisanych rodziców</p>
+                    </div>
+                {% endif %}
+
+                <!-- Ukryte pole do przesyłania listy rodziców (Select2 + AJAX będzie je uzupełniał) -->
+                <input type="hidden" name="parents" value="{% for p in kid.parenta_set.all %}{{ p.id }}{% if not forloop.last %},{% endif %}{% endfor %}">
+            </div>
+
+            <!-- Dodatkowe opcje -->
+            <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8">
+                <h2 class="mb-6 text-2xl font-bold text-gray-900 dark:text-white">Dodatkowe informacje</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Grupa</label>
+                        <select name="group" class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
+                            <option value="">--- Brak ---</option>
+                            {% for group in form.fields.group.queryset %}
+                                <option value="{{ group.pk }}" {% if kid.group == group %}selected{% endif %}>{{ group.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Plan płatności</label>
+                        <select name="payment_plan" class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
+                            <option value="">--- Brak ---</option>
+                            {% for plan in form.fields.payment_plan.queryset %}
+                                <option value="{{ plan.pk }}" {% if kid.payment_plan == plan %}selected{% endif %}>{{ plan.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Plan żywieniowy</label>
+                        <select name="kid_meals" class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
+                            <option value="">--- Brak ---</option>
+                            {% for meal in form.fields.kid_meals.queryset %}
+                                <option value="{{ meal.pk }}" {% if kid.kid_meals == meal %}selected{% endif %}>{{ meal.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Okres pobytu -->
+            <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8">
+                <h2 class="mb-6 text-2xl font-bold text-gray-900 dark:text-white">Okres pobytu</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2">Data rozpoczęcia *</label>
+                        <input type="date" name="start" value="{{ kid.start|date:'Y-m-d' }}" required
+                               class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 focus:border-primary">
+                    </div>
+
+                    <div id="end-date-container">
+                        <label class="block text-sm font-semibold mb-2">Data zakończenia <span class="text-gray-500">(opcjonalnie)</span></label>
+                        <input type="date" name="end" value="{% if kid.end %}{{ kid.end|date:'Y-m-d' }}{% endif %}"
+                               class="w-full h-12 px-4 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800">
+                    </div>
+
+                </div>
+
+                <div class="mt-6 flex items-center gap-3">
+                    <input type="checkbox" id="indefinite" name="indefinite" class="h-5 w-5 rounded text-primary"
+                           onchange="toggleEndDate()" {% if not kid.end %}checked{% endif %}>
+                    <label for="indefinite" class="text-base font-medium cursor-pointer">Umowa na czas nieokreślony</label>
+                </div>
+            </div>
+
+            <!-- Przyciski -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
+                <a href="{% url 'kid_details' pk=kid.id %}"
+                   class="px-8 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 font-bold hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    Anuluj
+                </a>
+                <button type="submit"
+                        class="px-8 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 shadow-lg transition">
+                    Zapisz zmiany
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Modal dodawania rodzica (ten sam co wcześniej) -->
+{#    {% include "partials/add_parent_modal.html" %}#}
+
+    <!-- Skrypty -->
+    <script>
+        $(document).ready(function() {
+            $('.js-select2').select2({
+                placeholder: "Szukaj rodzica...",
+                allowClear: true
+            });
+        });
+
+        function toggleEndDate() {
+            const container = document.getElementById('end-date-container');
+            const input = container.querySelector('input');
+            if (document.getElementById('indefinite').checked) {
+                container.style.display = 'none';
+                input.value = '';
+            } else {
+                container.style.display = 'block';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', toggleEndDate);
+    </script>
+
+    <!-- AJAX dodawania rodzica – użyj tego samego co wcześniej -->
+    <script src="{% static 'js/add_parent_ajax.js' %}"></script>
+
 {% endblock %}

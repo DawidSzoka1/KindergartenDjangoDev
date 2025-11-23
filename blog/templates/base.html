@@ -28,7 +28,8 @@
     <!-- Czcionki -->
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -54,9 +55,58 @@
             'GRAD' 0,
             'opsz' 24;
         }
+        .select2-container--default .select2-selection--single {
+            height: 48px !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.5rem !important;
+            padding-left: 2.5rem !important;
+            padding-top: 0.5rem !important;
+            background-color: white !important;
+        }
+        .select2-container--default.dark .select2-selection--single {
+            background-color: #1f2937 !important;
+            border-color: #374151 !important;
+        }
+        .select2-container .select2-selection--single .select2-selection__rendered {
+            line-height: 36px !important;
+            padding-left: 0 !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 46px !important;
+            right: 12px !important;
+        }
     </style>
 </head>
+<!-- Modal do dodawania rodzica -->
+<div id="add-parent-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex min-h-screen items-center justify-center px-4 pt-5 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" onclick="closeAddParentModal()"></div>
+        <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
 
+        <div class="inline-block transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 text-left align-bottom shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
+            <div class="bg-white dark:bg-gray-900 px-6 pt-5 pb-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Dodaj nowego rodzica</h3>
+                    <button onclick="closeAddParentModal()" class="text-gray-400 hover:text-gray-600">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">E-mail rodzica</label>
+                    <input type="email" name="email" id="new-parent-email" class="mt-2 h-12 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 focus:border-primary focus:outline-none" placeholder="np. anna.kowalska@gmail.com">
+                    <p class="mt-2 text-sm text-gray-500">Hasło zostanie wygenerowane automatycznie i wysłane na e-mail.</p>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-800 px-6 py-4 flex justify-end gap-3">
+                <button onclick="closeAddParentModal()" class="px-5 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium">Anuluj</button>
+                <button onclick="createParentAndSelect()" class="px-6 py-2.5 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 shadow-md">
+                    <span id="create-parent-text">Dodaj i wybierz</span>
+                    <span id="create-parent-spinner" class="hidden">Trwa dodawanie...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 <body class=" ">
 
 <div class="flex min-h-screen w-full">

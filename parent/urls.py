@@ -8,6 +8,6 @@ urlpatterns = [
     path('parent/delete/<int:pk>/', views.ParentDeleteView.as_view(), name='parent_delete'),
     path('parent/update/<int:pk>/', views.ParentUpdateView.as_view(), name='parent_update'),
     path('parent/kid/add/<int:pk>/', views.AddParentToKidView.as_view(), name='add_parent_to_kid'),
-
+    path('create-parent-ajax/', views.create_parent_ajax, name='create_parent_ajax'),
     path('parent/search/', views.ParentSearchView.as_view(), name='parent-search'),
 ]

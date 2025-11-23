@@ -1,5 +1,5 @@
 from django.core.paginator import Paginator
-
+import json
 from children.models import Kid
 from teacher.models import Employee
 from .forms import ParentUpdateForm
@@ -16,6 +16,66 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from .models import ParentA
 from django.core.exceptions import PermissionDenied
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import random
+import string
+from django.conf import settings
+
+
+@csrf_exempt
+def create_parent_ajax(request):
+    if request.method != "POST" or not request.user.is_authenticated:
+        return JsonResponse({"success": False, "error": "Brak dostępu"})
+    body = json.loads(request.body)
+    email = body.get('email', '').strip()
+    try:
+        if not email or '@' not in email:
+            return JsonResponse({"success": False, "error": "Wpisz poprawny e-mail"})
+
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({"success": False, "error": "Ten e-mail już jest zajęty"})
+
+        # Generujemy hasło
+        import random, string
+        password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+
+        # Tworzymy użytkownika i rodzica
+        user = User.objects.create_user(
+            email=email,
+            password=password
+        )
+        content_type = ContentType.objects.get_for_model(ParentA)
+        permission = Permission.objects.get(content_type=content_type, codename='is_parent')
+        principal = Director.objects.get(user=request.user.id)
+        par_user = ParentA.objects.create(user=user)
+        par_user.principal.add(principal)
+        par_user.user.user_permissions.clear()
+        par_user.user.user_permissions.add(permission)
+        user.parenta.save()
+
+        # Wysyłamy e-mail z hasłem
+        subject = f"Zaproszenie do KinderManage – konto rodzica dla Twojego dziecka"
+        text_content = f"Cześć!\n\nTwoje konto zostało utworzone.\nE-mail: {email}\nHasło: {password}\n\nZaloguj się tutaj: {request.scheme}://{request.get_host()}\n\nPozdrawiamy,\nZespół KinderManage"
+
+        html_content = render_to_string('email_to_parent.html', {
+            'password': password,
+            'email': email,
+            'login_url': f"{request.scheme}://{request.get_host()}"
+        })
+
+        msg = EmailMultiAlternatives(subject, text_content, settings.EMAIL_HOST_USER, [email])
+        msg.attach_alternative(html_content, "text/html")
+        msg.send()
+
+        return JsonResponse({
+            "success": True,
+            "parent_id": parent.pk,
+            "email": email
+        })
+    except Exception as e:
+        User.objects.filter(email=email).first().delete()
+        return JsonResponse({"success": False, "error": str(e)})
 
 
 class InviteParentView(PermissionRequiredMixin, View):

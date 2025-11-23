@@ -6,7 +6,7 @@ from django.contrib import messages
 from teacher.models import Employee
 from groups.models import Groups
 from django.contrib.messages.views import SuccessMessageMixin
-from .forms import KidAddForm
+from .forms import KidAddForm, KidUpdateForm
 from .models import Kid
 from django.utils import timezone
 from parent.models import ParentA
@@ -40,17 +40,26 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMix
         """ Passes the request object to the form class.
          This is necessary to only display members that belong to a given user"""
 
-        kwargs = super(AddKidView, self).get_form_kwargs()
-        kwargs.update({'current_user': self.request.user})
+        kwargs = super().get_form_kwargs()
+        kwargs['current_user'] = self.request.user
         return kwargs
 
     def get_form(self, form_class=None):
-        form = super(AddKidView, self).get_form(form_class)
+        form = super().get_form(form_class)
+        form.fields['group'].required = False
+        form.fields['payment_plan'].required = False
+        form.fields['kid_meals'].required = False
         form.fields['end'].required = False
         return form
 
     def form_valid(self, form):
-        form.instance.save()
+        if self.request.POST.get('indefinite'):
+            form.instance.end = None
+
+        kid = form.save(commit=False)  # pobieramy instancję
+        kid.save()  # zapisujemy w bazie
+
+        messages.success(self.request, self.success_message)
         return super().form_valid(form)
 
     def test_func(self):
@@ -170,8 +179,8 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
     permission_required = "director.is_director"
     model = Kid
     template_name = 'kid-update-info.html'
-    form_class = KidAddForm
-    success_message = "Poprawnie zmieniono informacje"
+    form_class = KidUpdateForm
+    success_message = "Profil dziecka został zaktualizowany!"
 
     def get_success_url(self):
         return reverse_lazy('kid_details', kwargs={'pk': self.object.pk})
@@ -185,8 +194,23 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
         return kwargs
 
     def form_valid(self, form):
-        form.instance.save()
+        kid = form.save(commit=False)
+
+        # Umowa na czas nieokreślony
+        if self.request.POST.get('indefinite'):
+            kid.end = None
+        kid.save()
+        selected_parents = form.cleaned_data.get('parents', [])
+        kid.parenta_set.set(selected_parents)
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Wszyscy rodzice należący do tego dyrektora
+        context['all_parents'] = ParentA.objects.filter(
+            principal__user=self.request.user
+        ).select_related('user')
+        return context
 
     def get_form(self, form_class=None):
         form = super(ChangeKidInfoView, self).get_form(form_class)
