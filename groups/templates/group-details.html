@@ -63,7 +63,7 @@
                                 <span class="font-medium text-neutral-text dark:text-neutral-background">{{ group.capacity }}</span>
                             </div>
                             <div class="w-full bg-neutral-background dark:bg-gray-700 rounded-full h-2 mt-1">
-                                {% with fill_percent=group.current_students_count %}
+                                {% with fill_percent=group.capacity_fill_percent %}
                                     <div class="h-2 rounded-full"
                                          style="width: {{ fill_percent|default:0 }}%; background-color: {% if fill_percent > 80 %}#D9534F{% else %}#5CB85C{% endif %};">
                                     </div>
