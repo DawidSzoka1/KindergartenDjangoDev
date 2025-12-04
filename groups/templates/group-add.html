@@ -1,139 +1,133 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90% ">
-    <form method="post" action="#">
-        {% csrf_token %}
-        <section class="h-100">
+    <div class="layout-content-container flex flex-col max-w-4xl mx-auto p-8">
 
-            <div class="container py-5 h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
+        <div class="flex flex-wrap justify-between gap-3 mb-8">
+            <p class="text-[#111811] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">Dodaj Nową Grupę</p>
+            <a href="{% url 'list_groups' %}" class="flex items-center gap-2 text-primary hover:text-primary/80 font-medium transition-colors">
+                <span class="material-symbols-outlined text-xl">arrow_back</span>
+                Powrót
+            </a>
+        </div>
 
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
-                                <div class="col">
-                                    <div class="card-body p-md-5" style="color: #75736B">
-                                        <div class="row">
-                                            <div class="col-9 justify-content-center">
-                                               {% if messages %}
-                                            {% for message in messages %}
-                                                <div class="alert alert-{{ message.tags }}"
-                                                     style="background-color: #FF5F57; color: white; text-align: center; font-size: 30px">
-                                                    {{ message }}
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col mb-4">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'list_groups' %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col mb-4">
-                                                <h2 class="text-uppercase d-flex justify-content-end"
-                                                    style="color: #75736B">Dodaj
-                                                    Grupe</h2>
-                                            </div>
-                                        </div>
+        {% if messages %}
+            <div class="mb-6 rounded-lg bg-red-500/10 border border-red-500 p-4 text-center text-white text-lg font-bold">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
 
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <label class="form-label" for="name">Nazwa grupy:</label>
-                                                    <input type="text" id="name"
-                                                           class="form-control form-control-lg" name="name"/>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <label class="form-label" for="capacity">Pojemnosc grupy:</label>
-                                                    <input type="number" id="capacity" min="1"
-                                                           class="form-control form-control-lg" name="capacity"/>
-                                                </div>
-                                            </div>
-                                             <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <label class="form-label" for="yearbook">Rocznik:</label>
-                                                    <input type="number" id="yearbook" min="2000"
-                                                           class="form-control form-control-lg" name="yearbook"/>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <label class="mr-2 mb-2">Wybierz obrazek:</label><br>
+        <div class="bg-white dark:bg-background-dark/80 rounded-xl p-8 shadow-xl">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
 
-                                                    <div class="dropdown">
-                                                        <button type="button" class="btn dropdown-toggle"
-                                                                id="dropdownButton"
-                                                                data-bs-toggle="dropdown"
-                                                                style="background-color: #BAB1AB; color:white">
-                                                            Obrazki
-                                                        </button>
-                                                        <div class="dropdown-menu" id="dropdownMenu">
-                                                            {% for photo in photos %}
-                                                                <div class="form-group">
-                                                                    <div class="form-check" id="options">
-                                                                        <label>
-                                                                            <input type="radio" name="photo"
-                                                                                   value="{{ photo.id }}"
-                                                                                   checked>
-                                                                            <img src="{{ photo.group_photos.url }}"
-                                                                                 width="64" height="64"
-                                                                                 alt="Option {{ forloop.counter }}">
-                                                                            {{ photo.name }}
-                                                                        </label>
-                                                                    </div>
-                                                                </div>
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                {% if form.non_field_errors %}
+                    <div class="mb-4 text-red-600 dark:text-red-400">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
+                <div>
+                    <label class="flex flex-col w-full">
+                        <p class="text-[#111811] dark:text-gray-200 text-base font-medium leading-normal pb-2">Nazwa grupy:</p>
+                        <input class="form-input flex w-full min-w-0 flex-1 rounded-lg text-[#111811] dark:text-gray-200 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark h-14 placeholder:text-[#618961] dark:placeholder:text-gray-500 p-[15px] text-base font-normal leading-normal"
+                               placeholder="np. Małe Pączki"
+                               type="text"
+                               id="name"
+                               name="name"
+                               value="{{ request.POST.name }}"
+                               required />
+                    </label>
+                    {% if form.name.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.name.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
 
-                                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                                        <div class="form-group">
+                    <div>
+                        <label class="flex flex-col w-full">
+                            <p class="text-[#111811] dark:text-gray-200 text-base font-medium leading-normal pb-2">Pojemność (Max Studenci)</p>
+                            <input class="form-input flex w-full min-w-0 flex-1 rounded-lg text-[#111811] dark:text-gray-200 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark h-14 placeholder:text-[#618961] dark:placeholder:text-gray-500 p-[15px] text-base font-normal leading-normal"
+                                   placeholder="np. 15"
+                                   type="number"
+                                   id="capacity"
+                                   name="capacity"
+                                   min="1"
+                                   value="{{ request.POST.capacity }}"
+                                   required />
+                        </label>
+                        {% if form.capacity.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.capacity.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
 
-                                        </div>
-                                        <div class="row">
-                                            <div class="d-flex justify-content-end pt-3">
-                                                <button type="submit" class="btn"
-                                                        style="background-color: #75736B; color: white; width: 35%">
-                                                    DODAJ
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div>
+                        <label class="flex flex-col w-full">
+                            <p class="text-[#111811] dark:text-gray-200 text-base font-medium leading-normal pb-2">Rocznik:</p>
+                            <input class="form-input flex w-full min-w-0 flex-1 rounded-lg text-[#111811] dark:text-gray-200 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark h-14 placeholder:text-[#618961] dark:placeholder:text-gray-500 p-[15px] text-base font-normal leading-normal"
+                                   placeholder="e.g., 2024"
+                                   type="number"
+                                   id="yearbook"
+                                   name="yearbook"
+                                   min="2000"
+                                   value="{{ request.POST.yearbook }}"
+                                   required />
+                        </label>
+                        {% if form.yearbook.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.yearbook.errors|join:", " }}</p>
+                        {% endif %}
                     </div>
                 </div>
-            </div>
-        </section>
-    </form>
+
+                <div class="pt-4">
+                    <p class="text-[#111811] dark:text-gray-200 text-base font-medium leading-normal pb-2">Wybierz obrazek:</p>
+
+                    <div class="relative inline-block text-left">
+                        <details class="dropdown">
+                            <summary class="flex min-w-[120px] cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-gray-200 dark:bg-gray-700 text-[#111811] dark:text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-gray-300 dark:hover:bg-gray-600">
+                                Obrazki
+                            </summary>
+                            <div class="absolute left-0 z-10 mt-2 w-max origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none p-2 grid grid-cols-3 gap-2" role="menu">
+                                {% for photo in photos %}
+                                    <label class="flex flex-col items-center p-2 cursor-pointer rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                                        <input type="radio"
+                                               name="photo"
+                                               value="{{ photo.id }}"
+                                               {% if forloop.first %}checked{% endif %}
+                                               class="sr-only peer" />
+                                        <img src="{{ photo.group_photos.url }}"
+                                             width="64" height="64"
+                                             class="rounded-lg peer-checked:ring-2 peer-checked:ring-primary transition"
+                                             alt="{{ photo.name }}" />
+                                        <span class="mt-1 text-xs text-gray-700 dark:text-gray-400 peer-checked:text-primary">{{ photo.name }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </details>
+                    </div>
+                </div>
+
+
+                <div class="flex items-center justify-end gap-4 pt-4 border-t border-gray-200 dark:border-gray-700 mt-6">
+                    <a href="{% url 'list_groups' %}"
+                       class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-gray-200 dark:bg-gray-700 text-[#111811] dark:text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-gray-300 dark:hover:bg-gray-600"
+                       type="button">
+                        <span class="truncate">Anuluj</span>
+                    </a>
+                    <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-[#111811] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90"
+                            type="submit">
+                        <span class="truncate">DODAJ</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="{% static 'photo.js' %}"></script>
 {% endblock %}

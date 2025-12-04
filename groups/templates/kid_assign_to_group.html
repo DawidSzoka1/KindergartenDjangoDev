@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <main class="flex-1 p-6 lg:p-10">
+        <div class="max-w-4xl mx-auto">
+
+            <div class="flex flex-wrap gap-2 mb-4">
+                <a class="text-primary dark:text-secondary text-sm font-medium" href="{% url 'list_groups' %}">Grupy</a>
+                <span class="text-gray-400 dark:text-gray-500 text-sm font-medium">/</span>
+                <a class="text-primary dark:text-secondary text-sm font-medium" href="{% url 'group_details' pk=group.pk %}">{{ group.name }}</a>
+                <span class="text-gray-400 dark:text-gray-500 text-sm font-medium">/</span>
+                <span class="text-neutral-text dark:text-neutral-background text-sm font-medium">Dodaj Dziecko</span>
+            </div>
+
+            <header class="mb-8">
+                <h1 class="text-neutral-text dark:text-white text-3xl font-bold tracking-tight">Przypisz Dzieci do Grupy {{ group.name }}</h1>
+                <p class="text-gray-500 dark:text-gray-400 text-base font-normal mt-1">Wybierz jedno lub więcej dzieci nieprzypisanych jeszcze do żadnej grupy, aby je dodać.</p>
+            </header>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-neutral-border dark:border-gray-700">
+
+                    <div class="p-6 flex justify-between">
+                        <div class="relative w-full sm:w-80">
+                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                            <input class="w-full pl-10 pr-4 py-2 text-sm border border-neutral-border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-neutral-text dark:text-white focus:ring-primary focus:border-primary"
+                                   placeholder="Szukaj nieprzypisanych dzieci..."
+                                   type="text"
+                                   name="q"
+                                   value="{{ search_query|default:'' }}"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-neutral-background dark:bg-gray-700/50 text-xs text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                            <tr>
+                                <th class="px-6 py-3 font-medium" scope="col">
+                                    <input class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary dark:bg-gray-900 dark:ring-offset-gray-900" type="checkbox" id="select-all-children"/>
+                                </th>
+                                <th class="px-6 py-3 font-medium" scope="col">Imię i Nazwisko</th>
+                                <th class="px-6 py-3 font-medium" scope="col">Wiek</th>
+                                <th class="px-6 py-3 font-medium" scope="col">Data Urodzenia</th>
+                                <th class="px-6 py-3 font-medium text-right" scope="col">Profil</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for kid in available_kids %}
+                                <tr class="border-b border-neutral-border dark:border-gray-700 hover:bg-neutral-background/50 dark:hover:bg-gray-700/50">
+                                    <td class="px-6 py-4">
+                                        <input class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary dark:bg-gray-800 dark:ring-offset-gray-800 child-checkbox"
+                                               type="checkbox"
+                                               name="kid_ids"
+                                               value="{{ kid.pk }}"
+                                        />
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center gap-3">
+                                            <img class="size-10 rounded-full object-cover"
+                                                 src="{% if kid.gender == 2 %}{% static 'girl.jpg' %}{% else %}{% static 'boy.jpg' %}{% endif %}" alt="Avatar"/>
+                                            <span class="font-medium text-neutral-text dark:text-neutral-background">{{ kid.first_name }} {{ kid.last_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-gray-600 dark:text-gray-300">{{ kid.years_old }} lat</td>
+                                    <td class="px-6 py-4 text-gray-600 dark:text-gray-300">{{ kid.date_of_birth|date:"d.m.Y" }}</td>
+                                    <td class="px-6 py-4 text-right">
+                                        <a class="font-medium text-primary dark:text-secondary hover:underline" href="{% url 'kid_details' pk=kid.pk %}">Zobacz Profil</a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                                        Brak nieprzypisanych dzieci do wyświetlenia.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-6 border-t border-neutral-border dark:border-gray-700">
+                        <div class="flex flex-wrap justify-between items-center gap-4">
+                            <p id="selected-count" class="text-sm font-medium text-neutral-text dark:text-neutral-background">0 dzieci wybranych</p>
+                            <div class="flex gap-3">
+                                <a href="{% url 'group_details' pk=group.pk %}" class="flex items-center justify-center rounded-lg h-10 px-4 bg-white dark:bg-gray-700 border border-neutral-border dark:border-gray-600 text-neutral-text dark:text-white text-sm font-semibold hover:bg-neutral-background dark:hover:bg-gray-600">
+                                    <span class="truncate">Anuluj</span>
+                                </a>
+                                <button type="submit" class="flex items-center justify-center gap-2 rounded-lg h-10 px-5 bg-primary text-white text-sm font-semibold hover:bg-primary/90">
+                                    <span class="material-symbols-outlined text-base">add</span>
+                                    <span>Dodaj wybrane dzieci do Grupy</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+    <script>
+        // Prosta logika JavaScript dla checkboxów
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAll = document.getElementById('select-all-children');
+            const checkboxes = document.querySelectorAll('.child-checkbox');
+            const selectedCountText = document.getElementById('selected-count');
+
+            function updateCount() {
+                const checkedCount = document.querySelectorAll('.child-checkbox:checked').length;
+                selectedCountText.textContent = `${checkedCount} dzieci wybranych`;
+            }
+
+            selectAll.addEventListener('change', function() {
+                checkboxes.forEach(cb => {
+                    cb.checked = selectAll.checked;
+                });
+                updateCount();
+            });
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', updateCount);
+            });
+
+            // Ustawienie początkowe licznika
+            updateCount();
+        });
+    </script>
+{% endblock %}
