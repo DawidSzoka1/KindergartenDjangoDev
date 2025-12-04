@@ -1,118 +1,120 @@
 {% extends "base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt=""
-         style="position: absolute; bottom: 0; left: -5%; height: 90% ">
-    <form method="post" action="#">
-        {% csrf_token %}
-        <section class="h-100">
+    <body class="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark">
+    <div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div class="flex flex-row min-h-screen">
 
-            <div class="container py-5 h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
-                                <div class="col">
-                                    <div class="card-body p-md-5" style="color: #75736B">
-                                        {% if messages %}
-                                            {% for message in messages %}
-                                                <div class="alert alert-{{ message.tags }}"
-                                                     style="background-color: #FF5F57; color: white; text-align: center; font-size: 30px">
-                                                    {{ message }}
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                        <div class="row">
-                                            <div class="col mb-4">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'list_teachers' %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col mb-4">
-                                                <h2 class="text-uppercase d-flex justify-content-end"
-                                                    style="color: #75736B">Dodaj
-                                                    Pracownika</h2>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
+            <main class="flex-1 p-6 md:p-8 lg:p-10">
+                <div class="max-w-4xl mx-auto">
 
-                                                <label class="form-label" for="form3Example1n">Email
-                                                    nauczyciela:</label>
-                                                <input type="email" id="form3Example1n"
-                                                       class="form-control form-control-lg" name="email"/>
-                                            </div>
-                                            <div class="col-md-6 mb-4">
+                    <div class="flex flex-wrap gap-2 mb-6 pt-4">
+                        <a class="text-primary text-sm font-medium leading-normal hover:text-primary/80" href="{% url 'list_teachers' %}">Nauczyciele</a>
+                        <span class="text-placeholder-light dark:text-placeholder-dark text-sm font-medium leading-normal">/</span>
+                        <span class="text-text-light dark:text-text-dark text-sm font-medium leading-normal">Dodaj nowego Pracownika</span>
+                    </div>
 
-                                                <label class="form-label" for="role">Posada:</label>
-                                                <select class="form-select form-select-lg" name="role" id="id_role">
-                                                    {% for role in roles %}
-                                                        {% if role.1 == 'nauczyciel' %}
-                                                            <option value="{{ role.0 }}">{{ role.1 }}</option>
-                                                        {% endif %}
+                    <div class="flex flex-wrap justify-between items-center gap-3 mb-8">
+                        <h1 class="text-text-light dark:text-text-dark text-3xl font-bold leading-tight tracking-tight">Dodaj Nowego Pracownika</h1>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="p-3 mb-4 rounded-lg text-white text-center font-semibold
+                        {% if message.tags == 'success' %}bg-green-600{% elif message.tags == 'error' %}bg-error{% else %}bg-primary{% endif %}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="bg-card-light dark:bg-card-dark p-6 md:p-8 rounded-lg shadow-sm border border-border-light dark:border-border-dark">
+
+                        <form method="post" action="#">
+                            {% csrf_token %}
+
+                            <div class="flex flex-col gap-8">
+
+                                <div class="flex flex-col gap-6">
+                                    <h2 class="text-lg font-semibold text-text-light dark:text-text-dark border-b border-border-light dark:border-border-dark pb-3">Dane Podstawowe & Zaproszenie</h2>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                                        <label class="flex flex-col">
+                                            <p class="text-text-light dark:text-text-dark text-sm font-medium leading-normal pb-2">Email Pracownika:</p>
+                                            <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-DEFAULT text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark focus:border-primary h-12 placeholder:text-placeholder-light dark:placeholder:text-placeholder-dark px-3 py-2 text-base font-normal leading-normal"
+                                                   placeholder="Wpisz email pracownika"
+                                                   type="email"
+                                                   name="email"
+                                                   required/>
+                                        </label>
+
+                                        <label class="flex flex-col">
+                                            <p class="text-text-light dark:text-text-dark text-sm font-medium leading-normal pb-2">Posada (Rola)</p>
+                                            <div class="relative w-full">
+                                                <select class="form-select appearance-none w-full min-w-0 flex-1 rounded-DEFAULT text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark focus:border-primary h-12 placeholder:text-placeholder-light dark:placeholder:text-placeholder-dark pl-3 pr-10 py-2 text-base font-normal leading-normal"
+                                                        name="role"
+                                                        id="id_role">
+                                                    {% for role_pk, role_name in roles %}
+                                                        {% comment %} W twoim oryginalnym kodzie, w widoku get, role jest listą tupli. {% endcomment %}
+                                                        <option value="{{ role_pk }}" {% if role_name == 'nauczyciel' %}selected{% endif %}>{{ role_name|title }}</option>
                                                     {% endfor %}
                                                 </select>
+                                                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-placeholder-light dark:text-placeholder-dark pointer-events-none">expand_more</span>
                                             </div>
+                                        </label>
+                                    </div>
+                                </div>
 
+                                <div class="flex flex-col gap-6">
+                                    <h2 class="text-lg font-semibold text-text-light dark:text-text-dark border-b border-border-light dark:border-border-dark pb-3">Warunki Zatrudnienia & Przypisanie</h2>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                                        </div>
-                                        <div class="row">
+                                        <label class="flex flex-col">
+                                            <p class="text-text-light dark:text-text-dark text-sm font-medium leading-normal pb-2">Miesięczne Wynagrodzenie (PLN):</p>
+                                            <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-DEFAULT text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark focus:border-primary h-12 placeholder:text-placeholder-light dark:placeholder:text-placeholder-dark px-3 py-2 text-base font-normal leading-normal"
+                                                   placeholder="Wpisz kwotę"
+                                                   type="number"
+                                                   min="1"
+                                                   name="salary"
+                                                   required/>
+                                        </label>
 
-
-                                            <div class="col-md-6 mb-4">
-
-                                                <label class="form-label" for="salary">Miesieczne wynagrodzenie:</label>
-                                                <input type="number" id="salary" min="1"
-                                                       class="form-control form-control-lg" name="salary"/>
-                                            </div>
-
-                                            <div class="col-md-6 mb-4" id="group">
-                                                <label class="mr-2 mb-2">Wybierz grupe:</label><br>
-                                                <select class="form-select form-select-lg" name="group">
+                                        <label class="flex flex-col" id="group-select-container">
+                                            <p class="text-text-light dark:text-text-dark text-sm font-medium leading-normal pb-2">Przypisz do Grupy:</p>
+                                            <div class="relative w-full">
+                                                <select class="form-select appearance-none w-full min-w-0 flex-1 rounded-DEFAULT text-text-light dark:text-text-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark focus:border-primary h-12 placeholder:text-placeholder-light dark:placeholder:text-placeholder-dark pl-3 pr-10 py-2 text-base font-normal leading-normal"
+                                                        name="group"
+                                                        id="id_group">
+                                                    <option value="">-- Nie przypisuj (jeśli rola to nie nauczyciel) --</option>
                                                     {% for group in groups %}
                                                         <option value="{{ group.id }}">{{ group.name }}</option>
                                                     {% endfor %}
                                                 </select>
-
+                                                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-placeholder-light dark:text-placeholder-dark pointer-events-none">expand_more</span>
                                             </div>
-                                        </div>
-
-                                        <div class="d-flex justify-content-end pt-3">
-                                            <button type="submit" class="btn"
-                                                    style="background-color: #75736B; color: white; width: 35%">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                     fill="currentColor" class="bi bi-envelope-fill"
-                                                     viewBox="0 0 16 16">
-                                                    <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"/>
-                                                </svg>
-                                                <i class="bi bi-envelope-fill"></i>WYŚLIJ ZAPROSZENIE
-                                            </button>
-                                        </div>
+                                        </label>
 
                                     </div>
                                 </div>
+
+                                <div class="border-t border-border-light dark:border-border-dark pt-6 mt-4 flex flex-col sm:flex-row-reverse sm:items-center sm:justify-start gap-4">
+                                    <button class="flex items-center justify-center gap-2 w-full sm:w-auto rounded-DEFAULT bg-primary px-6 py-3 text-base font-semibold leading-6 text-white shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" type="submit">
+                                        <span class="material-symbols-outlined text-xl">mail</span>
+                                        Wyślij Zaproszenie
+                                    </button>
+                                    <a href="{% url 'list_teachers' %}" class="flex items-center justify-center gap-2 w-full sm:w-auto rounded-DEFAULT bg-card-light dark:bg-card-dark px-6 py-3 text-base font-semibold leading-6 text-text-light dark:text-text-dark border border-border-light dark:border-border-dark shadow-sm hover:bg-background-light dark:hover:bg-background-dark" type="button">Anuluj</a>
+                                    <div class="flex items-center gap-2 text-placeholder-light dark:text-placeholder-dark text-sm mt-2 sm:mt-0 sm:mr-auto">
+                                        <span class="material-symbols-outlined text-base">info</span>
+                                        <span>Email z danymi do konta zostanie wysłany do pracownika.</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
-            </div>
-        </section>
-    </form>
-{#    <script src="{% static 'group.js' %}"></script>#}
+            </main>
+        </div>
+    </div>
+    </body>
 {% endblock %}

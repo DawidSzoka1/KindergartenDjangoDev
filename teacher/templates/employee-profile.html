@@ -1,258 +1,310 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
 {% load static %}
+
 {% block content %}
-    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
-        <!-- Container wrapper -->
-        <div class="container-fluid">
-            <!-- Left links -->
-            <ul class="navbar-nav flex-row">
+    <body class="bg-background-light dark:bg-background-dark font-display">
+    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden"
+         x-data="{ currentTab: 'overview', showAssignmentModal: false }">
 
-                <li class="nav-item me-2 me-lg-0">
-                    <h2>
-                        <a href="{% url 'home_page' %}" role="button"
-                           style="color: #75736B; text-decoration:none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                 height="32"
-                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                 viewBox="0 0 16 16">
-                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                            </svg>
+        <div class="flex h-full min-w-0 flex-1 flex-col">
+            <main class="flex flex-1 flex-col p-4 md:p-6 lg:p-8">
+                <div class="w-full max-w-7xl mx-auto">
 
-                            MENU
-
+                    <div class="flex items-center gap-3 mb-4 pt-4">
+                        <a href="{% url 'list_teachers' %}" class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-3xl">arrow_back</span>
+                            <span class="text-xl font-medium leading-normal hidden sm:inline">KADRA</span>
                         </a>
-                    </h2>
-                </li>
+                        <span class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal">/</span>
+                        <span class="text-[#111811] dark:text-gray-200 text-sm font-medium leading-normal">
+                            {{ employee.first_name|default:employee.user.email }}
+                        </span>
+                    </div>
 
-            </ul>
-            <!-- Left links -->
-            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <!-- Left links -->
-                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
-                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>PROFIL NAUCZYCIELA</b></li>
-                </ul>
-            </div>
-            {% if perms.director.is_director or perms.teacher.is_teacher %}
-                <ul class="navbar-nav d-flex flex-row me-1">
-                    <li class="nav-item">
-                        <button class="btn" onclick="location.href='{% url 'teacher_update' pk=employee.id %}'"
-                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
-                            EDYTUJ PROFIL
-                        </button>
-                    </li>
-                </ul>
-            {% endif %}
-        </div>
-        <!-- Container wrapper -->
-    </nav>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}"
-                 style="color: white; text-align: center; font-size: 30px">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    <form method="post" action="#">
-        {% csrf_token %}
-        <div class="container" style="margin-top: 85px">
-            <div class="row gutters">
-                <div class="col-6 mt-5" style="margin-left: -25%">
-                    <div class="card h-100 border-0">
-                        <div class="card-body">
-                            <figure>
-                                {% if employee.gender == 2 %}
-                                    <img src="{% static 'employee_female.jpg' %}" alt=""
-                                         style="height: 80%; display: block; margin-left: auto; margin-right: auto">
-                                {% elif employee.gender == 1 %}
-                                    <img src="{% static 'employee_male.jpg' %}" alt=""
-                                         style="height: 80%; display: block; margin-left: auto; margin-right: auto">
-                                {% else %}
-                                    <img src="{% static 'gander_null.jpg' %}" alt=""
-                                         style="height: 80%; display: block; margin-left: auto; margin-right: auto">
-                                {% endif %}
-                                <figcaption style="text-align: center; margin-top: 20px; font-size: 50px">
-                                    {% if employee.first_name and employee.last_name %}
-                                        <div>
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="p-3 mb-4 rounded-lg text-white text-center font-semibold
+                                {% if message.tags == 'success' %}bg-green-600{% elif message.tags == 'error' %}bg-red-600{% else %}bg-blue-600{% endif %}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="flex p-4 @container bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex w-full flex-col gap-4 @[520px]:flex-row @[520px]:justify-between @[520px]:items-center">
+
+                            <div class="flex gap-4">
+                                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-24 w-24">
+                                    {% if employee.gender == 2 %}
+                                        <img class="rounded-full w-24 h-24 object-cover" src="{% static 'employee_female.jpg' %}" alt="Avatar kobiety"/>
+                                    {% elif employee.gender == 1 %}
+                                        <img class="rounded-full w-24 h-24 object-cover" src="{% static 'employee_male.jpg' %}" alt="Avatar mężczyzny"/>
+                                    {% else %}
+                                        <img class="rounded-full w-24 h-24 object-cover" src="{% static 'gander_null.jpg' %}" alt="Avatar neutralny"/>
+                                    {% endif %}
+                                </div>
+
+                                <div class="flex flex-col justify-center">
+                                    <p class="text-[#111811] dark:text-white text-3xl font-bold leading-tight tracking-[-0.015em]">
+                                        {% if employee.first_name and employee.last_name %}
                                             {{ employee.first_name }} {{ employee.last_name }}
+                                        {% else %}
+                                            {{ employee.user.email }}
+                                        {% endif %}
+                                    </p>
+                                    <p class="text-[#618961] dark:text-gray-400 text-base font-normal leading-normal mt-1">
+                                        {{ employee.get_role_display|default:"Brak roli" }}
+                                    </p>
+                                    <p class="text-[#618961] dark:text-gray-400 text-sm font-normal leading-normal">
+                                        {{ employee.user.email }}
+                                        {% if employee.phone %} | {{ employee.phone }}{% endif %}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex w-full max-w-[480px] gap-3 @[480px]:w-auto">
+                                {% if perms.director.is_director or perms.teacher.is_teacher %}
+                                    <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-100 dark:bg-gray-800 text-[#111811] dark:text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] flex-1 @[480px]:flex-auto hover:bg-gray-200 dark:hover:bg-gray-700"
+                                            onclick="location.href='{% url 'teacher_update' pk=employee.id %}'">
+                                        <span class="truncate">EDYTUJ PROFIL</span>
+                                    </button>
+                                {% endif %}
+
+                                {% if perms.teacher.is_teacher and user.email == employee.user.email %}
+                                    <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-[#111811] text-sm font-bold leading-normal tracking-[0.015em] flex-1 @[480px]:flex-auto hover:opacity-90"
+                                            onclick="location.href='{% url 'password_change' %}'">
+                                        <span class="truncate">ZMIEŃ HASŁO</span>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+
+                        <div class="pb-3">
+                            <div class="flex border-b border-gray-200 dark:border-gray-700 px-4 gap-8">
+                                <a @click.prevent="currentTab = 'overview'"
+                                   :class="{ 'border-b-[#111811] dark:border-b-primary text-[#111811] dark:text-white': currentTab === 'overview', 'border-b-transparent text-[#618961] dark:text-gray-400': currentTab !== 'overview' }"
+                                   href="#" class="flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 hover:text-[#111811] dark:hover:text-white transition-colors">
+                                    <p class="text-sm font-bold leading-normal tracking-[0.015em]">Szczegóły</p>
+                                </a>
+                                <a @click.prevent="currentTab = 'groups'"
+                                   :class="{ 'border-b-[#111811] dark:border-b-primary text-[#111811] dark:text-white': currentTab === 'groups', 'border-b-transparent text-[#618961] dark:text-gray-400': currentTab !== 'groups' }"
+                                   href="#" class="flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 hover:text-[#111811] dark:hover:text-white transition-colors">
+                                    <p class="text-sm font-bold leading-normal tracking-[0.015em]">Przypisane Grupy</p>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div x-show="currentTab === 'overview'" class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6">
+
+                            <div class="lg:col-span-1 flex flex-col gap-6">
+                                <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                                    <h3 class="text-lg font-bold text-[#111811] dark:text-white mb-4">Dane Osobiste</h3>
+                                    <dl class="space-y-3">
+                                        <div class="flex justify-between">
+                                            <dt class="text-sm text-[#618961] dark:text-gray-400">Numer Kontaktowy</dt>
+                                            <dd class="text-sm font-medium text-[#111811] dark:text-gray-200">
+                                                {{ employee.phone|default:"Brak danych" }}
+                                            </dd>
                                         </div>
-                                    {% endif %}
-                                    {% if perms.teacher.is_teacher %}
-                                        {% if user.email == employee.user.email %}
-                                            <button type="button" class="btn me-3"
-                                                    style="color: white; background-color: #8D847B; width: 50%; height: 70px; font-size: 30px; margin-top: 2%"
-                                                    onclick="location.href='{% url 'password_change' %}'">
-                                                <b>ZMIEŃ HASŁO</b>
-                                            </button>
+                                        <div class="flex justify-between">
+                                            <dt class="text-sm text-[#618961] dark:text-gray-400">Adres Zamieszkania</dt>
+                                            <dd class="text-sm font-medium text-[#111811] dark:text-gray-200 text-right max-w-[50%]">
+                                                {{ employee.address|default:"Brak danych" }}
+                                            </dd>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <dt class="text-sm text-[#618961] dark:text-gray-400">Miasto</dt>
+                                            <dd class="text-sm font-medium text-[#111811] dark:text-gray-200">
+                                                {{ employee.city|default:"Brak danych" }}
+                                            </dd>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <dt class="text-sm text-[#618961] dark:text-gray-400">Kod Pocztowy</dt>
+                                            <dd class="text-sm font-medium text-[#111811] dark:text-gray-200">
+                                                {{ employee.zip_code|default:"Brak danych" }}
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </div>
+
+                                <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                                    <h3 class="text-lg font-bold text-[#111811] dark:text-white mb-4">Szczegóły Zatrudnienia</h3>
+                                    <dl class="space-y-3">
+                                        <div class="flex justify-between">
+                                            <dt class="text-sm text-[#618961] dark:text-gray-400">Posada</dt>
+                                            <dd class="text-sm font-medium text-[#111811] dark:text-gray-200">
+                                                {{ employee.get_role_display|default:"Brak danych" }}
+                                            </dd>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <dt class="text-sm text-[#618961] dark:text-gray-400">Grupa (Główna)</dt>
+                                            <dd class="text-sm font-medium text-[#111811] dark:text-gray-200">
+                                                {{ employee.group|default:"Brak danych" }}
+                                            </dd>
+                                        </div>
+                                        {% if perms.director.is_director or perms.teacher.is_teacher %}
+                                            <div class="flex justify-between">
+                                                <dt class="text-sm text-[#618961] dark:text-gray-400">Wynagrodzenie Miesięczne</dt>
+                                                <dd class="text-sm font-medium text-[#111811] dark:text-gray-200">
+                                                    {% if employee.salary %}{{ employee.salary }} zł{% else %}Brak danych{% endif %}
+                                                </dd>
+                                            </div>
                                         {% endif %}
-                                    {% endif %}
-                                </figcaption>
-                            </figure>
+                                        <div class="flex justify-between">
+                                            <dt class="text-sm text-[#618961] dark:text-gray-400">Status</dt>
+                                            <dd class="text-sm font-medium {% if employee.is_active %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                                                {% if employee.is_active %}Aktywny{% else %}Nieaktywny{% endif %}
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                                <h3 class="text-lg font-bold text-[#111811] dark:text-white mb-4">Notatki / Aktywność</h3>
+                                <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                                    <p class="text-sm text-[#111811] dark:text-gray-300">
+                                        Miejsce na notatki dyrektora, historię zmian lub ostatnią aktywność.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-5">
-                    <div class="card h-100" style="background-color: #BAB1AB; border-color: #BAB1AB">
-                        <div class="card-body text-white">
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="birth">E-MAIL:</label>
-                                        <input class="form-control" style="font-size: 20px" name="birth"
-                                               type="text"
-                                               id="birth"
-                                               value="{{ employee }}" readonly>
-                                    </h3>
-                                </div>
-                            </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="gender">NR KONTAKTOWY:</label>
-                                        {% if employee.phone %}
-                                            <input class="form-control" style="font-size: 20px" name="gender"
-                                                   type="text"
-                                                   id="gender"
-                                                   value="{{ employee.phone }}" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px" name="gender"
-                                                   type="text"
-                                                   id="gender"
-                                                   value="Brak dancyh" readonly>
-                                        {% endif %}
-                                    </h3>
-                                </div>
-                            </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="group">ADRES ZAMIESZKANIA:</label>
-                                        {% if employee.address %}
-                                            <input class="form-control" style="font-size: 20px" name="gender"
-                                                   type="text"
-                                                   id="gender"
-                                                   value="{{ employee.address }}" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px" name="gender"
-                                                   type="text"
-                                                   id="gender"
-                                                   value="Brak dancyh" readonly>
-                                        {% endif %}
-                                    </h3>
-                                </div>
-                            </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="start">MIASTO:</label>
-                                        {% if employee.city %}
-                                            <input class="form-control" style="font-size: 20px" name="gender"
-                                                   type="text"
-                                                   id="gender"
-                                                   value="{{ employee.city }}" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px" name="gender"
-                                                   type="text"
-                                                   id="gender"
-                                                   value="Brak dancyh" readonly>
-                                        {% endif %}
-                                    </h3>
-                                </div>
-                            </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="zip_code">KOD POCZTOWY:</label>
-                                        {% if employee.zip_code %}
-                                            <input class="form-control" style="font-size: 20px" name="zip_code"
-                                                   type="text"
-                                                   id="zip_code"
-                                                   value="{{ employee.zip_code }}" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px" name="end"
-                                                   type="text"
-                                                   id="zip_code"
-                                                   value="Brak danych" readonly>
-                                        {% endif %}
-                                    </h3>
-                                </div>
-                            </div>
 
-                        </div>
-                    </div>
-                </div>
+                        <div x-show="currentTab === 'groups'" class="pt-6">
+                            <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                                    <h3 class="text-lg font-bold text-[#111811] dark:text-white">Przypisana Grupa</h3>
 
-
-                <div class="col-5 mr-3" style="margin-right: -60%">
-                    <div class="card h-100" style="background-color: #BAB1AB; border-color: #BAB1AB">
-                        <div class="card-body text-white">
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="payment">POSADA:</label>
-                                        {% if employee.role %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="payment"
-                                                   type="text" id="payment"
-                                                   value="{{ employee.get_role_display }}" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="payment"
-                                                   type="text" id="payment"
-                                                   value="Brak danych" readonly>
-                                        {% endif %}
-                                    </h3>
+                                    {% if perms.director.is_director %}
+                                        <button @click="showAssignmentModal = true"
+                                                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-[#111811] text-sm font-bold leading-normal tracking-[0.015em] mt-4 sm:mt-0 gap-2 hover:opacity-90">
+                                            <span class="material-symbols-outlined text-base">add</span>
+                                            <span class="truncate">Przypisz do Grupy</span>
+                                        </button>
+                                    {% endif %}
                                 </div>
-                            </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="per_month">GRUPA:</label>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left">
+                                        <thead>
+                                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                                            <th class="p-4 text-sm font-semibold text-[#618961] dark:text-gray-400">Nazwa Grupy</th>
+                                            <th class="p-4 text-sm font-semibold text-[#618961] dark:text-gray-400">Rola</th>
+                                            <th class="p-4 text-sm font-semibold text-[#618961] dark:text-gray-400">Status</th>
+                                            <th class="p-4 text-sm font-semibold text-[#618961] dark:text-gray-400 text-right">Akcje</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
                                         {% if employee.group %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="per_month"
-                                                   type="text" id="per_month"
-                                                   value="{{ employee.group }}" readonly>
+                                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                                <td class="p-4 text-sm font-medium text-[#111811] dark:text-gray-200">
+                                                    <a href="{% url 'group_details' pk=employee.group.pk %}"
+                                                       class="text-primary/80 dark:text-primary/90 hover:text-primary dark:hover:text-primary/70 transition-colors underline">
+                                                        {{ employee.group }}
+                                                    </a>
+                                                </td>
+
+                                                <td class="p-4 text-sm text-[#111811] dark:text-gray-200">{{ employee.get_role_display }}</td>
+
+                                                <td class="p-4 text-sm text-[#111811] dark:text-gray-200">Główny przydział</td>
+
+                                                <td class="p-4 text-right">
+                                                    {% if perms.director.is_director %}
+                                                        <form method="POST" action="{% url 'remove_teacher_from_group' teacher_pk=employee.pk %}">
+                                                            {% csrf_token %}
+                                                            <button type="submit"
+                                                                    class="text-red-600 dark:text-red-500 hover:text-red-800 dark:hover:text-red-400 p-2 transition-colors"
+                                                                    title="Usuń nauczyciela z grupy"
+                                                                    onclick="return confirm('Czy na pewno chcesz usunąć {{ employee.first_name|default:employee.user.email }} z grupy {{ employee.group }}?');">
+                                                                <span class="material-symbols-outlined text-xl">delete</span>
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
                                         {% else %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="per_month"
-                                                   type="text" id="per_month"
-                                                   value="Brak danych" readonly>
+                                            <tr>
+                                                <td colspan="4" class="p-4 text-center text-gray-500 dark:text-gray-400">
+                                                    Pracownik nie ma przypisanej grupy.
+                                                </td>
+                                            </tr>
                                         {% endif %}
-                                    </h3>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                            {% if perms.director.is_director or perms.teacher.is_teacher %}
-                                <div class="col mt-4">
-                                    <div class="form-group">
-                                        <h3>
-                                            <label class="mb-2" for="to_pay">MIESIĘCZNE WYNAGRODZENIE:</label>
-                                            {% if employee.salary %}
-                                                <input class="form-control" style="font-size: 20px"
-                                                       name="to_pay"
-                                                       type="text" id="to_pay"
-                                                       value="{{ employee.salary }} zł" readonly>
-                                            {% else %}
-                                                <input class="form-control" style="font-size: 20px"
-                                                       name="to_pay"
-                                                       type="text" id="to_pay"
-                                                       value="0 zł" readonly>
-                                            {% endif %}
-                                        </h3>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div x-show="showAssignmentModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+             x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+             class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+
+            <div class="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-2xl m-4 flex flex-col max-h-[90vh]"
+                 @click.outside="showAssignmentModal = false">
+
+                <form method="POST" action="{% url 'change_employee_group' pk=employee.pk %}">
+                    {% csrf_token %}
+
+                    <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
+                        <h2 class="text-xl font-bold text-[#111811] dark:text-white">Przypisz {{ employee.first_name|default:employee.user.email }} do Grupy</h2>
+                        <button type="button" @click="showAssignmentModal = false" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+                            <span class="material-symbols-outlined text-gray-600 dark:text-gray-400">close</span>
+                        </button>
+                    </div>
+
+                    <div class="p-6 flex-1 overflow-y-auto">
+                        <p class="mb-4 text-gray-600 dark:text-gray-400">Wybierz grupę, do której chcesz przypisać pracownika. Obecny przydział zostanie nadpisany.</p>
+
+                        <div class="space-y-4">
+                            {% for group in groups_list %}
+                                <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                    <div class="flex items-center gap-4">
+                                        <input class="size-5 rounded-full border-gray-300 dark:border-gray-600 text-primary focus:ring-primary/50 dark:bg-gray-900 dark:ring-offset-gray-900"
+                                               id="group-{{ group.pk }}"
+                                               type="radio"
+                                               name="group_id"
+                                               value="{{ group.pk }}"
+                                               {% if employee.group.pk == group.pk %}checked{% endif %}/>
+                                        <label class="font-medium text-[#111811] dark:text-gray-200" for="group-{{ group.pk }}">{{ group.name }}</label>
+                                    </div>
+
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        {% if employee.group.pk == group.pk %}
+                                            (Aktualnie przypisany)
+                                        {% endif %}
                                     </div>
                                 </div>
-                            {% endif %}
-
+                            {% empty %}
+                                <p class="text-center text-gray-500 dark:text-gray-400">Brak dostępnych grup do przypisania.</p>
+                            {% endfor %}
                         </div>
                     </div>
 
-
-                </div>
+                    <div class="flex justify-end gap-4 p-6 border-t border-gray-200 dark:border-gray-800">
+                        <button type="button" @click="showAssignmentModal = false" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-100 dark:bg-gray-800 text-[#111811] dark:text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <span class="truncate">Anuluj</span>
+                        </button>
+                        <button type="submit" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-[#111811] text-sm font-bold leading-normal tracking-[0.015em] hover:opacity-90">
+                            <span class="truncate">Przypisz</span>
+                        </button>
+                    </div>
+                </form>
 
             </div>
         </div>
-    </form>
+    </div>
+    </body>
 
-{% endblock %}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{% endblock content %}
