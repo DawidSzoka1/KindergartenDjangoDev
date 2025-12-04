@@ -10,4 +10,5 @@ urlpatterns = [
     path('parent/kid/add/<int:pk>/', views.AddParentToKidView.as_view(), name='add_parent_to_kid'),
     path('create-parent-ajax/', views.create_parent_ajax, name='create_parent_ajax'),
     path('parent/search/', views.ParentSearchView.as_view(), name='parent-search'),
+    path('invite/parent/', views.InviteAndAssignParentView.as_view(), name='invite_standalone_parent'),
 ]
