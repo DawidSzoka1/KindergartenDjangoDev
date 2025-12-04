@@ -11,7 +11,16 @@
             <span class="text-gray-500">/</span>
             <span class="text-gray-900 dark:text-white font-medium">{{ kid }}</span>
         </div>
-
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-8 rounded-2xl p-6 shadow-lg border-l-8 border-primary bg-gradient-to-r from-primary/10 to-transparent flex items-center gap-4">
+                    <span class="material-symbols-outlined text-4xl text-primary">check_circle</span>
+                    <div>
+                        <p class="text-xl font-bold text-primary">{{ message }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
         <!-- Nagłówek profilu -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10">
             <div class="flex items-center gap-6">
@@ -111,14 +120,11 @@
                         {% for parent in kid.parenta_set.all %}
                             <div class="p-6 flex items-center gap-5 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                                 <div class="w-14 h-14 rounded-full bg-gray-300 dark:bg-gray-700 bg-cover bg-center"
-
                                      style="background-image: url('{% if parent.gender == 1 %}{% static 'parent_male.jpg' %}{% else %}{% static 'parent_female.jpg' %}{% endif %}')">
                                 </div>
                                 <div class="flex-1">
                                     <p class="font-semibold text-gray-900 dark:text-white">
-
                                         {{ parent.user.email }}
-                                        {% if parent.is_primary %}<span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full ml-2">Główny</span>{% endif %}
                                     </p>
                                     <p class="text-sm text-gray-600 dark:text-gray-400">
                                         {{ parent.user.first_name }} {{ parent.user.last_name }}

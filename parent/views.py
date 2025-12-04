@@ -70,7 +70,6 @@ def create_parent_ajax(request):
 
         return JsonResponse({
             "success": True,
-            "parent_id": parent.pk,
             "email": email
         })
     except Exception as e:

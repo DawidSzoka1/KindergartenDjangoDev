@@ -175,6 +175,12 @@ class DetailsKidView(LoginRequiredMixin, View):
         raise PermissionDenied
 
 
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.views.generic import UpdateView
+from django.urls import reverse_lazy
+from .forms import KidUpdateForm
+
 class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     permission_required = "director.is_director"
     model = Kid
@@ -186,12 +192,28 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
         return reverse_lazy('kid_details', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self, **kwargs):
-        """ Passes the request object to the form class.
-         This is necessary to only display members that belong to a given user"""
-
+        """Przekazuje current_user do formularza"""
         kwargs = super(ChangeKidInfoView, self).get_form_kwargs()
         kwargs.update({'current_user': self.request.user})
         return kwargs
+
+    def get_form(self, form_class=None):
+        form = super(ChangeKidInfoView, self).get_form(form_class)
+        form.fields['end'].required = False
+
+        # Usuwamy pole parents z walidacji formularza, bo obsługujemy je ręcznie w form_valid
+        if 'parents' in form.fields:
+            del form.fields['parents']
+        return form
+
+    # --- TO JEST METODA, KTÓREJ BRAKOWAŁO ---
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pobieramy wszystkich rodziców przypisanych do tego dyrektora,
+        # żeby wypełnić <select> w HTML
+        context['all_parents'] = ParentA.objects.filter(principal__user=self.request.user)
+        return context
+    # -----------------------------------------
 
     def form_valid(self, form):
         kid = form.save(commit=False)
@@ -199,34 +221,35 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
         # Umowa na czas nieokreślony
         if self.request.POST.get('indefinite'):
             kid.end = None
+
         kid.save()
-        selected_parents = form.cleaned_data.get('parents', [])
-        kid.parenta_set.set(selected_parents)
+
+        # Obsługa rodziców (wielu, z inputa hidden)
+        parents_input = self.request.POST.get('parents', '')
+
+        if parents_input:
+            # Rozbijamy string "1,2,5" na listę liczb
+            parent_ids = [int(pid) for pid in parents_input.split(',') if pid.strip().isdigit()]
+
+            # Pobieramy rodziców z bazy (tylko należących do tego dyrektora)
+            parents = ParentA.objects.filter(
+                id__in=parent_ids,
+                principal__user=self.request.user
+            )
+            kid.parenta_set.set(parents)
+        else:
+            # Jeśli lista pusta, usuwamy powiązania
+            kid.parenta_set.clear()
+
+        kid.save()
         return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # Wszyscy rodzice należący do tego dyrektora
-        context['all_parents'] = ParentA.objects.filter(
-            principal__user=self.request.user
-        ).select_related('user')
-        return context
-
-    def get_form(self, form_class=None):
-        form = super(ChangeKidInfoView, self).get_form(form_class)
-        form.fields['end'].required = False
-        return form
 
     def test_func(self):
         kid = self.get_object()
         try:
-            if self.request.user == kid.principal.user:
-                if kid.is_active == True:
-                    return True
+            return self.request.user == kid.principal.user and kid.is_active
         except Exception:
             return False
-        return False
-
 
 class KidDeleteView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
