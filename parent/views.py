@@ -140,26 +140,90 @@ class InviteParentView(PermissionRequiredMixin, View):
 
 class AddParentToKidView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"
+    PAGINATE_BY = 10 # Ilość dzieci na stronę
 
     def get(self, request, pk):
         parent = get_object_or_404(ParentA, id=int(pk))
-        if parent.principal.first().user.email == request.user.email:
-            kids = Director.objects.get(user=request.user.id).kid_set.filter(is_active=True).exclude(parenta=parent)
-            return render(request, 'parent-kid-add.html', {'kids': kids, 'parent': parent})
+        user_director = get_object_or_404(Director, user=request.user)
+        search_query = request.GET.get('search', '').strip()
+        page_number = request.GET.get('page')
+
+        # 1. Walidacja uprawnień (czy dyrektor jest przełożonym rodzica)
+        if parent.principal.filter(user=request.user).exists():
+
+            # 2. Pobieramy dzieci aktywne, nieprzypisane jeszcze do tego rodzica
+            kids_qs = user_director.kid_set.filter(is_active=True).exclude(parenta=parent)
+
+            # 3. Filtrowanie (jeśli search_query jest obecne)
+            if search_query:
+                kids_qs = kids_qs.filter(
+                    Q(first_name__icontains=search_query) |
+                    Q(last_name__icontains=search_query)
+                ).distinct()
+
+            # Sortowanie i paginacja
+            kids_qs = kids_qs.order_by('last_name', 'first_name')
+            paginator = Paginator(kids_qs, self.PAGINATE_BY)
+            kids_list = paginator.get_page(page_number)
+
+            # Wczytujemy z sesji/POST listę już zaznaczonych dzieci (jeśli użytkownik przeładował stronę)
+            # Lista ID dzieci, które były zaznaczone w ostatnim POST/GET
+            previously_selected_kids = request.session.get('selected_kids_for_parent_link', [])
+
+            context = {
+                'kids_list': kids_list,
+                'parent': parent,
+                'search_query': search_query,
+                'previously_selected_kids': previously_selected_kids,
+            }
+            return render(request, 'parent-kid-add.html', context)
+
         raise PermissionDenied
 
     def post(self, request, pk):
-        director = Director.objects.get(user=request.user.id)
         parent = get_object_or_404(ParentA, id=int(pk))
-        if parent.principal.first().user.email == director.user.email:
-            kids = request.POST.getlist('kids')
-            for kid in kids:
-                kid = get_object_or_404(Kid, id=int(kid))
-                if kid.id in director.kid_set.filter(is_active=True).values_list('id', flat=True):
+        user_director = get_object_or_404(Director, user=request.user)
+
+        # 1. Sprawdzamy, czy formularz POST to wyszukiwanie, czy zapis
+        if 'search_button' in request.POST:
+            # Użyjemy tej logiki, jeśli musisz użyć POST do wyszukiwania
+            search = request.POST.get('search', '').strip()
+
+            # Zapisz aktualny stan checkboxów do sesji, zanim przeładujesz stronę GET
+            selected_kids = request.POST.getlist('kids', [])
+            request.session['selected_kids_for_parent_link'] = selected_kids
+
+            if search:
+                return redirect(f"{request.path}?search={search}")
+            else:
+                return redirect(request.path)
+
+
+        # 2. Logika zapisu linków (główny submit)
+        if parent.principal.filter(user=request.user).exists():
+
+            # Lista ID dzieci wybranych przez użytkownika
+            kids_ids_to_link = request.POST.getlist('kids', [])
+            if not kids_ids_to_link:
+                messages.warning(request, f'Wybierz conajmniej jedno dziecko do podpięcia')
+                return redirect(request.path)
+                # Sprawdzenie, czy dyrektor ma prawo do tych dzieci
+            valid_kids_qs = user_director.kid_set.filter(is_active=True, id__in=kids_ids_to_link)
+
+            count = 0
+            for kid in valid_kids_qs:
+                if kid not in parent.kids.all():
                     parent.kids.add(kid)
-                    parent.save()
-            messages.success(request, f'Poprawnie dodano wybrane dzieci do {parent.user.email}')
-            return redirect('list_parent')
+                    count += 1
+
+            # Usuwamy stan sesji po pomyślnym zapisie
+            if 'selected_kids_for_parent_link' in request.session:
+                del request.session['selected_kids_for_parent_link']
+
+            messages.success(request, f'Poprawnie dodano {count} dzieci do {parent.user.email}')
+            return redirect('parent_profile', pk=parent.id)
+
+        raise PermissionDenied
 
 
 class ParentListView(LoginRequiredMixin, View):
@@ -224,22 +288,59 @@ class ParentProfileView(LoginRequiredMixin, View):
 class ParentUpdateView(PermissionRequiredMixin, View):
     permission_required = 'parent.is_parent'
 
+    def check_permissions(self, user, parent):
+        """Sprawdza, czy użytkownik ma prawo do edycji tego profilu rodzica."""
+        # Własny rodzic:
+        if user.get_user_permissions() == {'parent.is_parent'} and parent.user.email == user.email:
+            return True
+
+        # Dyrektor:
+        if user.get_user_permissions() == {'director.is_director'}:
+            try:
+                director = Director.objects.get(user=user)
+                if parent.principal.filter(id=director.id).exists():
+                    return True
+            except Director.DoesNotExist:
+                pass
+
+        return False
+
     def get(self, request, pk):
         parent = get_object_or_404(ParentA, id=int(pk))
-        form = ParentUpdateForm(instance=parent)
-        if parent.user.email == request.user.email:
+
+        if self.check_permissions(request.user, parent):
+            form = ParentUpdateForm(instance=parent)
             return render(request, 'parent-update.html', {'form': form, 'parent': parent})
+
         raise PermissionDenied
 
     def post(self, request, pk):
         parent = get_object_or_404(ParentA, id=int(pk))
-        form = ParentUpdateForm(request.POST, instance=parent)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Poprawnie zmieniona dane')
-            return redirect('parent_profile', pk=parent.id)
-        messages.error(request, f'{form.errors}')
-        return redirect('parent_update', pk=parent.id)
+
+        if self.check_permissions(request.user, parent):
+            form = ParentUpdateForm(request.POST, instance=parent)
+            if form.is_valid():
+                form.save(commit=False) # Zapisz model, ale nie do bazy
+
+                # Ręcznie zaktualizuj pola inne niż ManyToMany (kids)
+                # Używamy form.instance, który ma już zaktualizowane dane z POST
+                parent.first_name = form.cleaned_data.get('first_name')
+                parent.last_name = form.cleaned_data.get('last_name')
+                parent.gender = form.cleaned_data.get('gender')
+                parent.phone = form.cleaned_data.get('phone')
+                parent.city = form.cleaned_data.get('city')
+                parent.address = form.cleaned_data.get('address')
+                parent.zip_code = form.cleaned_data.get('zip_code')
+
+                parent.save() # Zapisz zmiany do bazy
+                messages.success(request, 'Poprawnie zmieniono dane.')
+                return redirect('parent_profile', pk=parent.id)
+
+            # W przypadku błędu, renderujemy formularz ponownie z błędami
+            messages.error(request, 'Wystąpił błąd walidacji formularza. Sprawdź pola zaznaczone na czerwono.')
+            return render(request, 'parent-update.html', {'form': form, 'parent': parent})
+
+        raise PermissionDenied
 
 
 class ParentDeleteView(PermissionRequiredMixin, View):
@@ -334,8 +435,6 @@ class InviteAndAssignParentView(LoginRequiredMixin, PermissionRequiredMixin, Vie
             messages.error(request, 'Ten email jest już zajęty.')
             return redirect('invite_standalone_parent')
 
-        if not kid_ids:
-            messages.warning(request, 'Utworzono konto rodzica, ale nie przypisano dziecka. Przypisz dziecko później.')
 
         # --- LOGIKA TWORZENIA KONTA Z TRANSAKCJĄ ---
         try:
@@ -359,6 +458,7 @@ class InviteAndAssignParentView(LoginRequiredMixin, PermissionRequiredMixin, Vie
                 permission = Permission.objects.get(content_type=content_type, codename='is_parent')
                 par_user.user.user_permissions.clear()
                 par_user.user.user_permissions.add(permission)
+                par_user.save()
 
                 # 5. Wyślij zaproszenie
                 subject = "Zaproszenie na konto przedszkola dla rodzica"
@@ -376,3 +476,21 @@ class InviteAndAssignParentView(LoginRequiredMixin, PermissionRequiredMixin, Vie
         except Exception as e:
             messages.error(request, f'Wystąpił błąd podczas tworzenia konta: {e}')
             return redirect('invite_standalone_parent')
+
+
+class RemoveKidFromParentView(PermissionRequiredMixin, View):
+    permission_required = 'director.is_director'
+
+    def post(self, request, parent_pk, kid_pk):
+        parent = get_object_or_404(ParentA, pk=parent_pk)
+        kid = get_object_or_404(Kid, pk=kid_pk)
+
+        # Sprawdzamy, czy relacja istnieje i usuwamy ją
+        if kid in parent.kids.all():
+            parent.kids.remove(kid) # Usuwamy relację ManyToMany
+            messages.success(request, f"Pomyślnie odpięto dziecko {kid.first_name} od {parent.user.email}.")
+        else:
+            messages.warning(request, "To dziecko nie było przypisane do tego rodzica.")
+
+        # Przekierowujemy z powrotem na profil rodzica
+        return redirect('parent_profile', pk=parent_pk)

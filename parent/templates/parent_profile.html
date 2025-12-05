@@ -1,224 +1,180 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
 {% load static %}
+
 {% block content %}
-    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
-        <!-- Container wrapper -->
-        <div class="container-fluid">
-            <!-- Left links -->
-            <ul class="navbar-nav flex-row">
+    <body class="font-display bg-background-light dark:bg-background-dark">
+    <div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div class="flex flex-grow">
 
-                <li class="nav-item me-2 me-lg-0">
-                    <h2>
+            <main class="flex-1 p-8">
+                <div class="max-w-7xl mx-auto">
+
+                    <div class="flex flex-wrap gap-2 mb-6 pt-4">
                         {% if perms.parent.is_parent %}
-                            <a href="{% url 'home_page' %}" role="button"
-                               style="color: #75736B; text-decoration:none;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                     height="32"
-                                     fill="currentColor" class="bi bi-caret-left-fill"
-                                     viewBox="0 0 16 16">
-                                    <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                </svg>
-
-                                MENU
-
-                            </a>
+                            <a class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal hover:underline" href="{% url 'home_page' %}">MENU</a>
                         {% else %}
-                            <a href="{% url 'list_parent' %}" role="button"
-                               style="color: #75736B; text-decoration:none;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                     height="32"
-                                     fill="currentColor" class="bi bi-caret-left-fill"
-                                     viewBox="0 0 16 16">
-                                    <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                </svg>
-
-                                LISTA RODZICÓW
-
-                            </a>
+                            <a class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal hover:underline" href="{% url 'list_parent' %}">LISTA RODZICÓW</a>
                         {% endif %}
-                    </h2>
-                </li>
+                        <span class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal">/</span>
+                        <span class="text-[#111811] dark:text-white text-sm font-medium leading-normal">PROFIL RODZICA</span>
+                    </div>
 
-            </ul>
-            <!-- Left links -->
-            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <!-- Left links -->
-                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
-                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>PROFIL RODZICA</b></li>
-                </ul>
-            </div>
-            <ul class="navbar-nav d-flex flex-row me-1">
-                {% if perms.parent.is_parent %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="p-3 mb-4 rounded-lg text-white text-center font-semibold
+                        {% if message.tags == 'success' %}bg-green-600{% elif message.tags == 'error' %}bg-red-600{% else %}bg-blue-600{% endif %}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
 
-                    <li class="nav-item">
-                        <button class="btn" onclick="location.href='{% url 'parent_update' parent.id %}'"
-                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
-                            EDYTUJ PROFIL
-                        </button>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-        <!-- Container wrapper -->
-    </nav>
+                    <div class="flex p-4 @container mb-8 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex w-full flex-col md:flex-row gap-6 items-start">
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}"
-                 style="color: white; text-align: center; font-size: 30px">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    <div class="container" style="margin-top: 85px">
-        <div class="row gutters">
-            <div class="col-6 mt-5" style="margin-left: -25%">
-                <div class="card h-100 border-0">
-                    <div class="card-body">
-                        <figure>
-                            {% if parent.gender == 2 %}
-                                <img src="{% static 'parent_female.jpg' %}" alt=""
-                                     style="height: 80%; display: block; margin-left: auto; margin-right: auto">
-                            {% elif parent.gender == 1 %}
-                                <img src="{% static 'parent_male.jpg' %}" alt=""
-                                     style="height: 80%; display: block; margin-left: auto; margin-right: auto">
-                            {% else %}
-                                <img src="{% static 'gander_null.jpg' %}" alt=""
-                                     style="height: 80%; display: block; margin-left: auto; margin-right: auto">
-                            {% endif %}
-                            <figcaption style="text-align: center; margin-top: 20px; font-size: 50px">
-                                {% if parent.first_name and parent.last_name %}
-                                    <div>
-                                        {{ parent.first_name }} {{ parent.last_name }}
-                                    </div>
+                            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full flex-shrink-0 w-32 h-32">
+                                {% if parent.gender == 2 %}
+                                    <img class="rounded-full w-32 h-32 object-cover" src="{% static 'parent_female.jpg' %}" alt="Avatar kobiety"/>
+                                {% elif parent.gender == 1 %}
+                                    <img class="rounded-full w-32 h-32 object-cover" src="{% static 'parent_male.jpg' %}" alt="Avatar mężczyzny"/>
+                                {% else %}
+                                    <img class="rounded-full w-32 h-32 object-cover" src="{% static 'gander_null.jpg' %}" alt="Avatar neutralny"/>
                                 {% endif %}
+                            </div>
+
+                            <div class="flex-grow">
+                                <p class="text-[#111811] dark:text-white text-[28px] font-bold leading-tight tracking-[-0.015em]">
+                                    {% if parent.first_name and parent.last_name %}
+                                        {{ parent.first_name }} {{ parent.last_name }}
+                                    {% else %}
+                                        {{ parent.user.email }}
+                                    {% endif %}
+                                </p>
+
+                                <div class="mt-2 flex flex-col sm:flex-row sm:items-center sm:gap-6 gap-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[#618961] dark:text-gray-400 text-lg">mail</span>
+                                        <p class="text-[#618961] dark:text-gray-400 text-base font-normal leading-normal">{{ parent.user.email }}</p>
+                                    </div>
+                                    {% if parent.phone %}
+                                        <div class="flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-[#618961] dark:text-gray-400 text-lg">phone</span>
+                                            <p class="text-[#618961] dark:text-gray-400 text-base font-normal leading-normal">{{ parent.phone }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="flex w-full md:w-auto gap-3 flex-wrap">
                                 {% if perms.parent.is_parent %}
+                                    <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-100 dark:bg-white/10 text-[#111811] dark:text-white text-sm font-bold leading-normal tracking-[0.015em] flex-1 md:flex-auto hover:bg-gray-200 dark:hover:bg-white/20"
+                                            onclick="location.href='{% url 'parent_update' parent.id %}'">
+                                        <span class="truncate">EDYTUJ PROFIL</span>
+                                    </button>
                                     {% if user.email == parent.user.email %}
-                                        <button type="button" class="btn me-3"
-                                                style="color: white; background-color: #8D847B; width: 50%; height: 70px; font-size: 30px; margin-top: 2%"
+                                        <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-[#111811] dark:text-background-dark text-sm font-bold leading-normal tracking-[0.015em] flex-1 md:flex-auto hover:opacity-90"
                                                 onclick="location.href='{% url 'password_change' %}'">
-                                            <b>ZMIEŃ HASŁO</b>
+                                            <span class="truncate">ZMIEŃ HASŁO</span>
                                         </button>
                                     {% endif %}
                                 {% endif %}
-                            </figcaption>
-                        </figure>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-9">
-                <div class="card h-100" style="background-color: #BAB1AB; border-color: #BAB1AB">
-                    <div class="card-body text-white">
-                        <div class="col mt-4">
-                            <div class="form-group">
-                                <h3>
-                                    <label class="mb-2" for="birth">E-MAIL:</label>
-                                    <input class="form-control" style="font-size: 20px" name="birth"
-                                           type="text"
-                                           id="birth"
-                                           value="{{ parent.user.email }}" readonly>
-                                </h3>
-                            </div>
-                        </div>
-                        <div class="col mt-4">
-                            <div class="form-group">
-                                <h3>
-                                    <label class="mb-2" for="gender">NR KONTAKTOWY:</label>
-                                    {% if parent.phone %}
-                                        <input class="form-control" style="font-size: 20px" name="gender"
-                                               type="text"
-                                               id="gender"
-                                               value="{{ parent.phone }}" readonly>
-                                    {% else %}
-                                        <input class="form-control" style="font-size: 20px" name="gender"
-                                               type="text"
-                                               id="gender"
-                                               value="Brak dancyh" readonly>
-                                    {% endif %}
-                                </h3>
-                            </div>
-                        </div>
-                        <div class="col mt-4">
-                            <div class="form-group">
-                                <h3>
-                                    <label class="mb-2" for="group">ADRES ZAMIESZKANIA:</label>
-                                    {% if parent.address %}
-                                        <input class="form-control" style="font-size: 20px" name="gender"
-                                               type="text"
-                                               id="gender"
-                                               value="{{ parent.address }}" readonly>
-                                    {% else %}
-                                        <input class="form-control" style="font-size: 20px" name="gender"
-                                               type="text"
-                                               id="gender"
-                                               value="Brak dancyh" readonly>
-                                    {% endif %}
-                                </h3>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="start">MIASTO:</label>
-                                        {% if parent.city %}
-                                            <input class="form-control" style="font-size: 20px" name="gender"
-                                                   type="text"
-                                                   id="gender"
-                                                   value="{{ parent.city }}" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px" name="gender"
-                                                   type="text"
-                                                   id="gender"
-                                                   value="Brak dancyh" readonly>
-                                        {% endif %}
-                                    </h3>
-                                </div>
-                            </div>
-                            <div class="col mt-4">
-                                <h3>
-                                    <label class="mb-2" for="zip_code">KOD POCZTOWY:</label>
-                                    {% if parent.zip_code %}
-                                        <input class="form-control" style="font-size: 20px" name="zip_code"
-                                               type="text"
-                                               id="zip_code"
-                                               value="{{ parent.zip_code }}" readonly>
-                                    {% else %}
-                                        <input class="form-control" style="font-size: 20px" name="end"
-                                               type="text"
-                                               id="zip_code"
-                                               value="Brak danych" readonly>
-                                    {% endif %}
-                                </h3>
-                            </div>
-                        </div>
-                        <div class="col mt-4">
-                            <div class="form-group">
-                                <h3>
-                                    <label class="mb-2" for="zip_code">DZIECI:</label>
-                                </h3>
-                                <div class="form-control" style="font-size: 20px">
 
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                        <div class="lg:col-span-1 flex flex-col gap-6">
+                            <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                                <h3 class="text-lg font-bold text-[#111811] dark:text-white mb-4">Dane Kontaktowe i Adresowe</h3>
+                                <dl class="space-y-3">
+
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-[#618961] dark:text-gray-400">Numer Kontaktowy</dt>
+                                        <dd class="text-sm font-medium text-[#111811] dark:text-gray-200">
+                                            {{ parent.phone|default:"Brak danych" }}
+                                        </dd>
+                                    </div>
+
+                                    <div class="flex justify-between items-start">
+                                        <dt class="text-sm text-[#618961] dark:text-gray-400">Adres Zamieszkania</dt>
+                                        <dd class="text-sm font-medium text-[#111811] dark:text-gray-200 text-right max-w-[50%]">
+                                            {{ parent.address|default:"Brak danych" }}
+                                        </dd>
+                                    </div>
+
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-[#618961] dark:text-gray-400">Miasto</dt>
+                                        <dd class="text-sm font-medium text-[#111811] dark:text-gray-200">
+                                            {{ parent.city|default:"Brak danych" }}
+                                        </dd>
+                                    </div>
+
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm text-[#618961] dark:text-gray-400">Kod Pocztowy</dt>
+                                        <dd class="text-sm font-medium text-[#111811] dark:text-gray-200">
+                                            {{ parent.zip_code|default:"Brak danych" }}
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-2 flex flex-col gap-6">
+                            <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                                <h3 class="text-lg font-bold text-[#111811] dark:text-white mb-4">Przypisane Dzieci</h3>
+
+                                <div class="space-y-4">
                                     {% for kid in parent.kids.all %}
                                         {% if kid.is_active == True %}
+                                            <div class="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                                <div class="flex items-center gap-4">
+                                                    <span class="material-symbols-outlined text-primary text-xl">child_care</span>
 
-                                            <a href="{% url 'kid_details' kid.id %}"
-                                               style="text-decoration: none; color:black">{{ kid }}</a>,
+                                                    <a href="{% url 'kid_details' kid.id %}"
+                                                       class="font-medium text-[#111811] dark:text-white hover:text-primary transition-colors">
+                                                        {{ kid.first_name }} {{ kid.last_name }}
+                                                        {% if kid.group %}({{ kid.group.name }}){% endif %}
+                                                    </a>
+                                                </div>
+                                                <div class="flex justify-end gap-2">
+                                                    <a href="{% url 'kid_details' kid.id %}" class="flex items-center justify-center size-8 rounded-lg hover:bg-[#f0f4f0] dark:hover:bg-white/10 text-[#618961] dark:text-gray-400" title="Zobacz Profil">
+                                                        <span class="material-symbols-outlined text-xl">visibility</span>
+                                                    </a>
+                                                    {% if perms.director.is_director %}
+                                                        <form method="POST" action="{% url 'remove_kid_from_parent' parent_pk=parent.id kid_pk=kid.id %}" onsubmit="return confirm('Czy na pewno chcesz odpiąć dziecko {{ kid.first_name }} od rodzica {{ parent.first_name|default:parent.user.email }}?');">
+                                                            {% csrf_token %}
+                                                            <button type="submit"
+                                                                    class="flex items-center justify-center size-8 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                                                                    title="Usuń link do dziecka">
+                                                                <span class="material-symbols-outlined text-xl">link_off</span>
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
                                         {% endif %}
+                                    {% empty %}
+                                        <p class="text-sm text-[#618961] dark:text-gray-400 p-2">Ten rodzic nie ma przypisanych aktywnych dzieci.</p>
                                     {% endfor %}
 
-                                </div>
+                                    {% if perms.director.is_director %}
+                                        <div class="pt-4">
+                                            <button onclick="location.href='{% url 'add_parent_to_kid' parent.id %}'"
+                                                    class="flex items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-[#111811] dark:text-background-dark text-sm font-bold leading-normal tracking-[0.015em] hover:opacity-90">
+                                                <span class="material-symbols-outlined text-lg">add</span>
+                                                <span class="truncate">Linkuj Nowe Dziecko</span>
+                                            </button>
+                                        </div>
+                                    {% endif %}
 
+                                </div>
                             </div>
                         </div>
                     </div>
 
                 </div>
-
-
-            </div>
+            </main>
         </div>
     </div>
+    </body>
 {% endblock %}

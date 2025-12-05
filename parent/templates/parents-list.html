@@ -25,12 +25,16 @@
                     </header>
 
                     {% if messages %}
-                        {% for message in messages %}
-                            <div class="p-3 mb-4 rounded-lg text-white text-center font-semibold
-                        {% if message.tags == 'success' %}bg-secondary{% elif message.tags == 'error' %}bg-error{% else %}bg-primary{% endif %}" role="alert">
-                                {{ message }}
+                        {% if messages %}
+                            <div class="mt-6">
+                                {% for message in messages %}
+                                    <div class="p-4 rounded-lg bg-green-500 text-white text-center text-lg">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
                             </div>
-                        {% endfor %}
+                        {% endif %}
+
                     {% endif %}
 
                     {% if perms.director.is_director or perms.teacher.is_teacher %}
