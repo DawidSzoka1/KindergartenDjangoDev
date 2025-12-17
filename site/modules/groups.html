@@ -1,0 +1,2578 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="children.html">
+      
+      
+        <link rel="next" href="calendar_app.html">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>👥 Groups (Grupy) - Dokumentacja</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.618322db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#modu-grup-groups" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../index.html" title="Dokumentacja" class="md-header__button md-logo" aria-label="Dokumentacja" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Dokumentacja
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              👥 Groups (Grupy)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../index.html" title="Dokumentacja" class="md-nav__button md-logo" aria-label="Dokumentacja" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Dokumentacja
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../index.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🏠 Strona Główna
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🛠 Wdrożenie i Start
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🛠 Wdrożenie i Start
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/setup.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Szybki Start (Dev)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/workflow.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Główny Przepływ (Flow)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🧩 Moduły Aplikacji
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    🧩 Moduły Aplikacji
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="accounts.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🔐 Accounts (Konta)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="director.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🎓 Director (Dyrektor)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="teacher.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    👩‍🏫 Teacher (Kadry)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="parent.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    👪 Parent (Rodzice)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="children.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    👶 Children (Dzieci)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    👥 Groups (Grupy)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="groups.html" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    👥 Groups (Grupy)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#modu-grup-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👥 Moduł Grup (Groups)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="👥 Moduł Grup (Groups)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#logika-biznesowa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logika Biznesowa
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dostep-do-danych-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dostęp do danych (Role)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-przykad-uzycia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Workflow / Przykład użycia:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔄 Workflow / Przykład użycia:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dla-dyrektora" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎓 Dla Dyrektora
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dla-nauczyciela" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👩🏫 Dla Nauczyciela
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dla-rodzica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👪 Dla Rodzica
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dokumentacja-techniczna" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dokumentacja Techniczna
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.models.Groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Groups
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Groups">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#groups.models.Groups.capacity_fill_percent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        capacity_fill_percent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groups.models.Groups.current_students_count" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        current_students_count
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groups.models.Groups.is_full" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_full
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groups.models.Groups.__str__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __str__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groups.models.Groups.get_active_kids" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_active_kids
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groups.models.Groups.get_status_tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_status_tag
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.forms.GroupsForm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GroupsForm
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.views.GroupAddView" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GroupAddView
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.views.GroupsListView" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GroupsListView
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.views.GroupDetailsView" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GroupDetailsView
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.views.AssignExistingKidToGroupView" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AssignExistingKidToGroupView
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.views.AssignTeachersView" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AssignTeachersView
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AssignTeachersView">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kluczowe-procesy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kluczowe Procesy:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="calendar_app.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📅 Calendar (Kalendarz)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="meals.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    🥗 Meals (Żywienie)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="payments_plans.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    💳 Payments (Finanse)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="blog.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    📝 Blog (Wydarzenia)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#modu-grup-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👥 Moduł Grup (Groups)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="👥 Moduł Grup (Groups)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#logika-biznesowa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logika Biznesowa
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dostep-do-danych-role" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dostęp do danych (Role)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-przykad-uzycia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔄 Workflow / Przykład użycia:
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🔄 Workflow / Przykład użycia:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dla-dyrektora" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🎓 Dla Dyrektora
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dla-nauczyciela" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👩🏫 Dla Nauczyciela
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dla-rodzica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        👪 Dla Rodzica
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dokumentacja-techniczna" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dokumentacja Techniczna
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.models.Groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Groups
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Groups">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#groups.models.Groups.capacity_fill_percent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        capacity_fill_percent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groups.models.Groups.current_students_count" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        current_students_count
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groups.models.Groups.is_full" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_full
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groups.models.Groups.__str__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __str__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groups.models.Groups.get_active_kids" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_active_kids
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groups.models.Groups.get_status_tag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_status_tag
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.forms.GroupsForm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GroupsForm
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.views.GroupAddView" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GroupAddView
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.views.GroupsListView" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GroupsListView
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.views.GroupDetailsView" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GroupDetailsView
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.views.AssignExistingKidToGroupView" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AssignExistingKidToGroupView
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#groups.views.AssignTeachersView" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AssignTeachersView
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AssignTeachersView">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kluczowe-procesy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kluczowe Procesy:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>👥 Groups (Grupy)</h1>
+
+<h2 id="modu-grup-groups">👥 Moduł Grup (Groups)</h2>
+<p>Moduł <code>groups</code> odpowiada za strukturę organizacyjną przedszkola, dzieląc dzieci i kadrę na konkretne oddziały (np. grupy wiekowe).</p>
+<h3 id="logika-biznesowa">Logika Biznesowa</h3>
+<ul>
+<li><strong>Pojemność i Roczniki</strong>: Każda grupa ma zdefiniowany rocznik oraz limit miejsc. Pozwala to na monitorowanie obłożenia placówki i planowanie zapisów.</li>
+<li><strong>Wizualna Identyfikacja</strong>: Grupy są personalizowane za pomocą ikon (zdjęć) zarządzanych przez Dyrektora, co ułatwia orientację w systemie zarówno kadrze,&gt;</li>
+<li><strong>Dynamiczne Zarządzanie Składem</strong>: System umożliwia dyrektorowi szybkie przepisywanie dzieci oraz nauczycieli między grupami. Dzięki zastosowaniu filtrów&gt;</li>
+</ul>
+<h3 id="dostep-do-danych-role">Dostęp do danych (Role)</h3>
+<ul>
+<li><strong>🎓 Dyrektor</strong>: Posiada pełne uprawnienia do tworzenia, edycji i usuwania grup oraz zarządzania ich składem osobowym.</li>
+<li><strong>👩🏫 Nauczyciel</strong>: Ma wgląd w szczegóły (listę dzieci, kalendarz) tylko tych grup, do których został formalnie przypisany przez Dyrektora.</li>
+<li><strong>👪 Rodzic</strong>: Widzi jedynie podstawowe informacje o grupach, do których uczęszczają jego dzieci.</li>
+</ul>
+<h3 id="workflow-przykad-uzycia">🔄 Workflow / Przykład użycia:</h3>
+<h4 id="dla-dyrektora">🎓 Dla Dyrektora</h4>
+<ul>
+<li><strong>Zadanie</strong>: Utworzenie nowej grupy "Pszczółki" i przypisanie do niej kadry.</li>
+<li><strong>Działanie</strong>: Dyrektor otwiera <code>GroupAddView</code>, wybiera ikonę z biblioteki <code>Director</code> i ustala limit miejsc (np. 25). Następnie używa <code>AssignTeachersView</code>&gt;</li>
+</ul>
+<h4 id="dla-nauczyciela">👩🏫 Dla Nauczyciela</h4>
+<ul>
+<li><strong>Zadanie</strong>: Sprawdzenie listy dzieci w przypisanej grupie na początku roku.</li>
+<li><strong>Działanie</strong>: Nauczyciel loguje się i w <code>GroupsListView</code> widzi tylko swoją grupę. Po wejściu w <code>GroupDetailsView</code> uzyskuje dostęp do pełnej listy podopie&gt;</li>
+</ul>
+<h4 id="dla-rodzica">👪 Dla Rodzica</h4>
+<ul>
+<li><strong>Zadanie</strong>: Sprawdzenie składu grupy dziecka i personelu opiekuńczego.</li>
+<li><strong>Działanie</strong>: Rodzic wchodzi w szczegóły grupy swojego dziecka; widzi profil przypisanego nauczyciela oraz listę rówieśników, z którymi jego dziecko prze&gt;</li>
+</ul>
+<h3 id="dokumentacja-techniczna">Dokumentacja Techniczna</h3>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="groups.models.Groups" class="doc doc-heading">
+            <code>groups.models.Groups</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="django.db.models.Model">Model</span></code></p>
+
+
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>groups/models.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Groups</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">principal</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Director</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">capacity</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">validators</span><span class="o">=</span><span class="p">[</span><span class="n">MinValueValidator</span><span class="p">(</span><span class="n">limit_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)])</span>
+    <span class="n">photo</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">GroupPhotos</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">is_active</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">yearbook</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        String representation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">current_students_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Zwraca aktualną liczbę aktywnych dzieci w grupie.</span>
+
+<span class="sd">        Uwaga: Ta metoda jest szybka, ale nie powinna być używana w pętlach w szablonie,</span>
+<span class="sd">        jeśli QuerySet nie został wcześniej wzbogacony przez .annotate() (jak robisz w GroupsListView).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kid_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">capacity_fill_percent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Oblicza procent wypełnienia grupy. Zwraca 0, jeśli pojemność nie jest ustawiona lub jest równa 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_students_count</span>
+            <span class="c1"># Użyj atrybutu child_count jeśli QuerySet był annotowany</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;child_count&#39;</span><span class="p">):</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_count</span>
+
+            <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="p">(</span><span class="n">count</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_full</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sprawdza, czy grupa osiągnęła maksymalną pojemność.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_students_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_active_kids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Zwraca QuerySet aktywnych dzieci przypisanych do tej grupy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Zakładam, że model dziecka ma ForeignKey do modelu Groups i nazywa się &#39;kid_set&#39; (domyślna nazwa).</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kid_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;last_name&#39;</span><span class="p">,</span> <span class="s1">&#39;first_name&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Przykładowa metoda, jeśli potrzebujesz statusu wizualnego</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_status_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Zwraca status grupy na podstawie jej aktywności.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;Aktywna&#39;</span>
+        <span class="k">return</span> <span class="s1">&#39;Archiwalna&#39;</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="groups.models.Groups.capacity_fill_percent" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">capacity_fill_percent</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Oblicza procent wypełnienia grupy. Zwraca 0, jeśli pojemność nie jest ustawiona lub jest równa 0.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="groups.models.Groups.current_students_count" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">current_students_count</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Zwraca aktualną liczbę aktywnych dzieci w grupie.</p>
+<p>Uwaga: Ta metoda jest szybka, ale nie powinna być używana w pętlach w szablonie,
+jeśli QuerySet nie został wcześniej wzbogacony przez .annotate() (jak robisz w GroupsListView).</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="groups.models.Groups.is_full" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">is_full</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Sprawdza, czy grupa osiągnęła maksymalną pojemność.</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="groups.models.Groups.__str__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__str__</span><span class="p">()</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>String representation</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>groups/models.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    String representation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="groups.models.Groups.get_active_kids" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_active_kids</span><span class="p">()</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Zwraca QuerySet aktywnych dzieci przypisanych do tej grupy.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>groups/models.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_active_kids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Zwraca QuerySet aktywnych dzieci przypisanych do tej grupy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Zakładam, że model dziecka ma ForeignKey do modelu Groups i nazywa się &#39;kid_set&#39; (domyślna nazwa).</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kid_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;last_name&#39;</span><span class="p">,</span> <span class="s1">&#39;first_name&#39;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="groups.models.Groups.get_status_tag" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_status_tag</span><span class="p">()</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Zwraca status grupy na podstawie jej aktywności.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>groups/models.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_status_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Zwraca status grupy na podstawie jej aktywności.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;Aktywna&#39;</span>
+    <span class="k">return</span> <span class="s1">&#39;Archiwalna&#39;</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="groups.forms.GroupsForm" class="doc doc-heading">
+            <code>groups.forms.GroupsForm</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="django.forms.ModelForm">ModelForm</span></code></p>
+
+
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>groups/forms.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">GroupsForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Groups</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="s1">&#39;__all__&#39;</span>
+        <span class="n">widgets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;principal&#39;</span><span class="p">:</span> <span class="n">forms</span><span class="o">.</span><span class="n">HiddenInput</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Nazwa:&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;capacity&#39;</span><span class="p">:</span> <span class="s1">&#39;Pojemność:&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;yearbook&#39;</span><span class="p">:</span> <span class="s2">&quot;Rocznik:&quot;</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">current_user</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">current_user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;photo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ModelChoiceField</span><span class="p">(</span>
+                <span class="n">queryset</span><span class="o">=</span><span class="n">Director</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">current_user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">groupphotos_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="groups.views.GroupAddView" class="doc doc-heading">
+            <code>groups.views.GroupAddView</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="django.contrib.auth.mixins.PermissionRequiredMixin">PermissionRequiredMixin</span></code>, <code><span title="django.views.View">View</span></code></p>
+
+
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>groups/views.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">GroupAddView</span><span class="p">(</span><span class="n">PermissionRequiredMixin</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+    <span class="n">permission_required</span> <span class="o">=</span> <span class="s2">&quot;director.is_director&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">director</span> <span class="o">=</span> <span class="n">Director</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">photos</span> <span class="o">=</span> <span class="n">director</span><span class="o">.</span><span class="n">groupphotos_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">photos</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;group-add.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;photos&#39;</span><span class="p">:</span> <span class="n">photos</span><span class="p">})</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Najpierwsz musisz dodac jakas iconke&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;photo_add&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">director</span> <span class="o">=</span> <span class="n">Director</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">photo_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;photo&#39;</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="n">capacity</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;capacity&#39;</span><span class="p">)</span>
+        <span class="n">yearbook</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;yearbook&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">photo_id</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">capacity</span> <span class="ow">and</span> <span class="n">yearbook</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;-&#39;</span> <span class="ow">in</span> <span class="n">capacity</span><span class="p">:</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;pojemnosc nie moze byc ujemna&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;add_group&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">GroupPhotos</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">photo_id</span><span class="p">))</span>
+                <span class="n">new_group</span> <span class="o">=</span> <span class="n">Groups</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">capacity</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">capacity</span><span class="p">),</span> <span class="n">principal</span><span class="o">=</span><span class="n">director</span><span class="p">,</span> <span class="n">photo</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
+                                                  <span class="n">yearbook</span><span class="o">=</span><span class="n">yearbook</span><span class="p">)</span>
+
+                <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;poprawnie dodano grupe o nazwie </span><span class="si">{</span><span class="n">new_group</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;list_groups&#39;</span><span class="p">)</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;Wszystkie pola musza byc wypelnione&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;add_group&#39;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="groups.views.GroupsListView" class="doc doc-heading">
+            <code>groups.views.GroupsListView</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="django.contrib.auth.mixins.LoginRequiredMixin">LoginRequiredMixin</span></code>, <code><span title="django.views.View">View</span></code></p>
+
+
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>groups/views.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">GroupsListView</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">groups_qs</span> <span class="o">=</span> <span class="n">Groups</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">()</span>  <span class="c1"># Inicjalizacja pustym QuerySetem</span>
+        <span class="n">search_query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>  <span class="c1"># 1. Pobieramy frazę wyszukiwania</span>
+
+        <span class="c1"># Utworzenie filtru bazowego (zależnego od roli)</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">get_user_permissions</span><span class="p">()</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;director.is_director&#39;</span><span class="p">}:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Pobieramy ID grup należących do dyrektora</span>
+                <span class="n">group_ids</span> <span class="o">=</span> <span class="n">Director</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">groups_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span>
+                                                                                                          <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">groups_qs</span> <span class="o">=</span> <span class="n">Groups</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">group_ids</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">Director</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">elif</span> <span class="n">user</span><span class="o">.</span><span class="n">get_user_permissions</span><span class="p">()</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;parent.is_parent&#39;</span><span class="p">}:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Pobieramy ID grup, do których należą dzieci rodzica</span>
+                <span class="n">group_ids</span> <span class="o">=</span> <span class="n">ParentA</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">kids</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s1">&#39;group_id&#39;</span><span class="p">,</span>
+                                                                                                   <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()</span>
+                <span class="n">groups_qs</span> <span class="o">=</span> <span class="n">Groups</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">group_ids</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">ParentA</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span>
+
+        <span class="c1"># 2. Aplikacja wyszukiwania (jeśli fraza nie jest pusta)</span>
+        <span class="k">if</span> <span class="n">search_query</span><span class="p">:</span>
+            <span class="c1"># Filtrowanie po nazwie grupy (case-insensitive contains)</span>
+            <span class="n">groups_qs</span> <span class="o">=</span> <span class="n">groups_qs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">name__icontains</span><span class="o">=</span><span class="n">search_query</span>
+            <span class="p">)</span>
+
+        <span class="c1"># 3. Dodanie adnotacji z licznikiem dzieci</span>
+        <span class="n">groups_qs</span> <span class="o">=</span> <span class="n">groups_qs</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+            <span class="n">child_count</span><span class="o">=</span><span class="n">Count</span><span class="p">(</span><span class="s1">&#39;kid&#39;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="n">Q</span><span class="p">(</span><span class="n">kid__is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-id&#39;</span><span class="p">)</span>
+
+        <span class="n">groups</span> <span class="o">=</span> <span class="n">groups_qs</span>  <span class="c1"># Zmieniamy nazwę zmiennej dla czytelności</span>
+
+        <span class="c1"># Paginacja</span>
+        <span class="n">paginator</span> <span class="o">=</span> <span class="n">Paginator</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">)</span>
+        <span class="n">page_obj</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">get_page</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;groups-list.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s1">&#39;page_obj&#39;</span><span class="p">:</span> <span class="n">page_obj</span><span class="p">,</span>
+            <span class="s1">&#39;search_query&#39;</span><span class="p">:</span> <span class="n">search_query</span>  <span class="c1"># Przekazujemy frazę wyszukiwania do szablonu</span>
+        <span class="p">})</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="groups.views.GroupDetailsView" class="doc doc-heading">
+            <code>groups.views.GroupDetailsView</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="django.contrib.auth.mixins.LoginRequiredMixin">LoginRequiredMixin</span></code>, <code><span title="django.views.View">View</span></code></p>
+
+
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>groups/views.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">GroupDetailsView</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Groups</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">pk</span><span class="p">))</span>
+        <span class="n">teachers_test</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">group</span><span class="o">.</span><span class="n">employee_set</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s2">&quot;user__email&quot;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">teachers</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">employee_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+        <span class="c1"># Pobieranie frazy wyszukiwania z URL</span>
+        <span class="n">search_query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="c1"># Pobieranie wszystkich aktywnych dzieci z grupy</span>
+        <span class="n">kids_qs</span> <span class="o">=</span> <span class="n">group</span><span class="o">.</span><span class="n">kid_set</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># --- APLIKACJA WYSZUKIWANIA ---</span>
+        <span class="k">if</span> <span class="n">search_query</span><span class="p">:</span>
+            <span class="n">kids_qs</span> <span class="o">=</span> <span class="n">kids_qs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">Q</span><span class="p">(</span><span class="n">first_name__icontains</span><span class="o">=</span><span class="n">search_query</span><span class="p">)</span> <span class="o">|</span>
+                <span class="n">Q</span><span class="p">(</span><span class="n">last_name__icontains</span><span class="o">=</span><span class="n">search_query</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">kids_qs</span><span class="p">)</span>
+        <span class="c1"># -------------------------------</span>
+
+        <span class="c1"># Finalna lista dzieci do przekazania</span>
+        <span class="n">kids</span> <span class="o">=</span> <span class="n">kids_qs</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">kids</span><span class="p">)</span>
+
+        <span class="n">month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">month</span><span class="p">)</span>
+        <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
+
+        <span class="c1"># Sprawdzenie uprawnień i renderowanie</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">get_user_permissions</span><span class="p">()</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;teacher.is_teacher&#39;</span><span class="p">}:</span>
+            <span class="c1"># ... (Logika nauczyciela) ...</span>
+            <span class="n">teacher_email</span> <span class="o">=</span> <span class="n">Employee</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">email</span>
+            <span class="k">if</span> <span class="n">teacher_email</span> <span class="ow">in</span> <span class="n">teachers_test</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;group-details.html&#39;</span><span class="p">,</span>
+                              <span class="p">{</span><span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span> <span class="s1">&#39;teachers&#39;</span><span class="p">:</span> <span class="n">teachers</span><span class="p">,</span> <span class="s1">&#39;kids&#39;</span><span class="p">:</span> <span class="n">kids</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="n">month</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="n">year</span><span class="p">,</span>
+                               <span class="s1">&#39;search_query&#39;</span><span class="p">:</span> <span class="n">search_query</span><span class="p">})</span>
+
+        <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">get_user_permissions</span><span class="p">()</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;director.is_director&#39;</span><span class="p">}:</span>
+            <span class="c1"># ... (Logika dyrektora) ...</span>
+            <span class="n">director</span> <span class="o">=</span> <span class="n">Director</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">director</span> <span class="o">==</span> <span class="n">group</span><span class="o">.</span><span class="n">principal</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;group-details.html&#39;</span><span class="p">,</span>
+                              <span class="p">{</span><span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span> <span class="s1">&#39;teachers&#39;</span><span class="p">:</span> <span class="n">teachers</span><span class="p">,</span> <span class="s1">&#39;kids&#39;</span><span class="p">:</span> <span class="n">kids</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="n">month</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="n">year</span><span class="p">,</span>
+                               <span class="s1">&#39;search_query&#39;</span><span class="p">:</span> <span class="n">search_query</span><span class="p">})</span>
+
+        <span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">get_user_permissions</span><span class="p">()</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;parent.is_parent&#39;</span><span class="p">}:</span>
+            <span class="c1"># ... (Logika rodzica) ...</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">ParentA</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">parent_kids</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">kids</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">allow</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">kid</span> <span class="ow">in</span> <span class="n">parent_kids</span><span class="p">:</span>
+                <span class="c1"># Sprawdzenie, czy przefiltrowana lista dzieci zawiera któreś z dzieci rodzica</span>
+                <span class="c1"># Ważne: Sprawdzenie &#39;if kid in kids:&#39; jest nieoptymalne, ale zgodne z Twoją logiką.</span>
+                <span class="c1"># W praktyce lepiej sprawdzić, czy rodzic ma dzieci w danej grupie.</span>
+                <span class="k">if</span> <span class="n">kid</span> <span class="ow">in</span> <span class="n">kids</span><span class="p">:</span>
+                    <span class="n">allow</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">allow</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;group-details.html&#39;</span><span class="p">,</span>
+                              <span class="p">{</span><span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span> <span class="s1">&#39;teachers&#39;</span><span class="p">:</span> <span class="n">teachers</span><span class="p">,</span> <span class="s1">&#39;kids&#39;</span><span class="p">:</span> <span class="n">kids</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="n">month</span><span class="p">,</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span> <span class="n">year</span><span class="p">,</span>
+                               <span class="s1">&#39;search_query&#39;</span><span class="p">:</span> <span class="n">search_query</span><span class="p">})</span>
+
+        <span class="k">raise</span> <span class="n">PermissionDenied</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="groups.views.AssignExistingKidToGroupView" class="doc doc-heading">
+            <code>groups.views.AssignExistingKidToGroupView</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="django.contrib.auth.mixins.LoginRequiredMixin">LoginRequiredMixin</span></code>, <code><span title="django.contrib.auth.mixins.PermissionRequiredMixin">PermissionRequiredMixin</span></code>, <code><span title="django.views.View">View</span></code></p>
+
+
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>groups/views.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AssignExistingKidToGroupView</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">PermissionRequiredMixin</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+    <span class="n">permission_required</span> <span class="o">=</span> <span class="s1">&#39;director.is_director&#39;</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;kid_assign_to_group.html&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_pk</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse_lazy</span><span class="p">(</span><span class="s1">&#39;group_details&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;pk&#39;</span><span class="p">:</span> <span class="n">group_pk</span><span class="p">})</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Groups</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+        <span class="n">director</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Director</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="c1"># Logika wyszukiwania (opcjonalnie, jeśli dodasz pole &#39;q&#39; do URL)</span>
+        <span class="n">search_query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Dzieci, które można przypisać: należą do dyrektora, są aktywne i NIE mają obecnie ustawionej grupy LUB są w innej grupie.</span>
+        <span class="c1"># Najprostszy filtr to: nie mają przypisanej grupy LUB mają inną grupę</span>
+        <span class="n">available_kids_qs</span> <span class="o">=</span> <span class="n">Kid</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">principal</span><span class="o">=</span><span class="n">director</span><span class="p">,</span>
+            <span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="c1"># Dzieci, które albo mają grupę null, albo mają grupę inną niż obecna</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">Q</span><span class="p">(</span><span class="n">group__isnull</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">|</span> <span class="o">~</span><span class="n">Q</span><span class="p">(</span><span class="n">group__pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Zastosowanie wyszukiwania</span>
+        <span class="k">if</span> <span class="n">search_query</span><span class="p">:</span>
+            <span class="n">available_kids_qs</span> <span class="o">=</span> <span class="n">available_kids_qs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">Q</span><span class="p">(</span><span class="n">first_name__icontains</span><span class="o">=</span><span class="n">search_query</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">last_name__icontains</span><span class="o">=</span><span class="n">search_query</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span>
+            <span class="s1">&#39;available_kids&#39;</span><span class="p">:</span> <span class="n">available_kids_qs</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;last_name&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;search_query&#39;</span><span class="p">:</span> <span class="n">search_query</span><span class="p">,</span>
+        <span class="p">})</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Groups</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+        <span class="n">director</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Director</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="c1"># POBIERAMY LISTĘ ID DZIECI Z CHECKBOXÓW (np. [&#39;1&#39;, &#39;5&#39;, &#39;9&#39;])</span>
+        <span class="n">kid_ids</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;kid_ids&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">kid_ids</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Nie wybrano żadnego dziecka do przypisania.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_success_url</span><span class="p">(</span><span class="n">pk</span><span class="p">))</span>
+
+        <span class="c1"># Filtrujemy wybrane dzieci, upewniając się, że należą do tego dyrektora</span>
+        <span class="n">kids_to_assign</span> <span class="o">=</span> <span class="n">Kid</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">pk__in</span><span class="o">=</span><span class="n">kid_ids</span><span class="p">,</span>
+            <span class="n">principal</span><span class="o">=</span><span class="n">director</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Aktualizujemy pole &#39;group&#39; dla wszystkich wybranych dzieci</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">kids_to_assign</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Pomyślnie przypisano </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> dzieci do grupy </span><span class="si">{</span><span class="n">group</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;Nie udało się przypisać dzieci lub zostały one już usunięte/przypisane.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_success_url</span><span class="p">(</span><span class="n">pk</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="groups.views.AssignTeachersView" class="doc doc-heading">
+            <code>groups.views.AssignTeachersView</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="django.contrib.auth.mixins.LoginRequiredMixin">LoginRequiredMixin</span></code>, <code><span title="django.contrib.auth.mixins.PermissionRequiredMixin">PermissionRequiredMixin</span></code>, <code><span title="django.views.View">View</span></code></p>
+
+
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>groups/views.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AssignTeachersView</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">PermissionRequiredMixin</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+    <span class="n">permission_required</span> <span class="o">=</span> <span class="s1">&#39;director.is_director&#39;</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;teacher_assign_to_group.html&#39;</span>  <span class="c1"># Utwórz ten szablon</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_pk</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse_lazy</span><span class="p">(</span><span class="s1">&#39;group_details&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;pk&#39;</span><span class="p">:</span> <span class="n">group_pk</span><span class="p">})</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Groups</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+
+        <span class="c1"># Tworzymy formularz, przekazując ID grupy i dyrektora do __init__</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AssignTeachersForm</span><span class="p">(</span>
+            <span class="n">group_pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span>
+            <span class="n">current_user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+            <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span>
+        <span class="p">})</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Groups</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+
+        <span class="c1"># Przekazujemy dane POST i te same argumenty do formularza</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">AssignTeachersForm</span><span class="p">(</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span>
+            <span class="n">group_pk</span><span class="o">=</span><span class="n">pk</span><span class="p">,</span>
+            <span class="n">current_user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="c1"># Zbieramy QuerySet wybranych nauczycieli</span>
+            <span class="n">teachers_qs</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;teachers_to_assign&#39;</span><span class="p">]</span>
+
+            <span class="c1"># 1. Aktualizujemy pole &#39;group&#39; dla wszystkich wybranych nauczycieli</span>
+            <span class="c1"># Używamy .update() dla efektywności</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="n">teachers_qs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">)</span>
+
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Pomyślnie przypisano </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> nauczycieli do grupy </span><span class="si">{</span><span class="n">group</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_success_url</span><span class="p">(</span><span class="n">pk</span><span class="p">))</span>
+
+        <span class="c1"># Jeśli formularz jest niepoprawny, renderujemy go ponownie z błędami</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span>
+            <span class="s1">&#39;group&#39;</span><span class="p">:</span> <span class="n">group</span><span class="p">,</span>
+        <span class="p">})</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><hr />
+<h4 id="kluczowe-procesy">Kluczowe Procesy:</h4>
+<ol>
+<li><strong>Tworzenie Grupy</strong>: Wymaga wcześniejszego wgrania ikon w module <code>director</code>.</li>
+<li><strong>Usuwanie Grupy</strong>: System nie usuwa danych trwale. Grupa staje się nieaktywna, a przypisane do niej dzieci zostają "uwolnione" (ich pole grupy zostaje w&gt;</li>
+</ol>
+<hr />
+<pre class="mermaid"><code>erDiagram
+    %% CORE TABLE: Group Definition
+    DIRECTOR_DIRECTOR ||--o{ GROUPS_GROUPS : "OneToMany, Właściciel Grupy"
+    DIRECTOR_GROUPPHOTOS }|--|| GROUPS_GROUPS : "ForeignKey, Ikona Grupy"
+
+    GROUPS_GROUPS {
+        bigint id PK
+        bigint principal_id FK
+        bigint photo_id FK
+        varchar name
+        integer capacity
+        integer yearbook
+        boolean is_active
+    }
+
+    %% RELATIONS TO OTHER APPS
+    GROUPS_GROUPS ||--o{ CHILDREN_KID : "OneToMany, Zawiera Dzieci"
+    GROUPS_GROUPS }o--|| TEACHER_EMPLOYEE : "ForeignKey, Nauczyciel Grupy"
+    BLOG_POST }o--|| GROUPS_GROUPS : "ManyToMany, Adresat Ogłoszenia"
+
+    %% JUNCTION TABLE for Blog
+    BLOG_POST_GROUP {
+        bigint id PK
+        bigint post_id FK
+        bigint groups_id FK
+    }
+
+    BLOG_POST ||--o{ BLOG_POST_GROUP : "Relacja do Postów"
+    GROUPS_GROUPS ||--o{ BLOG_POST_GROUP : "Relacja do Grup (Adresowanie)"</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>
