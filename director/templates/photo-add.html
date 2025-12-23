@@ -1,95 +1,99 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90% ">
-    <form method="post" action="#" enctype='multipart/form-data'>
-        {% csrf_token %}
-        <section class="h-100">
+    <div class="flex h-screen w-full overflow-hidden">
+        <div class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light dark:bg-background-dark relative">
+            <div class="flex flex-col w-full max-w-[960px] mx-auto px-6 py-8 md:px-12 md:py-10">
 
-            <div class="container py-5 h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
+                <nav class="flex flex-wrap gap-2 items-center mb-6 text-sm">
+                    <a class="text-[#618961] dark:text-[#8cb88c] hover:text-primary font-medium transition-colors" href="{% url 'photos_list' %}">Lista Ikon</a>
+                    <span class="text-[#618961] dark:text-[#8cb88c] font-medium">/</span>
+                    <span aria-current="page" class="text-[#111811] dark:text-white font-medium">Dodaj Nową</span>
+                </nav>
 
-                                <div class="col" style="color: #75736B">
-                                    <div class="card-body p-md-5 ">
-                                        {% if messages %}
-                                            {% for message in messages %}
-                                                <div class="alert alert-{{ message.tags }}"
-                                                     style="background-color: #FF5F57; color: white; text-align: center; font-size: 30px">
-                                                    {{ message }}
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                        <div class="row">
+                <div class="flex flex-col gap-2 mb-8">
+                    <h1 class="text-[#111811] dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Dodaj Nową Ikonkę</h1>
+                    <p class="text-[#618961] dark:text-[#a1cca1] text-base font-normal max-w-2xl">Prześlij nową grafikę, która będzie używana dla grup przedszkolnych lub planów żywieniowych.</p>
+                </div>
 
-                                            <div class="col mb-4">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'photos_list' %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col mb-4">
-                                                <h2 class="text-uppercase d-flex justify-content-end"
-                                                    style="color: #75736B">Dodaj
-                                                    Ikonke</h2>
-                                            </div>
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mb-6 p-4 rounded-xl text-center font-bold {% if message.tags == 'error' %}bg-red-500 text-white{% else %}bg-primary text-background-dark{% endif %} shadow-sm">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
 
+                <div class="bg-white dark:bg-[#1a2e1a] rounded-xl shadow-sm border border-[#e5e7eb] dark:border-[#2a3e2a] p-6 md:p-8">
+                    <form method="post" enctype="multipart/form-data" class="flex flex-col gap-8 max-w-[600px]">
+                        {% csrf_token %}
 
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[#111811] dark:text-gray-200 text-sm font-bold uppercase tracking-wider" for="name">Nazwa Ikonki</label>
+                            <input name="name" id="name" type="text" required
+                                   class="w-full rounded-lg bg-background-light dark:bg-[#102210] border border-[#dbe6db] dark:border-[#2a3e2a] text-[#111811] dark:text-white placeholder-[#618961] dark:placeholder-[#4a6b4a] focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none h-12 px-4 text-base transition-shadow"
+                                   placeholder="np. Słoneczniki lub Grupa Żabki">
+                        </div>
 
-                                                <label class="form-label" for="form3Example1n">Typ iconki</label>
-                                                <select class="form-select form-select-lg" name="type">
-                                                    <option value="group">Iconka do grup</option>
-                                                    <option value="meal">Iconka do posilkow</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                <label class="form-label" for="role">Zdjecie:</label>
-                                                <input class="form-control" type="file" name="file">
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                <label class="form-label" for="name">Nazwa:</label>
-                                                <input class="form-control" type="text" name="name" id="name">
-                                            </div>
-
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="d-flex justify-content-end pt-3">
-                                                <button type="submit" class="btn"
-                                                        style="background-color: #75736B; color: white; width: 35%">
-                                                    DODAJ
-                                                </button>
-                                            </div>
-                                        </div>
-
+                        <div class="flex flex-col gap-2">
+                            <span class="text-[#111811] dark:text-gray-200 text-sm font-bold uppercase tracking-wider">Kategoria</span>
+                            <div class="flex p-1 bg-background-light dark:bg-[#102210] rounded-lg w-full sm:w-auto self-start border border-[#dbe6db] dark:border-[#2a3e2a]">
+                                <label class="flex-1 sm:flex-none relative cursor-pointer">
+                                    <input type="radio" name="type" value="group" class="peer sr-only" checked>
+                                    <div class="px-6 py-2 rounded-md text-sm font-medium text-[#618961] dark:text-[#8cb88c] transition-all peer-checked:bg-white dark:peer-checked:bg-[#2a3e2a] peer-checked:text-[#111811] dark:peer-checked:text-white peer-checked:shadow-sm hover:text-[#111811] dark:hover:text-white flex items-center justify-center gap-2">
+                                        <span class="material-symbols-outlined text-[18px]">groups</span>
+                                        Ikonka Grupy
                                     </div>
+                                </label>
+                                <label class="flex-1 sm:flex-none relative cursor-pointer">
+                                    <input type="radio" name="type" value="meal" class="peer sr-only">
+                                    <div class="px-6 py-2 rounded-md text-sm font-medium text-[#618961] dark:text-[#8cb88c] transition-all peer-checked:bg-white dark:peer-checked:bg-[#2a3e2a] peer-checked:text-[#111811] dark:peer-checked:text-white peer-checked:shadow-sm hover:text-[#111811] dark:hover:text-white flex items-center justify-center gap-2">
+                                        <span class="material-symbols-outlined text-[18px]">restaurant_menu</span>
+                                        Ikonka Posiłku
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <span class="text-[#111811] dark:text-gray-200 text-sm font-bold uppercase tracking-wider">Plik Graficzny</span>
+                            <div class="relative flex flex-col items-center justify-center w-full h-64 rounded-xl border-2 border-dashed border-[#dbe6db] dark:border-[#2a3e2a] bg-background-light dark:bg-[#102210] hover:bg-[#ecfdf5] dark:hover:bg-[#142814] hover:border-primary/50 transition-colors cursor-pointer group">
+                                <input type="file" name="file" accept=".jpg, .jpeg" required
+                                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                       onchange="updateFileName(this)">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+                                    <div class="bg-white dark:bg-[#2a3e2a] p-3 rounded-full shadow-sm mb-4 group-hover:scale-110 transition-transform duration-200">
+                                        <span class="material-symbols-outlined text-3xl text-primary">cloud_upload</span>
+                                    </div>
+                                    <p class="mb-2 text-base text-[#111811] dark:text-white font-medium" id="file-label">
+                                        <span class="text-primary font-bold hover:underline">Kliknij, aby przesłać</span> lub przeciągnij plik
+                                    </p>
+                                    <p class="text-xs text-[#618961] dark:text-[#8cb88c]">Tylko pliki JPG (MAX. 2MB)</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
+
+                        <div class="flex items-center gap-4 mt-4 pt-4 border-t border-[#f0f4f0] dark:border-[#2a3e2a]">
+                            <button type="submit" class="px-6 py-3 rounded-lg bg-primary hover:bg-[#10c910] text-[#052e05] font-bold text-sm shadow-sm transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                                Zapisz Ikonkę
+                            </button>
+                            <a href="{% url 'photos_list' %}" class="px-6 py-3 rounded-lg bg-transparent hover:bg-background-light dark:hover:bg-[#2a3e2a] text-[#618961] dark:text-[#8cb88c] hover:text-[#111811] dark:hover:text-white font-medium text-sm transition-colors">
+                                Anuluj
+                            </a>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </section>
-    </form>
+        </div>
+    </div>
 
+    <script>
+        function updateFileName(input) {
+            const label = document.getElementById('file-label');
+            if (input.files && input.files.length > 0) {
+                label.innerHTML = "Wybrano: <span class='text-primary'>" + input.files[0].name + "</span>";
+            }
+        }
+    </script>
 {% endblock %}

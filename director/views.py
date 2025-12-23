@@ -171,6 +171,7 @@ class GiveDirectorPermissions(PermissionRequiredMixin, LoginRequiredMixin, View)
     permission_required = 'director.is_director'
 
     def get(self, request):
+        # Pobieramy tylko tych pracowników, którzy są przypisani do dyrektora
         employees = Employee.objects.filter(principal=Director.objects.get(user=request.user)).order_by('-id')
         paginator = Paginator(employees, 10)
         page = request.GET.get('page')
@@ -178,19 +179,31 @@ class GiveDirectorPermissions(PermissionRequiredMixin, LoginRequiredMixin, View)
         return render(request, 'give-director-permission.html', context={'page_obj': page_obj})
 
     def post(self, request):
+        action = request.POST.get('action')
         search = request.POST.get('search')
-        if search:
-            employees = Employee.objects.filter(principal=Director.objects.get(user=request.user)).filter(
+        director = Director.objects.get(user=request.user)
+
+        # Obsługa wyszukiwania
+        if action == 'search' or search:
+            employees = Employee.objects.filter(principal=director).filter(
                 user__email__icontains=search).order_by('-id')
             paginator = Paginator(employees, 10)
             page = request.GET.get('page')
             page_obj = paginator.get_page(page)
             return render(request, 'give-director-permission.html', context={'page_obj': page_obj})
-        content_type = ContentType.objects.get_for_model(Director)
-        permission = Permission.objects.get(content_type=content_type, codename='is_director')
-        pk = list(map(int, request.POST.getlist('pk')))
-        employees = Employee.objects.filter(id__in=pk)
-        for employee in employees:
-            employee.user.user_permissions.add(permission)
+
+        # Obsługa nadawania uprawnień
+        if action == 'grant':
+            content_type = ContentType.objects.get_for_model(Director)
+            permission = Permission.objects.get(content_type=content_type, codename='is_director')
+            pk_list = request.POST.getlist('pk')
+
+            if pk_list:
+                employees = Employee.objects.filter(id__in=pk_list)
+                for employee in employees:
+                    employee.user.user_permissions.add(permission)
+                messages.success(request, f'Pomyślnie nadano uprawnienia dla {employees.count()} pracowników.')
+            else:
+                messages.error(request, 'Nie wybrano żadnego pracownika.')
 
         return redirect('give-permissions')

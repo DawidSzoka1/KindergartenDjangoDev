@@ -1,90 +1,82 @@
 {% extends "base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90% ">
-    <form method="post" action="#" enctype='multipart/form-data'>
-        {% csrf_token %}
-        <section class="h-100">
+    <div class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light dark:bg-background-dark">
+        <main class="flex-1 p-4 sm:p-6 md:p-8">
+            <div class="max-w-4xl mx-auto">
 
-            <div class="container py-5 h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
+                <div class="flex flex-wrap gap-2 mb-6 text-sm">
+                    <a class="text-[#618961] dark:text-gray-400 font-medium hover:text-primary transition-colors" href="{% url 'home_page' %}">Dashboard</a>
+                    <span class="text-[#618961] dark:text-gray-400 font-medium">/</span>
+                    <a class="text-[#618961] dark:text-gray-400 font-medium hover:text-primary transition-colors" href="{% url 'contact' %}">Dane Kontaktowe</a>
+                    <span class="text-[#618961] dark:text-gray-400 font-medium">/</span>
+                    <span class="text-[#111811] dark:text-white font-medium">Edycja</span>
+                </div>
 
-                                <div class="col" style="color: #75736B">
-                                    <div class="card-body p-md-5 ">
-                                        {% if messages %}
-                                            {% for message in messages %}
-                                                <div class="alert alert-{{ message.tags }}"
-                                                     style="background-color: #FF5F57; color: white; text-align: center; font-size: 30px">
-                                                    {{ message }}
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                        <div class="row">
+                <div class="bg-white dark:bg-[#1a2e1a] rounded-xl shadow-sm border border-[#dbe6db] dark:border-gray-800 overflow-hidden">
+                    <div class="bg-primary/10 border-b border-[#dbe6db] dark:border-gray-800 p-6">
+                        <h1 class="text-[#111811] dark:text-white text-2xl font-black leading-tight tracking-tight uppercase">Zmień Dane Kontaktowe</h1>
+                    </div>
 
-                                            <div class="col mb-4">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'contact' %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col mb-4">
-                                                <h2 class="text-uppercase d-flex justify-content-end"
-                                                    style="color: #75736B">Zmień
-                                                    Dane kontktowe</h2>
-                                            </div>
+                    <form method="post" class="p-8">
+                        {% csrf_token %}
+                        {{ form.director.as_hidden }}
 
-                                            <div class="col-md-6 mb-4">
-                                                {{ form.director.as_hidden }}
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
-                                                {{ form.email_address|as_crispy_field }}
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                {{ form.phone|as_crispy_field }}
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                {{ form.localization|as_crispy_field }}
-                                            </div>
-
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="d-flex justify-content-end pt-3">
-                                                <button type="submit" class="btn"
-                                                        style="background-color: #75736B; color: white; width: 35%">
-                                                    DODAJ
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                    </div>
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="mb-6 p-4 rounded-lg bg-red-100 text-red-700 text-center font-bold">
+                                    {{ message }}
                                 </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 custom-form-grid">
+                            <div class="md:col-span-2">
+                                {{ form.localization|as_crispy_field }}
+                            </div>
+                            <div class="md:col-span-1">
+                                {{ form.email_address|as_crispy_field }}
+                            </div>
+                            <div class="md:col-span-1">
+                                {{ form.phone|as_crispy_field }}
                             </div>
                         </div>
-                    </div>
+
+                        <div class="flex items-center justify-end gap-4 mt-10 pt-6 border-t border-gray-100 dark:border-gray-800">
+                            <a href="{% url 'contact' %}" class="px-6 py-3 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors font-medium">Anuluj</a>
+                            <button type="submit" class="px-10 py-3 bg-primary text-[#111811] font-bold rounded-lg shadow-md hover:bg-primary/90 transition-all uppercase tracking-tight">
+                                Zapisz Zmiany
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </section>
-    </form>
+        </main>
+    </div>
 
+    <style>
+        /* Stylowanie pól Crispy dla Tailwind */
+        .custom-form-grid label {
+            font-weight: 700;
+            color: #618961;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .custom-form-grid input, .custom-form-grid textarea {
+            width: 100%;
+            border-radius: 0.5rem;
+            border: 1px solid #dbe6db;
+            padding: 0.75rem;
+            background-color: #f6f8f6;
+        }
+        .dark .custom-form-grid input, .dark .custom-form-grid textarea {
+            background-color: #102210;
+            border-color: #2a3e2a;
+            color: white;
+        }
+    </style>
 {% endblock %}

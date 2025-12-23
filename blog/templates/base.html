@@ -159,6 +159,20 @@
                             <span class="material-symbols-outlined">restaurant_menu</span>
                             <p class="text-sm font-medium leading-normal">Menu (Jadłospis)</p>
                         </a>
+                        <div class="my-2 border-t border-gray-100 dark:border-gray-800"></div>
+
+                        <a href="{% url 'photos_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">image</span>
+                            <p class="text-sm font-medium">Zarządzaj Ikonami</p>
+                        </a>
+                        <a href="{% url 'contact' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">contact_phone</span>
+                            <p class="text-sm font-medium">Dane Kontaktowe</p>
+                        </a>
+                        <a href="{% url 'give-permissions' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">verified_user</span>
+                            <p class="text-sm font-medium">Uprawnienia Kadry</p>
+                        </a>
                     {% endif %}
                     <!-- Moja grupa — tylko nauczyciel -->
                     {% if perms.teacher.is_teacher %}
