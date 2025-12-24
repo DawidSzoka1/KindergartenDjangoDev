@@ -1,28 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
-
-
-    <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Bootstrap 5 404 Error Page</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    </head>
-
-
-    <body>
-        <div class="d-flex align-items-center justify-content-center vh-100">
-            <div class="text-center">
-                <h1 class="display-1 fw-bold">404</h1>
-                <p class="fs-3"> <span class="text-danger">Opps!</span> Page not found.</p>
-                <p class="lead">
-                    The page you’re looking for doesn’t exist.
-                  </p>
-                <a href="{% url 'home_page' %}" class="btn btn-primary">Go Home</a>
-            </div>
+<html lang="pl" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Strona nie istnieje</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#a78bfa", "bg-dark": "#102210" },
+                    fontFamily: { "display": ["Lexend", "sans-serif"] }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-display bg-[#f6f8f6] dark:bg-bg-dark min-h-screen flex items-center justify-center p-6">
+<div class="max-w-md w-full text-center relative">
+    <div class="mb-8 flex justify-center">
+        <div class="size-24 rounded-3xl bg-primary/10 flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-5xl">explore_off</span>
         </div>
-    </body>
-
-
+    </div>
+    <h1 class="text-9xl font-black text-primary/10 tracking-tighter absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 -z-10">404</h1>
+    <h2 class="text-4xl font-black text-gray-900 dark:text-white mb-4 uppercase tracking-tight">Zgubiłeś się?</h2>
+    <p class="text-gray-500 dark:text-gray-400 mb-8 font-medium">Strona, której szukasz, prawdopodobnie została przeniesiona lub nigdy nie istniała. Sprawdź adres URL i spróbuj ponownie.</p>
+    <a href="{% url 'home_page' %}" class="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/30 hover:scale-105 transition-all uppercase tracking-tighter">
+        <span class="material-symbols-outlined">home</span>
+        Powrót do Dashboardu
+    </a>
+</div>
+</body>
 </html>
