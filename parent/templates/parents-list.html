@@ -1,200 +1,222 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" href="{% static 'input_foucs.css' %}">
-    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
-        <!-- Container wrapper -->
-        <div class="container-fluid">
-            <!-- Left links -->
-            <ul class="navbar-nav flex-row">
 
-                <li class="nav-item me-2 me-lg-0">
-                    <h2>
-                        <a href="{% url 'home_page' %}" role="button"
-                           style="color: #75736B; text-decoration:none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                 height="32"
-                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                 viewBox="0 0 16 16">
-                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                            </svg>
+    <body class="bg-background-light dark:bg-background-dark font-display text-text-light-primary dark:text-text-dark-primary">
+    <div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div class="flex h-full grow">
 
-                            MENU
+            <main class="flex-1 p-8">
+                <div class="flex flex-col max-w-7xl mx-auto">
 
-                        </a>
-                    </h2>
-                </li>
+                    <header class="flex flex-wrap justify-between items-center gap-4 mb-6 pt-4 border-b pb-4 border-border-light dark:border-border-dark">
+                        <div class="flex flex-col gap-1">
+                            <p class="text-text-light-primary dark:text-text-dark-primary text-3xl font-bold leading-tight">RODZICE</p>
+                            <p class="text-text-light-secondary dark:text-text-dark-secondary text-base font-normal leading-normal">Widok i zarządzanie rekordami rodziców.</p>
+                        </div>
 
-            </ul>
-            <!-- Left links -->
-            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <!-- Left links -->
-                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
-                    <li class="nav-item" style="font-size: 35px; "><a href="{% url 'list_parent' %}"
-                                                                      style=" text-decoration: none; color:#75736B; margin-left: auto; margin-right: auto"><b>RODZICE</b></a>
-                    </li>
-                </ul>
-            </div>
-            {% if perms.director.is_director %}
-                <ul class="navbar-nav d-flex flex-row me-1">
-                    <li class="nav-item">
-                        <button class="btn" onclick="location.href='{% url 'add_kid' %}'"
-                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
-                            DODAJ RODZICA
-                        </button>
-                    </li>
-                </ul>
-            {% endif %}
-        </div>
-        <!-- Container wrapper -->
-    </nav>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}"
-                 style="color: white; text-align: center; font-size: 30px">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    {% if perms.director.is_director %}
-        <div class="justify-content-center">
-            <form class="d-flex" method="POST" action="#"
-                  style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">
-                {% csrf_token %}
-                <input class="form-control" type="search" placeholder="Wpisz mail"
-                       aria-label="Wpisz imie dziecka" name="search">
-                <span><button class="btn " type="submit"
-                              style="margin-left: -8px; background-color: #BAB1AB; color: white">SZUKAJ</button></span>
-            </form>
-        </div>
-    {% endif %}
-    {% for parent in page_obj %}
+                        {% if perms.director.is_director %}
+                            <button class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-6 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-primary/90 transition-colors"
+                                    onclick="location.href='{% url 'invite_standalone_parent' %}'">
+                                <span class="material-symbols-outlined">add</span>
+                                <span class="truncate">DODAJ RODZICA</span>
+                            </button>
+                        {% endif %}
+                    </header>
 
-
-        <div class="container-fluid mt-3"
-             style="background-color: white">
-            <div class="row align-item-center" style="padding-top: 10px;">
-                <div class="col mb-1"
-                     style="justify-content: start">
-                    {% if parent.gender == 2 %}
-                        <img class="img"
-                             style="height: 150px;"
-                             src="{% static 'parent_female.jpg' %}"
-                             alt="">
-                    {% elif parent.gender == 1 %}
-                        <img class="img"
-                             style="height: 150px; margin-left: 3%; margin-right: 2%"
-                             src="{% static 'parent_male.jpg' %}"
-                             alt="">
-                    {% else %}
-                        <img class="img"
-                             style="height: 150px; margin-left: 3%; margin-right: 2%"
-                             src="{% static 'gander_null.jpg' %}"
-                             alt="">
-                    {% endif %}
-                </div>
-                <div class="col-8" style="margin-top: 80px">
-
-                    <a href="{% url 'parent_profile' pk=parent.id %}"
-                       style="font-size: 20px; text-decoration:none; color: #75736B ">{{ parent.user.email }}</a>
-
-                </div>
-                <div class="col-2 ml-5"
-                     style="font-size: 20px; text-decoration:none; color: #75736B; margin-top: 80px ">
-
-                    {% if parent.first_name and parent.last_name %}
-
-                        {{ parent.first_name.title }} {{ parent.last_name.title }}
+                    {% if messages %}
+                        {% if messages %}
+                            <div class="mt-6">
+                                {% for message in messages %}
+                                    <div class="p-4 rounded-lg bg-green-500 text-white text-center text-lg">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
 
                     {% endif %}
 
-                </div>
-                <div class="col" style="margin-top: 80px">
-
-                    <div class="drodown">
-                        <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                           href="#"
-                           id="navbarDropdownMenuAvatar"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false"
-                           style="font-size: 20px;  text-decoration:none; color: #75736B; ">
-                            Opcje
-                        </a>
-                        <ul
-                                class="dropdown-menu dropdown-menu-end"
-                                aria-labelledby="navbarDropdownMenuAvatar"
-                        >
-                            <li>
-                                <a href="{% url 'parent_profile' pk=parent.id %}"
-                                   class="dropdown-item">Konto
-                                    Rodzica
-                                </a>
-                            </li>
-                            {% if perms.director.is_director %}
-                                <li>
-                                    <button class="btn dropdown-item" onclick="location.href='{% url 'add_parent_to_kid' parent.id %}'">
-                                        DODAJ DZIECKO
+                    {% if perms.director.is_director or perms.teacher.is_teacher %}
+                        <div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-border-light dark:border-border-dark mb-6">
+                            <form method="POST" action="{% url 'list_parent' %}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {% csrf_token %}
+                                <div class="md:col-span-2">
+                                    <label class="flex flex-col w-full">
+                                        <div class="flex w-full flex-1 items-stretch rounded-lg h-11 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark focus-within:ring-2 focus-within:ring-primary">
+                                            <div class="text-text-light-secondary dark:text-text-dark-secondary flex items-center justify-center pl-4">
+                                                <span class="material-symbols-outlined">search</span>
+                                            </div>
+                                            <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden text-text-light-primary dark:text-text-dark-primary focus:outline-none focus:ring-0 border-none bg-transparent h-full placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary px-2 text-sm font-normal leading-normal"
+                                                   placeholder="Szukaj po nazwisku lub mailu..."
+                                                   name="search"
+                                                   value="{{ search_query|default:'' }}"/>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="md:col-span-1 flex justify-end">
+                                    <button type="submit" class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-6 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-primary/90 transition-colors">
+                                        <span class="material-symbols-outlined">search</span>
+                                        <span class="truncate">SZUKAJ</span>
                                     </button>
-                                </li>
-                                <li>
-                                    <form method="POST"
-                                          action="{% url 'parent_delete' pk=parent.id %}">
-                                        {% csrf_token %}
-                                        <button class="dropdown-item"
-                                                type="submit"
-                                                name="delete"
-                                                value="Usuń"
-                                                onclick="return confirm('Jestes pewny ze chcesz usunac rodzica {{ parent.user.email }}');"
-                                        >USUŃ
-                                        </button>
-                                    </form>
-                                </li>
-                            {% endif %}
-                        </ul>
+                                </div>
+                            </form>
+                        </div>
+                    {% endif %}
+
+                    <div class="rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+                        <div>
+                            <table class="min-w-full divide-y divide-border-light dark:divide-border-dark">
+                                <thead class="bg-background-light dark:bg-background-dark">
+                                <tr>
+                                    <th class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-text-light-primary dark:text-text-dark-primary sm:pl-6" scope="col">Rodzic</th>
+                                    <th class="px-3 py-3.5 text-left text-sm font-semibold text-text-light-primary dark:text-text-dark-primary" scope="col">Kontakt (Email)</th>
+                                    <th class="px-3 py-3.5 text-left text-sm font-semibold text-text-light-primary dark:text-text-dark-primary" scope="col">Liczba Dzieci</th>
+                                    <th class="relative py-3.5 pl-3 pr-4 sm:pr-6" scope="col">
+                                        <span class="sr-only">Akcje</span>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody class="divide-y divide-border-light dark:divide-border-dark bg-surface-light dark:bg-surface-dark">
+                                {% for parent in page_obj %}
+                                    <tr>
+                                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                            <div class="flex items-center">
+                                                <div class="h-10 w-10 flex-shrink-0">
+                                                    {% if parent.gender == 2 %}
+                                                        <img class="h-10 w-10 rounded-full object-cover" src="{% static 'parent_female.jpg' %}" alt="Avatar kobiety"/>
+                                                    {% elif parent.gender == 1 %}
+                                                        <img class="h-10 w-10 rounded-full object-cover" src="{% static 'parent_male.jpg' %}" alt="Avatar mężczyzny"/>
+                                                    {% else %}
+                                                        <img class="h-10 w-10 rounded-full object-cover" src="{% static 'gander_null.jpg' %}" alt="Avatar neutralny"/>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="ml-4">
+                                                    <div class="font-medium text-text-light-primary dark:text-text-dark-primary">
+                                                        {% if parent.first_name and parent.last_name %}
+                                                            {{ parent.first_name.title }} {{ parent.last_name.title }}
+                                                        {% else %}
+                                                            Brak Imienia
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-text-light-secondary dark:text-text-dark-secondary">
+                                            <a href="{% url 'parent_profile' pk=parent.id %}" class="text-primary hover:text-primary/80 transition-colors">
+                                                {{ parent.user.email }}
+                                            </a>
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-text-light-secondary dark:text-text-dark-secondary">
+                                            {% if parent.num_children is not None %}
+                                                {{ parent.num_children }} Dzieci
+                                            {% else %}
+                                                Brak danych
+                                            {% endif %}
+                                        </td>
+
+                                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                            <div class="relative inline-block text-left"
+                                                 x-data="{ open: false }"
+                                                 @click.outside="open = false">
+
+                                                <button type="button"
+                                                        @click="open = !open"
+                                                        class="text-gray-500 dark:text-gray-400 hover:text-neutral-text dark:hover:text-white p-1 rounded-full transition-colors focus:outline-none">
+                                                    <span class="material-symbols-outlined">more_vert</span>
+                                                </button>
+
+                                                <div x-show="open"
+                                                     x-transition:enter="transition ease-out duration-100"
+                                                     x-transition:enter-start="transform opacity-0 scale-95"
+                                                     x-transition:enter-end="transform opacity-100 scale-100"
+                                                     x-transition:leave="transition ease-in duration-75"
+                                                     x-transition:leave-start="transform opacity-100 scale-100"
+                                                     x-transition:leave-end="transform opacity-0 scale-95"
+
+                                                     class="origin-top-right absolute right-0 mt-2 w-56 rounded-md bg-white dark:bg-gray-800 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none z-10 opacity-100">
+
+                                                    <div class="py-1">
+                                                        <a href="{% url 'parent_profile' pk=parent.id %}"
+                                                           class="block px-4 py-2 text-sm text-neutral-text dark:text-white hover:bg-neutral-background dark:hover:bg-gray-700 transition-colors">
+                                                            Konto Rodzica
+                                                        </a>
+
+                                                        {% if perms.director.is_director %}
+                                                            <button onclick="location.href='{% url 'add_parent_to_kid' parent.id %}'"
+                                                                    class="block w-full text-left px-4 py-2 text-sm text-neutral-text dark:text-white hover:bg-neutral-background dark:hover:bg-gray-700 transition-colors">
+                                                                DODAJ DZIECKO
+                                                            </button>
+
+                                                            <div class="my-1 border-t border-neutral-border dark:border-gray-700"></div>
+
+                                                            <form method="POST" action="{% url 'parent_delete' pk=parent.id %}" class="w-full">
+                                                                {% csrf_token %}
+                                                                <button type="submit" name="delete" value="Usuń"
+                                                                        class="block w-full text-left px-4 py-2 text-sm text-error dark:text-error/90 hover:bg-red-50 dark:hover:bg-red-900/50 transition-colors"
+                                                                        onclick="return confirm('Jestes pewny ze chcesz usunac rodzica {{ parent.user.email }}');">
+                                                                    USUŃ
+                                                                </button>
+                                                            </form>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
+
+                    {% if page_obj.has_other_pages %}
+                        <div class="flex items-center justify-center mt-6">
+                            <div class="flex items-center gap-2">
+
+                                {% if page_obj.has_previous %}
+                                    <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}"
+                                       class="flex items-center justify-center size-10 rounded-lg text-text-light-secondary dark:text-text-dark-secondary bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-background-light dark:hover:bg-background-dark transition-colors">
+                                        <span class="material-symbols-outlined text-base">chevron_left</span>
+                                    </a>
+                                {% else %}
+                                    <span class="flex items-center justify-center size-10 rounded-lg text-text-light-secondary dark:text-text-dark-secondary bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark opacity-50 cursor-not-allowed">
+                            <span class="material-symbols-outlined text-base">chevron_left</span>
+                        </span>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <button class="flex items-center justify-center size-10 rounded-lg text-white bg-primary">
+                                            <span class="text-sm font-medium">{{ num }}</span>
+                                        </button>
+                                    {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
+                                        <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}"
+                                           class="flex items-center justify-center size-10 rounded-lg text-text-light-secondary dark:text-text-dark-secondary bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-background-light dark:hover:bg-background-dark transition-colors">
+                                            <span class="text-sm font-medium">{{ num }}</span>
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}"
+                                       class="flex items-center justify-center size-10 rounded-lg text-text-light-secondary dark:text-text-dark-secondary bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-background-light dark:hover:bg-background-dark transition-colors">
+                                        <span class="material-symbols-outlined text-base">chevron_right</span>
+                                    </a>
+                                {% else %}
+                                    <span class="flex items-center justify-center size-10 rounded-lg text-text-light-secondary dark:text-text-dark-secondary bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark opacity-50 cursor-not-allowed">
+                            <span class="material-symbols-outlined text-base">chevron_right</span>
+                        </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+
                 </div>
-                <hr>
-            </div>
-
+            </main>
         </div>
+    </div>
 
-
-    {% endfor %}
-
-
-    {% if page_obj.has_other_pages %}
-        <div style="position: absolute; bottom: auto; left:45%">
-            {% if page_obj.has_previous %}
-
-                <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
-                   style=" font-size: 50px; color:#75736B">< </a>
-            {% else %}
-                <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
-                   style=" font-size: 50px; color:#75736B">< </a>
-            {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <a class="btn mb-4" href="?page={{ num }}"
-                       style=" font-size: 50px; color:#75736B">{{ num }}</a>
-                {% endif %}
-
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-                <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
-                   style=" text-decoration: none; font-size: 50px; color:#75736B"> ></a>
-            {% else %}
-
-                <a class="btn mb-4" href="?page=1"
-                   style=" font-size: 50px; color:#75736B"> > </a>
-            {% endif %}
-        </div>
-    {% endif %}
-
-
-
-
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    </body>
 {% endblock %}

@@ -1,5 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zaproszenie do Portalu Rodzica - KinderManage</title>
+    <style>
+        /* Styl bazowy dla lepszej kompatybilności */
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; }
 
-<a href="http://127.0.0.1:8000/{% url 'login'  %}">Click</a>
-Twoj email {{ email }}
-Twoje haslo {{ password }}
+        /* Twoje kolory (wersja inlinowa) */
+        :root {
+            --primary: #13ec13;
+            --background-light: #f6f8f6;
+            --text-dark: #111811;
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f6f8f6; font-family: 'Lexend', sans-serif; color: #111811;">
 
+<div style="text-align: center;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f6f8f6; max-width: 600px;">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <h1 style="color: #111811; font-size: 28px; font-weight: 700; margin: 0;">KinderManage Kindergarten</h1>
+            </td>
+        </tr>
+
+        <tr>
+            <td align="center" style="padding: 0 10px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff; border-radius: 12px; border: 1px solid #dbe6db; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+
+                    <tr>
+                        <td style="padding: 30px 30px 20px 30px;">
+                            <h2 style="color: #111811; font-size: 22px; font-weight: 700; margin: 0 0 15px 0;">Witaj w Portalu Rodzica!</h2>
+                            <p style="color: #111811; font-size: 16px; line-height: 1.6; margin: 0;">
+                                Witamy w naszym portalu! Poniżej znajdziesz swoje dane logowania, aby rozpocząć.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center" style="padding: 10px 30px 30px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #13ec131A; border-radius: 8px; padding: 20px;">
+                                <tr>
+                                    <td style="color: #111811; font-size: 18px; font-weight: 700; padding-bottom: 10px;">Dane Logowania</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #111811; font-size: 15px; line-height: 1.8;">
+                                        <p style="margin: 0;">
+                                            <strong>Adres E-mail:</strong> <span style="font-weight: 600;">{{ email }}</span>
+                                        </p>
+                                        <p style="margin: 0;">
+                                            <strong>Hasło Tymczasowe:</strong> <span style="font-weight: 600; color: #cc0000;">{{ password }}</span>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center" style="padding: 10px 30px 30px 30px;">
+                            <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                                <tr>
+                                    <td align="center" style="border-radius: 8px; background-color: #13ec13; padding: 12px 25px;">
+                                        <a href="http://127.0.0.1:8000{% url 'login' %}" target="_blank" style="font-size: 16px; font-weight: 700; color: #111811; text-decoration: none; display: inline-block;">
+                                            Przejdź do Portalu i Zaloguj się
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 20px 30px 30px 30px; border-top: 1px solid #dbe6db;">
+                            <p style="color: #111811; font-size: 15px; line-height: 1.6; margin: 0;">
+                                Jeśli masz pytania, skontaktuj się z nami pod adresem <a style="color: #13ec13; text-decoration: none;" href="mailto:support@KinderManage.com">support@KinderManage.com</a>.
+                            </p>
+                            <p style="color: #111811; font-size: 15px; line-height: 1.6; margin: 15px 0 0 0;">
+                                Z poważaniem,<br/>Zespół KinderManage
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <p style="color: #618961; font-size: 12px; margin: 0;">&copy; 2025 KinderManage Kindergarten. Wszystkie prawa zastrzeżone.</p>
+            </td>
+        </tr>
+
+    </table>
+</div>
+</body>
+</html>

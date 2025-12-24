@@ -1,355 +1,256 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block content %}
-    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
-        <!-- Container wrapper -->
-        <div class="container-fluid">
-            <!-- Left links -->
+    <main class="flex-1 p-6 lg:p-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-wrap gap-2 mb-4">
+                <a class="text-primary dark:text-secondary text-sm font-medium" href="{% url 'list_groups' %}">Grupy</a>
+                <span class="text-gray-400 dark:text-gray-500 text-sm font-medium">/</span>
+                <span class="text-neutral-text dark:text-neutral-background text-sm font-medium">{{ group.name }}</span>
+            </div>
 
-            <ul class="navbar-nav flex-row">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-3 rounded-lg text-center font-medium"
+                         style="background-color: #5CB85C; color: white;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <header class="flex flex-wrap justify-between items-center gap-4 mb-8">
+                <div class="flex flex-col">
+                    <h1 class="text-neutral-text dark:text-white text-3xl font-bold tracking-tight">{{ group.name }}</h1>
+                    <p class="text-gray-500 dark:text-gray-400 text-base font-normal mt-1">Zarządzaj dziećmi, nauczycielami i ustawieniami tej grupy.</p>
+                </div>
+
                 {% if perms.director.is_director %}
-                    <li class="nav-item me-2 me-lg-0">
-
-                        <a href="{% url 'list_groups' %}" role="button"
-                           style="font-size: 25px; color: #75736B; text-decoration:none;">
-
-                            GRUPY
+                    <div class="flex flex-wrap gap-3">
+                        <a href="{% url 'group_update' pk=group.id %}" class="flex items-center justify-center rounded-lg h-10 px-4 bg-white dark:bg-gray-700 border border-neutral-border dark:border-gray-600 text-neutral-text dark:text-white text-sm font-semibold hover:bg-neutral-background dark:hover:bg-gray-600">
+                            <span class="truncate">Edytuj Grupę</span>
                         </a>
-                    </li>
-                {% else %}
-                    <li class="nav-item me-2 me-lg-0">
-                        <h2>
-                            <a href="{% url 'home_page' %}" role="button"
-                               style="color: #75736B; text-decoration:none;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                     height="32"
-                                     fill="currentColor" class="bi bi-caret-left-fill"
-                                     viewBox="0 0 16 16">
-                                    <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                </svg>
-
-                                MENU
-
-                            </a>
-                        </h2>
-                    </li>
-                {% endif %}
-
-            </ul>
-            <!-- Left links -->
-
-            {% if perms.director.is_director %}
-                <ul class="navbar-nav d-flex flex-row me-1">
-                    <li class="nav-item">
-                        <button class="btn" onclick="location.href='{% url 'group_update' pk=group.id %}'"
-                                style="font-size: 25px; margin-right: 2px; color: white; background-color: #75736B; text-decoration:none;">
-                            EDYTUJ GRUPĘ
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <form method="POST" action="{% url 'group_delete' pk=group.id %}">
+                        <form method="POST" action="{% url 'group_delete' pk=group.id %}" onsubmit="return confirm('Czy na pewno chcesz usunąć tę grupę? Dzieci zostaną bez grupy.');">
                             {% csrf_token %}
-                            <button class="btn" type="submit" name="delete"
-                                    value="Usuń"
-                                    style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;"
-                                    onclick="return confirm('Czy na pewno chcesz usnuac ta grupe? Jezli ja usuniesz wszystki dzieci w niej zostana bez grupy');"
-                            >USUŃ GRUPE
+                            <button type="submit" name="delete" value="Usuń"
+                                    class="flex items-center justify-center rounded-lg h-10 px-4 bg-red-600
+                                       text-white text-sm font-semibold
+                                       hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800">
+                                <span class="truncate">Usuń Grupę</span>
                             </button>
                         </form>
+                    </div>
+                {% endif %}
+            </header>
 
-                    </li>
-                </ul>
-            {% endif %}
-        </div>
-        <!-- Container wrapper -->
-    </nav>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}"
-                 style="color: white; text-align: center; font-size: 30px">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    <div class="row">
-        <div class="row">
-            <div class="row">
-                <figure>
-                    <img style="width: 15%; position: absolute;
-                            left: 12%; bottom: 40%;"
-                         src="{{ group.photo }}" alt="zdjecie">
-                    <figcaption style="position: absolute; font-size: 30px;
-                            left: 15%; bottom: 30%; color: #75736B;"><b>{{ group.name.upper }}</b></figcaption>
-                </figure>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            </div>
+                <aside class="lg:col-span-1 space-y-6">
 
-        </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-neutral-border dark:border-gray-700 p-5 text-center">
+                        <img class="size-24 rounded-full object-cover mx-auto mb-4 border-4 border-neutral-border dark:border-gray-700"
+                             src="{{ group.photo }}" alt="{{ group.name }} photo"/>
+                        <h2 class="text-xl font-bold text-neutral-text dark:text-white">{{ group.name.upper }}</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Rocznik: {{ group.yearbook }}</p>
 
-        <section class="vh-100" style="margin-left: 35%; width: 60%; margin-top: 5%;">
-            <div class="container h-100">
-                <div class="row d-flex justify-content-center align-items-center h-90">
-                    <div class="col-lg-12 col-xl-11">
-                        <div class="card text-white" style="border-radius: 25px; background-color: #BAB1AB">
-                            <div class="card-body p-md-5">
-                                <div class="row justify-content-center">
-                                    <div class="col-md-10">
-
-                                        <p class="text-center"></p>
-
-                                        <form class="mx-1" method="POST">
-                                            {% csrf_token %}
-                                            <div class="row">
-                                                {% for teacher in teachers %}
-                                                    {% if forloop.counter >= 2 %}
-                                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                            <label for="teacher"><a
-                                                                    href="{% url 'teacher-profile' pk=teacher.id %}">NAUCZYCIEL/KA
-                                                                GRUPY:</a></label>
-                                                            <a href="{% url 'teacher-profile' pk=teacher.id %}"
-                                                               style="text-decoration: none">
-                                                                {% if teacher.first_name or teacher.last_name %}
-                                                                    <input readonly class="form-control" name="teacher"
-                                                                           type="text"
-                                                                           value="{{ teacher.first_name }} {{ teacher.last_name }}">
-                                                                {% else %}
-                                                                    <input readonly class="form-control" name="teacher"
-                                                                           type="text"
-                                                                           value="{{ teacher.user.email }}">
-                                                                {% endif %}
-                                                            </a>
-                                                        </div>
-                                                    {% elif forloop.counter == 1 %}
-                                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                            <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
-                                                            <a href="{% url 'teacher-profile' pk=teacher.id %}"
-                                                               style="text-decoration: none">
-                                                                {% if teacher.first_name or teacher.last_name %}
-
-                                                                    <input readonly class="form-control" name="teacher"
-                                                                           type="text"
-                                                                           value="{{ teacher.first_name }} {{ teacher.last_name }}">
-
-                                                                {% else %}
-
-                                                                    <input readonly class="form-control" name="teacher"
-                                                                           type="text"
-                                                                           value="{{ teacher }}">
-
-
-                                                                {% endif %}
-                                                            </a>
-                                                        </div>
-                                                        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                            <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
-
-                                                            <input readonly class="form-control" name="teacher"
-                                                                   type="text"
-                                                                   value="Grupa nie ma jeszcze drugiego nauczyciela">
-                                                        </div>
-
-                                                    {% endif %}
-                                                {% empty %}
-                                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
-
-                                                        <input readonly class="form-control" name="teacher" type="text"
-                                                               value="Grupa jeszcze nie ma nauczyciela">
-                                                    </div>
-                                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                        <label for="teacher">NAUCZYCIEL/KA GRUPY:</label>
-
-                                                        <input readonly class="form-control" name="teacher" type="text"
-                                                               value="Grupa jeszcze nie ma nauczyciela">
-                                                    </div>
-                                                {% endfor %}
-
-                                            </div>
-                                            <div class="row  mt-3">
-                                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                    <label for="teacher">STAN DZIECI:</label>
-
-                                                    <input readonly class="form-control" name="teacher" type="text"
-                                                           value="{{ kids.count }}">
-                                                </div>
-                                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                    <label for="teacher">LICZBA MIEJSC:</label>
-
-                                                    <input readonly class="form-control" name="teacher" type="text"
-                                                           value="{{ group.capacity }}">
-                                                </div>
-
-                                            </div>
-                                            {% if perms.director.is_director or perms.teacher.is_teacher %}
-                                                <div class="row mt-4">
-                                                    <div class="col">
-                                                        <button class="btn " data-bs-toggle="collapse"
-                                                                style="background-color: #E6DCD3; color: white; width: 100%"
-                                                                aria-expanded="false" type="button"
-                                                                data-bs-target="#collapse"
-                                                                aria-controls="collapse">
-                                                            LISTA DZIECI
-                                                        </button>
-                                                        <div id="collapse" class="collapse"
-                                                             aria-labelledby="heading"
-                                                             data-bs-parent="#accordion">
-
-
-                                                            {% for kid in group.kid_set.all %}
-                                                                {% if kid.is_active == True %}
-
-
-
-                                                                    <div class="container mb-1"
-                                                                         style="background-color: white">
-                                                                        <div class="row" style="padding-top: 10px;">
-                                                                            <div class="col-xl-1 col-lg-6 col-md-6 col-sm-6 col-12"
-                                                                                 style="justify-content: start">
-                                                                                {% if kid.gender == 2 %}
-                                                                                    <img class="img"
-                                                                                         style="height: 65px;"
-                                                                                         src="{% static 'girl.jpg' %}"
-                                                                                         alt="">
-                                                                                {% else %}
-                                                                                    <img class="img"
-                                                                                         style="height: 65px; margin-left: 3%; margin-right: 2%"
-                                                                                         src="{% static 'boy.jpg' %}"
-                                                                                         alt="">
-                                                                                {% endif %}
-                                                                            </div>
-                                                                            <div class="col-md-5 mt-3">
-
-                                                                                <a href="{% url 'kid_details' pk=kid.id %}"
-                                                                                   style="font-size: 20px; text-decoration:none; color: #75736B ">{{ kid.first_name.title }} {{ kid.last_name.title }}</a>
-
-                                                                            </div>
-                                                                            <div class="col mt-3 ml-5">
-
-                                                                                {% if perms.director.is_director %}
-                                                                                    {% if kid.parenta_set.all %}
-
-                                                                                        <a style="font-size: 20px;  text-decoration:none; color: #75736B; margin-top: 20px "
-                                                                                           href="{% url 'invite_parent'  pk=kid.id %}">
-                                                                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                                                                 width="16"
-                                                                                                 height="16"
-                                                                                                 fill="currentColor"
-                                                                                                 class="bi bi-check2-square"
-                                                                                                 viewBox="0 0 16 16"
-                                                                                                 style="color: green">
-                                                                                                <path d="M3 14.5A1.5 1.5 0 0 1 1.5 13V3A1.5 1.5 0 0 1 3 1.5h8a.5.5 0 0 1 0 1H3a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V8a.5.5 0 0 1 1 0v5a1.5 1.5 0 0 1-1.5 1.5H3z"/>
-                                                                                                <path d="m8.354 10.354 7-7a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0z"/>
-                                                                                            </svg>
-                                                                                            Dodaj rodzica</a>
-                                                                                    {% else %}
-                                                                                        <a style="font-size: 20px;  text-decoration:none; color: #75736B "
-                                                                                           href="{% url 'invite_parent'  pk=kid.id %}">
-                                                                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                                                                 width="16"
-                                                                                                 height="16"
-                                                                                                 fill="currentColor"
-                                                                                                 class="bi bi-app"
-                                                                                                 viewBox="0 0 16 16">
-                                                                                                <path d="M11 2a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V5a3 3 0 0 1 3-3h6zM5 1a4 4 0 0 0-4 4v6a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4V5a4 4 0 0 0-4-4H5z"/>
-                                                                                            </svg>
-                                                                                            Dodaj rodzica</a>
-                                                                                    {% endif %}
-                                                                                {% endif %}
-
-                                                                            </div>
-                                                                            <div class="col-3 mt-3 ml-4"
-                                                                                 style="margin-right: 1px">
-
-                                                                                <div class="drodown">
-                                                                                    <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                                                                                       href="#"
-                                                                                       id="navbarDropdownMenuAvatar"
-                                                                                       role="button"
-                                                                                       data-bs-toggle="dropdown"
-                                                                                       aria-expanded="false"
-                                                                                       style="font-size: 20px;  text-decoration:none; color: #75736B; ">
-                                                                                        | Opcje
-                                                                                    </a>
-                                                                                    <ul
-                                                                                            class="dropdown-menu dropdown-menu-end"
-                                                                                            aria-labelledby="navbarDropdownMenuAvatar"
-                                                                                    >
-                                                                                        <li>
-                                                                                            <a href="{% url 'kid_details' pk=kid.id %}"
-                                                                                               class="dropdown-item">Konto
-                                                                                                dziecka
-                                                                                            </a>
-                                                                                        </li>
-                                                                                        <li>
-                                                                                            <a href="{% url 'calendar' kid.id month year %}"
-                                                                                               class="dropdown-item">Kalendarz
-                                                                                                obecnosci
-                                                                                            </a>
-                                                                                        </li>
-                                                                                        {% if perms.director.is_director %}
-                                                                                            <li>
-                                                                                                <a href="{% url 'change_kid_info' pk=kid.id %}"
-                                                                                                   class="dropdown-item">Zmien
-                                                                                                    informacje</a>
-                                                                                            </li>
-
-                                                                                            <li>
-
-                                                                                                <form method="POST"
-                                                                                                      action="{% url 'kid_delete' pk=kid.id %}">
-                                                                                                    {% csrf_token %}
-                                                                                                    <button class="dropdown-item"
-                                                                                                            type="submit"
-                                                                                                            name="delete"
-                                                                                                            value="Usuń"
-                                                                                                            onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}');"
-                                                                                                    >Usuń dziecko
-                                                                                                    </button>
-                                                                                                </form>
-                                                                                            </li>
-                                                                                        {% endif %}
-                                                                                    </ul>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                {% endif %}
-                                                            {% endfor %}
-
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-                                            <div class="row mt-3">
-                                                <div class="col">
-                                                    <label for="teacher">ZAJĘCIA GRUPOWE:</label>
-
-                                                    <input readonly class="form-control" name="teacher" type="text"
-                                                           value="">
-                                                </div>
-                                            </div>
-                                            <div class="row mt-3">
-                                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
-                                                    <label for="teacher">ROCZNIK:</label>
-
-                                                    <input readonly class="form-control" name="teacher" type="text"
-                                                           value="">
-                                                </div>
-                                            </div>
-
-
-                                        </form>
-
-
-                                    </div>
-                                    <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
-                                    </div>
-                                </div>
+                        <div class="mt-4 pt-3 border-t border-neutral-border dark:border-gray-700 space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-500 dark:text-gray-400">Stan dzieci</span>
+                                <span class="font-medium text-neutral-text dark:text-neutral-background">{{ group.current_students_count }}</span>
                             </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500 dark:text-gray-400">Liczba miejsc</span>
+                                <span class="font-medium text-neutral-text dark:text-neutral-background">{{ group.capacity }}</span>
+                            </div>
+                            <div class="w-full bg-neutral-background dark:bg-gray-700 rounded-full h-2 mt-1">
+                                {% with fill_percent=group.capacity_fill_percent %}
+                                    <div class="h-2 rounded-full"
+                                         style="width: {{ fill_percent|default:0 }}%; background-color: {% if fill_percent > 80 %}#D9534F{% else %}#5CB85C{% endif %};">
+                                    </div>
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-neutral-border dark:border-gray-700 p-5">
+                        <h2 class="text-lg font-semibold text-neutral-text dark:text-white mb-4">Przypisani Nauczyciele</h2>
+                        <ul class="space-y-3 mb-4">
+                            {% for teacher in teachers %}
+                                <li class="flex items-center justify-between p-2 rounded-lg hover:bg-neutral-background dark:hover:bg-gray-700 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <img class="size-9 rounded-full object-cover" data-alt="Teacher avatar" src="{% static 'boy.jpg' %}"/><div class="flex-1">
+                                        <a href="{% url 'teacher-profile' pk=teacher.id %}" class="font-medium text-sm text-primary dark:text-secondary hover:underline">
+                                            {% if teacher.first_name or teacher.last_name %}
+                                                {{ teacher.first_name }} {{ teacher.last_name }}
+                                            {% else %}
+                                                {{ teacher.user.email }}
+                                            {% endif %}
+                                        </a>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">{% if forloop.first %}Główny Nauczyciel{% else %}Asystent{% endif %}</p>
+                                    </div>
+                                    </div>
+
+                                    {% if perms.director.is_director %}
+                                        <div class="relative">
+                                            <button onclick="toggleDropdown('teacher-{{ teacher.id }}')"
+                                                    class="text-gray-500 dark:text-gray-400 hover:text-neutral-text dark:hover:text-white">
+                                                <span class="material-symbols-outlined">more_vert</span>
+                                            </button>
+                                            <div id="dropdown-teacher-{{ teacher.id }}" class="absolute right-0 z-50 hidden w-48 mt-2 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                                <a href="{% url 'teacher-profile' pk=teacher.id %}" class="block px-4 py-2 text-sm text-neutral-text dark:text-white hover:bg-neutral-background dark:hover:bg-gray-700 transition-colors">Profil Nauczyciela</a>
+                                                <form method="POST" action="{% url 'remove_teacher_from_group' teacher_pk=teacher.id %}" onsubmit="return confirm('Czy na pewno chcesz usunąć nauczyciela {{ teacher.first_name }} z tej grupy?');">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-status-warning dark:text-status-warning/90 hover:bg-neutral-background dark:hover:bg-gray-700 transition-colors">
+                                                        Usuń z grupy
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </li>
+                            {% empty %}
+                                <li class="text-sm text-gray-500 dark:text-gray-400">Grupa nie ma przypisanych nauczycieli.</li>
+                            {% endfor %}
+                        </ul>
+                        {% if perms.director.is_director %}
+                        <a href="{% url 'assign_teachers' pk=group.pk %}"
+                           class="w-full flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-primary/20 text-primary dark:bg-primary/30 dark:text-white text-sm font-semibold hover:bg-primary/30 dark:hover:bg-primary/40">
+                            <span class="material-symbols-outlined text-base">add</span>
+                            <span>Przypisz Nauczyciela</span>
+                        </a>
+                    {% endif %}
+                    </div>
+                </aside>
+
+                <div class="lg:col-span-2">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-neutral-border dark:border-gray-700">
+
+                        <div class="p-5 border-b border-neutral-border dark:border-gray-700">
+                            <h2 class="text-xl font-bold text-neutral-text dark:text-white">Lista Dzieci ({{ group.kid_set.count }})</h2>
+                        </div>
+
+                        <div class="p-5">
+                            <div class="flex flex-wrap gap-4 justify-between items-center mb-6">
+                                <form method="GET" action="{% url 'group_details' pk=group.pk %}">
+                                        <div class="relative w-full sm:w-72">
+                                            <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 p-0 border-none bg-transparent">
+                                                <span class="material-symbols-outlined">search</span>
+                                            </button>
+                                            <input class="w-full pl-10 pr-4 py-2 text-sm border border-neutral-border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-neutral-text dark:text-white focus:ring-primary focus:border-primary"
+                                                   placeholder="Szukaj dziecka..."
+                                                   type="text"
+                                                   name="q"
+                                                   value="{{ search_query|default:'' }}"
+                                            />
+                                    </div>
+                                </form>
+                                {% if perms.director.is_director %}
+                                <a href="{% url 'assign_kid_to_group' group.pk %}" class="w-full sm:w-auto flex items-center justify-center gap-2 rounded-lg h-10 px-5 bg-primary text-white text-sm font-semibold hover:bg-primary/90">
+                                    <span class="material-symbols-outlined text-base">add</span>
+                                    <span>Dodaj Dziecko do Grupy</span>
+                                </a>
+                                {% endif %}
+                            </div>
+
+                            <div class="space-y-3">
+                                {% for kid in kids %}
+                                    {% if kid.is_active %}
+                                        <div class="flex items-center justify-between p-3 rounded-lg bg-neutral-background/50 dark:bg-gray-700/50 hover:bg-neutral-background dark:hover:bg-gray-700 transition-colors">
+                                            <div class="flex items-center gap-3">
+                                                <img class="size-10 rounded-full object-cover"
+                                                     src="{% if kid.gender == 2 %}{% static 'girl.jpg' %}{% else %}{% static 'boy.jpg' %}{% endif %}" alt="Avatar"/>
+                                                <a href="{% url 'kid_details' pk=kid.id %}" class="font-medium text-neutral-text dark:text-white hover:underline">
+                                                    {{ kid.first_name.title }} {{ kid.last_name.title }}
+                                                </a>
+                                            </div>
+
+                                            <div class="flex items-center gap-4 text-sm">
+                                                {% if perms.director.is_director %}
+                                                    <a href="{% url 'invite_parent' pk=kid.id %}"
+                                                       class="flex items-center gap-1 text-primary dark:text-secondary hover:underline">
+                                                        {% if kid.parenta_set.all %}
+                                                            <span class="material-symbols-outlined text-status-success text-lg">check_circle</span>
+                                                            Dodaj rodzica
+                                                        {% else %}
+                                                            <span class="material-symbols-outlined text-gray-500 text-lg">person_add</span>
+                                                            Dodaj rodzica
+                                                        {% endif %}
+                                                    </a>
+                                                {% endif %}
+
+                                                <div class="relative group">
+                                                    <button class="text-gray-500 dark:text-gray-400 hover:text-neutral-text dark:hover:text-white"
+                                                            id="options-menu-{{ kid.id }}" onclick="toggleDropdown('kid-{{ kid.id }}')">
+                                                        <span class="material-symbols-outlined">more_vert</span>
+                                                    </button>
+                                                    <div id="dropdown-kid-{{ kid.id }}"
+                                                         class="absolute right-0 bottom-0 translate-y-full z-50 hidden w-56 origin-bottom-right rounded-md bg-white dark:bg-gray-800 shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+
+                                                        <a href="{% url 'kid_details' pk=kid.id %}" class="block px-4 py-2 text-sm text-neutral-text dark:text-white hover:bg-neutral-background dark:hover:bg-gray-700 transition-colors">Konto dziecka</a>
+                                                        <a href="{% url 'calendar' kid.id month year %}" class="block px-4 py-2 text-sm text-neutral-text dark:text-white hover:bg-neutral-background dark:hover:bg-gray-700 transition-colors">Kalendarz obecności</a>
+
+                                                        {% if perms.director.is_director %}
+                                                            <div class="my-1 border-t border-neutral-border dark:border-gray-700"></div>
+
+                                                            <form method="POST" action="{% url 'remove_kid_from_group' kid_pk=kid.id %}" onsubmit="return confirm('Czy na pewno chcesz usunąć dziecko {{ kid.first_name }} z tej grupy? Zostanie ono nieprzypisane.');">
+                                                                {% csrf_token %}
+                                                                <button type="submit" name="remove" class="block w-full text-left px-4 py-2 text-sm text-status-warning dark:text-status-warning/90 hover:bg-neutral-background dark:hover:bg-gray-700 transition-colors">
+                                                                    Usuń z grupy
+                                                                </button>
+                                                            </form>
+
+                                                            <a href="{% url 'change_kid_info' pk=kid.id %}" class="block px-4 py-2 text-sm text-neutral-text dark:text-white hover:bg-neutral-background dark:hover:bg-gray-700 transition-colors">Zmień informacje</a>
+
+                                                            <form method="POST" action="{% url 'kid_delete' pk=kid.id %}" onsubmit="return confirm('Jesteś pewien, że chcesz usunąć dziecko {{ kid.first_name }} {{ kid.last_name }}?');">
+                                                                {% csrf_token %}
+                                                                <button type="submit" name="delete" class="block w-full text-left px-4 py-2 text-sm text-status-warning dark:text-status-warning/90 hover:bg-neutral-background dark:hover:bg-gray-700 transition-colors">Usuń dziecko</button>
+                                                            </form>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% empty %}
+                                    <p class="text-center p-5 text-gray-500 dark:text-gray-400">Brak aktywnych dzieci w tej grupie.</p>
+                                {% endfor %}
+                            </div>
+
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-    </div>
+        </div>
+    </main>
+    <script>
+
+        function toggleDropdown(idString) {
+            const dropdown = document.getElementById(`dropdown-${idString}`);
+
+            // Zamknij wszystkie inne dropdowny
+            document.querySelectorAll('[id^="dropdown-"]').forEach(d => {
+                if (d.id !== `dropdown-${idString}`) {
+                    d.classList.add('hidden');
+                }
+            });
+
+            // Przełącz widoczność bieżącego
+            if (dropdown) {
+                dropdown.classList.toggle('hidden');
+            }
+        }
+
+        // Zamykanie dropdownów po kliknięciu gdziekolwiek indziej
+        document.addEventListener('click', function(event) {
+            let isDropdownButton = event.target.closest('button[onclick^="toggleDropdown"]');
+            let isInsideDropdown = event.target.closest('[id^="dropdown-"]');
+
+            if (!isDropdownButton && !isInsideDropdown) {
+                document.querySelectorAll('[id^="dropdown-"]').forEach(d => {
+                    d.classList.add('hidden');
+                });
+            }
+        });
+    </script>
 {% endblock %}
+

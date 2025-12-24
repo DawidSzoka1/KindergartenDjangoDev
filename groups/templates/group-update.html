@@ -1,145 +1,160 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90%">
-    <form method="post" action="#">
-        {% csrf_token %}
-        <section class="h-100">
+    <main class="flex-1 p-6 lg:p-10">
+        <div class="max-w-4xl mx-auto">
 
-            <div class="container py-5 h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
-                                <div class="col">
-                                    <div class="card-body p-md-5" style="color: #75736B">
-                                        {% if messages %}
-                                            {% for message in messages %}
-                                                <div class="alert alert-{{ message.tags }}"
-                                                     style="background-color: #FF5F57; color: white; text-align: center; font-size: 30px">
-                                                    {{ message }}
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                        <div class="row">
-                                            <div class="col mb-4">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'group_details' pk=group.id %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col mb-4">
-                                                <h2 class="text-uppercase d-flex justify-content-end"
-                                                    style="color: #75736B">Zmień
-                                                    Grupe</h2>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    {{ form.name|as_crispy_field }}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    {{ form.capacity|as_crispy_field }}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    {{ form.yearbook|as_crispy_field }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            {{ form.is_active.as_hidden }}
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <label class="mr-2 mb-2">Wybierz obrazek:</label><br>
-
-                                                    <div class="dropdown">
-                                                        <button type="button" class="btn dropdown-toggle"
-                                                                id="dropdownButton"
-                                                                data-bs-toggle="dropdown"
-                                                                style="background-color: #BAB1AB; color:white">
-                                                            Obrazki
-                                                        </button>
-
-                                                        <div class="dropdown-menu" id="dropdownMenu">
-                                                            {% for photo in photos %}
-                                                                {% if photo == group_photo %}
-                                                                    <div class="form-group">
-                                                                        <div class="form-check" id="options">
-                                                                            <label>
-                                                                                <input type="radio" name="photo"
-                                                                                       value="{{ photo.id }}"
-                                                                                       checked>
-                                                                                <img src="{{ photo.group_photos.url }}"
-                                                                                     width="64" height="64"
-                                                                                     alt="Option {{ forloop.counter }}">
-                                                                                {{ photo.name }}
-                                                                            </label>
-                                                                        </div>
-                                                                    </div>
-                                                                {% else %}
-                                                                    <div class="form-group">
-                                                                        <div class="form-check" id="options">
-                                                                            <label>
-                                                                                <input type="radio" name="photo"
-                                                                                       value="{{ photo.id }}"
-                                                                                >
-                                                                                <img src="{{ photo.group_photos.url }}"
-                                                                                     width="64" height="64"
-                                                                                     alt="Option {{ forloop.counter }}">
-                                                                                {{ photo.name }}
-                                                                            </label>
-                                                                        </div>
-                                                                    </div>
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-
-                                        </div>
-                                        {{ form.principal.as_hidden }}
-                                        <div class="form-group">
-
-                                        </div>
-                                        <div class="row">
-                                            <div class="d-flex justify-content-end pt-3">
-                                                <button type="submit" class="btn"
-                                                        style="background-color: #75736B; color: white; width: 35%">
-                                                    ZATWIERDŹ ZMIANY
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="flex flex-wrap gap-2 mb-4">
+                <a class="text-primary dark:text-secondary text-sm font-medium" href="{% url 'list_groups' %}">Grupy</a>
+                <span class="text-gray-400 dark:text-gray-500 text-sm font-medium">/</span>
+                <a class="text-primary dark:text-secondary text-sm font-medium" href="{% url 'group_details' pk=group.id %}">{{ group.name }}</a>
+                <span class="text-gray-400 dark:text-gray-500 text-sm font-medium">/</span>
+                <span class="text-neutral-text dark:text-neutral-background text-sm font-medium">Edytuj</span>
             </div>
-        </section>
-    </form>
+
+            <header class="flex flex-wrap justify-between items-center gap-4 mb-8">
+                <div class="flex flex-col">
+                    <h1 class="text-neutral-text dark:text-white text-3xl font-bold tracking-tight">Zmień Szczegóły Grupy</h1>
+                    <p class="text-gray-500 dark:text-gray-400 text-base font-normal mt-1">Aktualizuj informacje dla grupy {{ group.name }}.</p>
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                    <a href="{% url 'group_details' pk=group.id %}" class="flex items-center justify-center rounded-lg h-10 px-4 bg-white dark:bg-gray-700 border border-neutral-border dark:border-gray-600 text-neutral-text dark:text-white text-sm font-semibold hover:bg-neutral-background dark:hover:bg-gray-600">
+                        <span class="truncate">Anuluj</span>
+                    </a>
+                    <button type="submit" form="group-edit-form" class="flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-semibold hover:bg-primary/90">
+                        <span class="truncate">Zapisz Zmiany</span>
+                    </button>
+                </div>
+            </header>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-3 rounded-lg text-center font-medium"
+                         style="background-color: #D9534F; color: white;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl border border-neutral-border dark:border-gray-700 p-6 md:p-8 shadow-lg">
+                <form method="post" id="group-edit-form" action="">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="mb-4 text-status-warning dark:text-status-warning/90">
+                            {% for error in form.non_field_errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <h3 class="text-xl font-bold text-neutral-text dark:text-white mb-6">Informacje Podstawowe</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <div>
+                            <label class="block text-sm font-medium text-neutral-text dark:text-neutral-background mb-1.5" for="id_name">Nazwa Grupy</label>
+                            <input class="w-full text-sm border border-neutral-border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-neutral-text dark:text-white focus:ring-primary focus:border-primary"
+                                   id="id_name"
+                                   name="name"
+                                   type="text"
+                                   value="{{ form.name.value|default:group.name }}"
+                                   {% if form.name.errors %}style="border-color: #D9534F;"{% endif %}
+                            />
+                            {% if form.name.errors %}
+                                <p class="text-status-warning text-sm mt-1">{{ form.name.errors|join:", " }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-neutral-text dark:text-neutral-background mb-1.5" for="id_capacity">Pojemność (Max Studenci)</label>
+                            <input class="w-full text-sm border border-neutral-border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-neutral-text dark:text-white focus:ring-primary focus:border-primary"
+                                   id="id_capacity"
+                                   name="capacity"
+                                   type="number"
+                                   value="{{ form.capacity.value|default:group.capacity }}"
+                                   {% if form.capacity.errors %}style="border-color: #D9534F;"{% endif %}
+                            />
+                            {% if form.capacity.errors %}
+                                <p class="text-status-warning text-sm mt-1">{{ form.capacity.errors|join:", " }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="md:col-span-1">
+                            <label class="block text-sm font-medium text-neutral-text dark:text-neutral-background mb-1.5" for="id_yearbook">Rocznik</label>
+                            <input class="w-full text-sm border border-neutral-border dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-neutral-text dark:text-white focus:ring-primary focus:border-primary"
+                                   id="id_yearbook"
+                                   name="yearbook"
+                                   type="number"
+                                   value="{{ form.yearbook.value|default:group.yearbook }}"
+                                   {% if form.yearbook.errors %}style="border-color: #D9534F;"{% endif %}
+                            />
+                            {% if form.yearbook.errors %}
+                                <p class="text-status-warning text-sm mt-1">{{ form.yearbook.errors|join:", " }}</p>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-neutral-border dark:border-gray-700">
+                        <label class="block text-sm font-medium text-neutral-text dark:text-neutral-background mb-3">Wybierz Obrazek Grupy:</label>
+
+                        <div class="relative inline-block text-left">
+                            <details class="dropdown">
+                                <summary class="flex min-w-[120px] cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-neutral-background dark:bg-gray-700 text-[#111811] dark:text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-gray-300 dark:hover:bg-gray-600 border border-neutral-border dark:border-gray-600">
+                                    Wybierz / Zmień obrazek
+                                </summary>
+
+                                <div class="absolute left-0 z-10 mt-2 w-max origin-top-left rounded-md bg-white dark:bg-gray-800 shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none p-2 grid grid-cols-3 gap-2" role="menu">
+
+                                    {% for photo in photos %}
+                                        {% comment %} Sprawdzamy, czy ten obrazek jest aktualnie przypisany do grupy {% endcomment %}
+                                        {% with is_selected=False %}
+                                            {% if photo == group_photo %}
+                                                {% with is_selected=True %}{% endwith %}
+                                            {% elif form.photo.value == photo.id %}
+                                                {% with is_selected=True %}{% endwith %}
+                                            {% endif %}
+
+                                            <label class="flex flex-col items-center p-2 cursor-pointer rounded-lg hover:bg-neutral-background dark:hover:bg-gray-700 transition">
+                                                <input type="radio"
+                                                       name="photo"
+                                                       value="{{ photo.id }}"
+                                                       class="sr-only peer"
+                                                       {% if is_selected %}checked{% endif %}
+                                                />
+                                                <img src="{{ photo.group_photos.url }}"
+                                                     width="64" height="64"
+                                                     class="rounded-lg peer-checked:ring-4 peer-checked:ring-primary transition"
+                                                     alt="{{ photo.name }}" />
+                                                <span class="mt-1 text-xs text-gray-700 dark:text-gray-400 peer-checked:text-primary">{{ photo.name }}</span>
+                                            </label>
+                                        {% endwith %}
+                                    {% endfor %}
+                                </div>
+                            </details>
+                        </div>
+
+                    </div>
+
+
+                    {{ form.is_active.as_hidden }}
+                    {{ form.principal.as_hidden }}
+
+
+                    <div class="border-t border-neutral-border dark:border-gray-700 pt-6 mt-8 flex justify-end gap-3">
+                        <a href="{% url 'group_details' pk=group.id %}" class="flex items-center justify-center rounded-lg h-10 px-4 bg-white dark:bg-gray-700 border border-neutral-border dark:border-gray-600 text-neutral-text dark:text-white text-sm font-semibold hover:bg-neutral-background dark:hover:bg-gray-600">
+                            <span class="truncate">Anuluj</span>
+                        </a>
+                        <button type="submit" class="flex items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-semibold hover:bg-primary/90">
+                            <span class="truncate">ZATWIERDŹ ZMIANY</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
     <script src="{% static 'photo.js' %}"></script>
 {% endblock %}

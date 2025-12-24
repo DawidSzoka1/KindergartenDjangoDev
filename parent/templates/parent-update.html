@@ -1,119 +1,169 @@
 {% extends "base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90% ">
-    <form method="post" action="#">
-        {% csrf_token %}
-        <section class="h-100">
+    <body class="font-display bg-background-light dark:bg-background-dark">
+    <div class="relative flex min-h-screen w-full flex-col group/design-root">
+        <div class="flex flex-1">
 
-            <div class="container py-5 h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
-                                <div class="col">
-                                    <div class="card-body p-md-5" style="color: #75736B">
-                                        {% if messages %}
-                                            {% for message in messages %}
-                                                <div class="alert alert-{{ message.tags }}"
-                                                     style="color: white; text-align: center; font-size: 20px">
-                                                    {{ message }}
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                        <div class="row">
-                                            <div class="col mb-4">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'parent_profile' pk=parent.id %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col mb-4">
-                                                {% if valid %}
-                                                    <h2 class="text-uppercase d-flex justify-content-end"
-                                                        style="color: #75736B">Zmień lub wypełnij informacj
-                                                    </h2>
-                                                {% else %}
-                                                    <h2 class="text-uppercase d-flex justify-content-end"
-                                                        style="color: #75736B">Zmień informajce
-                                                    </h2>
-                                                {% endif %}
-                                            </div>
+            <main class="flex-1 p-6 sm:p-8 lg:p-10">
+                <div class="max-w-4xl mx-auto">
+
+                    <div class="flex flex-wrap gap-2 mb-4 pt-4">
+                        <a class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal hover:underline"
+                           href="{% url 'list_parent' %}">Rodzice</a>
+                        <span class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal">/</span>
+                        <a class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal hover:underline"
+                           href="{% url 'parent_profile' pk=parent.id %}">{{ parent.first_name|default:parent.user.email }}</a>
+                        <span class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal">/</span>
+                        <span class="text-[#111811] dark:text-white text-sm font-medium leading-normal">Edycja</span>
+                    </div>
+
+                    <div class="flex flex-wrap justify-between gap-3 mb-8">
+                        <h1 class="text-[#111811] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">
+                            Edytuj Profil Rodzica</h1>
+                    </div>
+
+                    {% if form.errors and not messages %}
+                        <div class="p-3 mb-4 rounded-lg text-white text-center font-semibold bg-red-600" role="alert">
+                            Wystąpił błąd walidacji. Proszę sprawdzić pola oznaczone na czerwono.
+                        </div>
+                    {% elif messages %}
+                        {% for message in messages %}
+                            <div class="p-3 mb-4 rounded-lg text-white text-center font-semibold
+                        {% if message.tags == 'success' %}bg-green-600{% elif message.tags == 'error' %}bg-red-600{% else %}bg-blue-600{% endif %}"
+                                 role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <div class="bg-white dark:bg-zinc-900/50 rounded-xl border border-gray-200 dark:border-gray-800">
+
+                        <form method="post" action="{% url 'parent_update' pk=parent.id %}"
+                              enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <div class="flex p-6 @container border-b border-gray-200 dark:border-gray-800 pb-6">
+                                <div class="flex w-full flex-col gap-4 @[520px]:flex-row @[520px]:justify-between @[520px]:items-center">
+                                    <div class="flex gap-4 items-center">
+                                        <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-16 w-16">
+                                            {% if parent.gender == 2 %}
+                                                <img class="rounded-full w-16 h-16 object-cover"
+                                                     src="{% static 'parent_female.jpg' %}" alt="Avatar kobiety"/>
+                                            {% elif parent.gender == 1 %}
+                                                <img class="rounded-full w-16 h-16 object-cover"
+                                                     src="{% static 'parent_male.jpg' %}" alt="Avatar mężczyzny"/>
+                                            {% else %}
+                                                <img class="rounded-full w-16 h-16 object-cover"
+                                                     src="{% static 'gander_null.jpg' %}" alt="Avatar neutralny"/>
+                                            {% endif %}
                                         </div>
-
-
-                                        {{ form.kids.as_hidden }}
-                                        {{ form.principal.as_hidden }}
-                                        {{ form.user.as_hidden }}
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
-
-                                                {{ form.first_name|as_crispy_field }}
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-
-                                                {{ form.last_name|as_crispy_field }}
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-
-                                                {{ form.gender|as_crispy_field }}
-                                            </div>
-
+                                        <div class="flex flex-col justify-center">
+                                            <p class="text-[#111811] dark:text-white text-base font-medium">{{ parent.first_name }} {{ parent.last_name }}</p>
+                                            <p class="text-[#618961] dark:text-gray-400 text-sm">{{ parent.user.email }}</p>
                                         </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
+                                    </div>
+                                </div>
+                            </div>
 
-                                                {{ form.city|as_crispy_field }}
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                {{ form.address|as_crispy_field }}
-                                            </div>
+                            <div class="p-6">
+                                <h3 class="text-[#111811] dark:text-white text-xl font-bold leading-tight tracking-[-0.015em] pb-3 border-b border-gray-200 dark:border-gray-800">
+                                    Dane Osobowe i Kontaktowe</h3>
 
-                                        </div>
+                                <div class="space-y-10">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
 
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
-                                                {{ form.zip_code|as_crispy_field }}
-                                            </div>
-                                            <div class="col-md-6 mb-4">
+                                        {% comment %} DEFINICJA MAKR W STYLU JINJA (ALE KORZYSTAMY Z CZYSTEGO KODU HTML W PĘTLI) {% endcomment %}
 
-                                                {{ form.phone|as_crispy_field }}
-                                            </div>
+                                        {% for field in form %}
+                                            {# Pomijamy ukryte pola, które już wyrenderowaliśmy #}
+                                            {% if not field.is_hidden %}
+                                                {% if field.name == 'user' or field.name == 'principal' %}
+                                                    {{ field.as_hidden }}
+                                                    {% else %}
+                                                    <div class="{% if field.name == 'address' %}md:col-span-2{% endif %}">
 
-                                        </div>
+                                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                                               for="{{ field.id_for_label }}">
+                                                            {{ field.label }}
+                                                        </label>
 
+                                                        {# Nadajemy klasy Tailwind bezpośrednio na widżet #}
+                                                        <div class="relative">
 
-                                        <div class="d-flex justify-content-end pt-3 mr-3">
-                                            <button type="submit" class="btn"
-                                                    style="background-color: #75736B; color: white; width: 35%">
-                                                Zatwierdź
-                                            </button>
-                                        </div>
+                                                            {% with error_class="border-red-500 dark:border-red-500 focus:border-red-500 focus:ring-red-500/50" %}
+                                                                {% with default_class="border-gray-300 dark:border-gray-700 focus:border-primary focus:ring-primary/50" %}
+                                                                    {% with base_class="w-full rounded-lg p-3 text-base bg-white dark:bg-gray-900 text-[#111811] dark:text-white focus:outline-none focus:ring-2 border" %}
 
+                                                                        {# Renderowanie pola tekstowego/numerycznego #}
+                                                                        {% if field.field.widget.input_type != 'select' %}
+                                                                            <input type="{{ field.field.widget.input_type }}"
+                                                                                   id="{{ field.id_for_label }}"
+                                                                                   name="{{ field.name }}"
+                                                                                   value="{{ field.value|default:'' }}"
+                                                                                   placeholder="{{ field.label }}"
+                                                                                   class="{{ base_class }} {{ field.css_classes }}
+
+                                                                                       {% if field.errors %}{{ error_class }}{% else %}{{ default_class }}{% endif %}"
+                                                                                   {% if field.field.required %}required{% endif %}
+                                                                            />
+                                                                        {% else %}
+                                                                            {# Renderowanie pola SELECT (Pole Płeć) #}
+                                                                            <select id="{{ field.id_for_label }}"
+                                                                                    name="{{ field.name }}"
+                                                                                    class="{{ base_class }} appearance-none pr-10
+
+                                                                                        {% if field.errors %}{{ error_class }}{% else %}{{ default_class }}{% endif %}">
+                                                                                {% for value, label in field.field.choices %}
+                                                                                    <option value="{{ value }}"
+                                                                                            {% if field.value == value|stringformat:"s" or field.value == value %}selected{% endif %}>{{ label }}</option>
+                                                                                {% endfor %}
+                                                                            </select>
+
+                                                                        {% endif %}
+
+                                                                    {% endwith %}
+                                                                {% endwith %}
+                                                            {% endwith %}
+                                                        </div>
+
+                                                        {# Wyświetlanie błędu (Poprawione) #}
+                                                        {% if field.errors %}
+                                                            <p class="text-sm text-red-600 dark:text-red-400 mt-1">
+                                                                {# Używamy .as_text, aby uzyskać czysty komunikat błędu #}
+                                                                {{ field.errors.as_text }}
+                                                            </p>
+                                                        {% endif %}
+
+                                                    </div>
+                                                    {% endif %}
+
+                                            {% endif %}
+                                        {% endfor %}
 
                                     </div>
                                 </div>
                             </div>
-                        </div>
+
+
+                            <div class="flex justify-end gap-4 p-4 border-t border-gray-200 dark:border-gray-800 rounded-b-xl bg-gray-50 dark:bg-zinc-900/50">
+                                <a href="{% url 'parent_profile' pk=parent.id %}"
+                                   class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-6 bg-gray-100 dark:bg-gray-800 text-[#111811] dark:text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-gray-200 dark:hover:bg-gray-700">
+                                    <span class="truncate">Anuluj</span>
+                                </a>
+                                <button type="submit"
+                                        class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-6 bg-primary text-black text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90">
+                                    <span class="truncate">Zapisz Zmiany</span>
+                                </button>
+                            </div>
+
+                        </form>
                     </div>
                 </div>
-            </div>
-        </section>
-    </form>
-    <script src="{% static 'group.js' %}"></script>
+            </main>
+        </div>
+    </div>
+    </body>
 {% endblock %}

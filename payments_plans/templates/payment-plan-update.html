@@ -1,94 +1,94 @@
 {% extends "base.html" %}
-{% load static %}
 {% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90% ">
-    <form method="post" action="#">
-        {% csrf_token %}
-        <section class="h-100">
+    <div class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light dark:bg-background-dark">
+        <main class="flex-1 p-4 md:p-8 flex justify-center">
+            <div class="w-full max-w-4xl">
 
-            <div class="container py-5 h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
+                <nav class="flex items-center gap-2 mb-6 text-sm font-bold">
+                    <a href="{% url 'list_payments_plans' %}" class="text-gray-400 hover:text-primary transition-colors uppercase tracking-widest">Finanse</a>
+                    <span class="text-gray-300">/</span>
+                    <span class="text-primary uppercase tracking-widest">Edycja: {{ plan.name }}</span>
+                </nav>
 
-                                <div class="col" style="color: #75736B">
-                                    <div class="card-body p-md-5 ">
-                                        {% if form.errors %}
-                                            <div class="alert alert-danger">
-                                                {{ form.errors }}
-                                            </div>
-                                        {% endif %}
-                                        <div class="row">
+                <div class="bg-white dark:bg-[#0f1d0f] rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                    <div class="bg-primary p-6 text-white flex justify-between items-center">
+                        <h1 class="text-2xl font-black uppercase tracking-tighter">Edytuj Plan Płatniczy</h1>
+                        <span class="bg-white/20 px-4 py-1 rounded-full text-xs font-bold">ID: #PP-{{ plan.id }}</span>
+                    </div>
 
-                                            <div class="col mb-4">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'list_payments_plans' %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col-7 mb-4">
-                                                <h2 class="text-uppercase d-flex justify-content-end"
-                                                    style="color: #75736B">ZMIEŃ
-                                                    Plan płatniczy</h2>
-                                            </div>
+                    <form method="POST" class="p-8 flex flex-col gap-6">
+                        {% csrf_token %}
+                        {{ form.principal.as_hidden }}
+                        {{ form.is_active.as_hidden }}
 
+                        {% if form.errors %}
+                            <div class="p-4 rounded-xl bg-red-50 text-red-600 font-bold border border-red-100 mb-4">
+                                <p>Proszę poprawić błędy w formularzu:</p>
+                                <ul class="text-xs list-disc ml-5 mt-2">
+                                    {% for field, errors in form.errors.items %}
+                                        <li>{{ field }}: {{ errors|striptags }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
 
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    {{ form.principal.as_hidden }}
-                                                    {{ form.is_active.as_hidden }}
-                                                </div>
-                                            </div>
+                        <div class="custom-crispy-styling">
+                            {{ form.name|as_crispy_field }}
+                        </div>
 
-                                        </div>
-
-
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
-                                                {{ form.name|as_crispy_field }}
-
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                {{ form.price|as_crispy_field }}
-                                            </div>
-                                        </div>
-
-
-                                        <div class="row">
-                                            <div class="d-flex justify-content-end pt-3">
-                                                <button type="submit" class="btn"
-                                                        style="background-color: #75736B; color: white; width: 35%">
-                                                    ZATWIERDŹ ZMIANY
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="custom-crispy-styling">
+                                {{ form.price|as_crispy_field }}
+                            </div>
+                            <div class="custom-crispy-styling">
+                                {{ form.frequency|as_crispy_field }}
                             </div>
                         </div>
-                    </div>
+
+                        <div class="custom-crispy-styling">
+                            {{ form.discount_info|as_crispy_field }}
+                        </div>
+                        <div class="custom-crispy-styling">
+                            {{ form.description|as_crispy_field }}
+                        </div>
+
+                        <div class="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-2xl border border-gray-200 dark:border-gray-800">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                {{ form.is_archived }}
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-gray-700 dark:text-gray-300">Zarchiwizuj ten plan</span>
+                                    <span class="text-xs text-gray-400">Archiwalne plany nie są widoczne przy przypisywaniu dzieci, ale pozostają w historii.</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-4 mt-6 pt-6 border-t border-gray-100 dark:border-gray-800">
+                            <a href="{% url 'payment_plan_details' pk=plan.id %}" class="px-6 py-3 font-bold text-gray-400 hover:text-gray-600 transition-colors">Anuluj</a>
+                            <button type="submit" class="px-10 py-4 bg-primary text-white font-black rounded-2xl shadow-lg hover:scale-[1.02] transition-transform uppercase tracking-tighter">
+                                Zapisz Zmiany
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </section>
-    </form>
+        </main>
+    </div>
 
+    <style>
+        .custom-crispy-styling label { font-weight: 700; color: #6b7280; text-transform: uppercase; font-size: 0.75rem; margin-bottom: 0.5rem; display: block; }
+        .custom-crispy-styling input, .custom-crispy-styling textarea, .custom-crispy-styling select {
+            width: 100%; border-radius: 0.75rem; border: 1px solid #d1d5db; padding: 0.75rem; background-color: white; transition: all 0.2s;
+        }
+        .custom-crispy-styling input:focus, .custom-crispy-styling textarea:focus, .custom-crispy-styling select:focus {
+            border-color: #a78bfa; outline: none; ring: 2px; ring-color: #a78bfa;
+        }
+        .dark .custom-crispy-styling input, .dark .custom-crispy-styling textarea, .dark .custom-crispy-styling select {
+            background-color: #1a2e1a; border-color: #374151; color: white;
+        }
+        input[type="checkbox"] {
+            width: 1.25rem; height: 1.25rem; border-radius: 0.375rem; border-color: #d1d5db; text-color: #a78bfa;
+        }
+    </style>
 {% endblock %}

@@ -1,153 +1,135 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
+
 {% block content %}
+    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark p-6 md:p-10">
+            <div class="max-w-6xl mx-auto flex flex-col gap-6">
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}"
-                 style="color: white; text-align: center; font-size: 30px">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    {% if perms.director.is_director %}
-        <div class="justify-content-center">
-            <div class="d-flex"
-                  style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">
-                {% csrf_token %}
-                <input class="form-control" type="search" placeholder="Wpisz mail"
-                       aria-label="Wpisz imie dziecka" name="search">
-                <span><button class="btn " type="submit" id="search-button"
-                              style="margin-left: -8px; background-color: #BAB1AB; color: white">SZUKAJ</button></span>
-            </div>
-
-
-        </div>
-    {% endif %}
-    {% for teacher in page_obj %}
-
-        <div hidden="hidden" class="pk">{{ teacher.id }}</div>
-
-        <div class="container-fluid mt-3" id="teacher"
-             style="background-color: white">
-            <div class="row align-item-center" style="padding-top: 10px;">
-                <div class="col mb-1"
-                     style="justify-content: start">
-                    {% if teacher.gender == 2 %}
-                        <img class="img"
-                             style="height: 150px;"
-                             src="{% static 'employee_female.jpg' %}"
-                             alt="">
-                    {% elif teacher.gender == 1 %}
-                        <img class="img"
-                             style="height: 150px; margin-left: 3%; margin-right: 2%"
-                             src="{% static 'employee_male.jpg' %}"
-                             alt="">
-                    {% else %}
-                        <img class="img"
-                             style="height: 150px; margin-left: 3%; margin-right: 2%"
-                             src="{% static 'gander_null.jpg' %}"
-                             alt="">
-                    {% endif %}
+                <div class="flex flex-wrap gap-2 items-center text-sm">
+                    <a class="text-[#618961] font-medium hover:text-primary transition-colors flex items-center gap-1" href="{% url 'home_page' %}">
+                        <span class="material-symbols-outlined text-[18px]">home</span> Dashboard
+                    </a>
+                    <span class="text-[#618961] font-medium">/</span>
+                    <span class="text-[#111811] dark:text-white font-semibold">Zarządzanie Uprawnieniami</span>
                 </div>
-                <div class="col-8" style="margin-top: 80px">
 
-                    <a href="{% url 'teacher-profile' pk=teacher.id %}"
-                       style="font-size: 20px; text-decoration:none; color: #75736B ">{{ teacher.user.email }}</a>
-
-                </div>
-                <div class="col-2 ml-5"
-                     style="font-size: 20px; text-decoration:none; color: #75736B; margin-top: 80px ">
-
-                    {% if teacher.first_name and teacher.last_name %}
-                        {{ teacher.first_name.title }} {{ teacher.last_name.title }}
-                    {% endif %}
-                    <input style="width: 20%; height: 40%" type="checkbox" name="pk" value="{{ teacher.id }}">
-
-                </div>
-                <div class="col" style="margin-top: 80px">
-
-                    <div class="drodown">
-                        <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                           href="#"
-                           id="navbarDropdownMenuAvatar"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false"
-                           style="font-size: 20px;  text-decoration:none; color: #75736B; ">
-                            Opcje
-                        </a>
-                        <ul
-                                class="dropdown-menu dropdown-menu-end"
-                                aria-labelledby="navbarDropdownMenuAvatar"
-                        >
-                            <li>
-                                <a href="{% url 'teacher-profile' pk=teacher.id %}"
-                                   class="dropdown-item">PROFIL
-
-                                </a>
-                            </li>
-                            {% if perms.director.is_director %}
-                                <li>
-
-                                    <form method="POST"
-                                          action="{% url 'teacher_delete' pk=teacher.id %}">
-                                        {% csrf_token %}
-                                        <button class="dropdown-item"
-                                                type="submit"
-                                                name="delete"
-                                                value="Usuń"
-                                                onclick="return confirm('Jestes pewny ze chcesz usunac pracownika {{ teacher.user.email }}');"
-                                        >USUŃ
-                                        </button>
-
-                                    </form>
-                                </li>
-                            {% endif %}
-                        </ul>
+                <div class="flex flex-wrap justify-between items-end gap-6 bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-[#dbe6db] dark:border-gray-800 shadow-sm">
+                    <div class="flex flex-col gap-2 max-w-2xl">
+                        <h1 class="text-[#111811] dark:text-white text-3xl font-black leading-tight tracking-tight">Uprawnienia Dyrektorskie</h1>
+                        <p class="text-[#618961] dark:text-gray-400 text-base font-normal leading-relaxed">
+                            Wyszukaj pracowników i nadaj im uprawnienia dyrektorskie. Pamiętaj, że ta operacja daje pełny dostęp do systemu.
+                        </p>
                     </div>
                 </div>
-                <hr>
-            </div>
 
-        </div>
-
-
-    {% endfor %}
-
-
-    {% if page_obj.has_other_pages %}
-        <div style="position: absolute; bottom: auto; left:45%">
-            {% if page_obj.has_previous %}
-
-                <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
-                   style=" font-size: 50px; color:#75736B">< </a>
-            {% else %}
-                <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
-                   style=" font-size: 50px; color:#75736B">< </a>
-            {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <a class="btn mb-4" href="?page={{ num }}"
-                       style=" font-size: 50px; color:#75736B">{{ num }}</a>
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="p-4 rounded-xl {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %} font-bold text-center shadow-sm">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 {% endif %}
 
-            {% endfor %}
+                <form method="POST" action="{% url 'give-permissions' %}">
+                    {% csrf_token %}
 
-            {% if page_obj.has_next %}
-                <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
-                   style=" text-decoration: none; font-size: 50px; color:#75736B"> ></a>
-            {% else %}
+                    <div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 shadow-sm mb-6">
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="flex-1 relative">
+                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#618961]">search</span>
+                                <input name="search" class="w-full pl-10 pr-4 h-11 rounded-lg border border-[#dbe6db] dark:border-gray-700 bg-white dark:bg-gray-900 text-[#111811] dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent placeholder-[#618961] text-sm"
+                                       placeholder="Wyszukaj po adresie e-mail..." type="text" value="{{ request.POST.search|default:'' }}">
+                            </div>
+                            <button type="submit" name="action" value="search" class="h-11 px-6 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg font-bold text-sm transition-colors">
+                                SZUKAJ
+                            </button>
+                        </div>
+                    </div>
 
-                <a class="btn mb-4" href="?page=1"
-                   style=" font-size: 50px; color:#75736B"> > </a>
-            {% endif %}
-        </div>
-    {% endif %}
+                    <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-[#dbe6db] dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                <tr class="bg-[#f0f4f0] dark:bg-gray-900/50 border-b border-[#dbe6db] dark:border-gray-800">
+                                    <th class="p-4 w-14 text-center">
+                                        <input class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 cursor-pointer" type="checkbox" onclick="toggleAll(this)">
+                                    </th>
+                                    <th class="p-4 text-xs font-bold uppercase tracking-wider text-[#618961]">Pracownik</th>
+                                    <th class="p-4 text-xs font-bold uppercase tracking-wider text-[#618961]">Dane Personalne</th>
+                                    <th class="p-4 text-xs font-bold uppercase tracking-wider text-[#618961] text-right">Akcje</th>
+                                </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#f0f4f0] dark:divide-gray-800">
+                                {% for teacher in page_obj %}
+                                    <tr class="group hover:bg-[#f8faf8] dark:hover:bg-gray-800/50 transition-colors">
+                                        <td class="p-4 text-center">
+                                            <input name="pk" value="{{ teacher.id }}" class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 cursor-pointer" type="checkbox">
+                                        </td>
+                                        <td class="p-4">
+                                            <div class="flex items-center gap-3">
+                                                <div class="size-10 rounded-full bg-cover bg-center border border-gray-200"
+                                                     style='background-image: url("{% if teacher.gender == 2 %}{% static 'employee_female.jpg' %}{% elif teacher.gender == 1 %}{% static 'employee_male.jpg' %}{% else %}{% static 'gander_null.jpg' %}{% endif %}");'>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <span class="text-[#111811] dark:text-white font-semibold text-sm">{{ teacher.user.email }}</span>
+                                                    <span class="text-[#618961] text-xs">ID: {{ teacher.id }}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="p-4 text-sm text-[#111811] dark:text-gray-200">
+                                            {% if teacher.first_name %}{{ teacher.first_name.title }} {{ teacher.last_name.title }}{% else %}<span class="italic text-gray-400">Brak danych</span>{% endif %}
+                                        </td>
+                                        <td class="p-4 text-right">
+                                            <a href="{% url 'teacher-profile' pk=teacher.id %}" class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-primary transition-colors" title="Zobacz Profil">
+                                                <span class="material-symbols-outlined text-[20px]">visibility</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="p-10 text-center text-[#618961]">Nie znaleziono pracowników spełniających kryteria.</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
 
+                        <div class="p-6 border-t border-[#dbe6db] dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-white/5">
+                            <button type="submit" name="action" value="grant" class="flex items-center gap-2 rounded-lg h-11 px-8 bg-primary hover:bg-[#0fd60f] text-black font-bold text-sm shadow-md transition-all">
+                                <span class="material-symbols-outlined text-[20px]">verified_user</span>
+                                Nadaj Uprawnienia Zaznaczonym
+                            </button>
 
+                            <div class="flex gap-2">
+                                {% if page_obj.has_previous %}
+                                    <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 rounded-lg border border-[#dbe6db] text-sm hover:bg-white transition-colors">Poprzednia</a>
+                                {% endif %}
+                                {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 rounded-lg border border-[#dbe6db] text-sm hover:bg-white transition-colors">Następna</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </form>
 
-<script src="{% static 'script-dir.js' %}"></script>
+                <div class="flex items-start gap-4 p-4 rounded-xl bg-blue-50 border border-blue-100 text-blue-900 text-sm">
+                    <span class="material-symbols-outlined text-blue-600 mt-0.5">info</span>
+                    <div>
+                        <p class="font-semibold mb-1">Informacja o Uprawnieniach</p>
+                        <p class="text-blue-800/80 leading-relaxed">Nadanie uprawnień dyrektorskich pozwala wybranym pracownikom na edycję finansów, zarządzanie kadrą oraz dostęp do danych wrażliwych wszystkich dzieci w Twojej placówce.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleAll(source) {
+            checkboxes = document.getElementsByName('pk');
+            for(var i=0, n=checkboxes.length; i<n; i++) {
+                checkboxes[i].checked = source.checked;
+            }
+        }
+    </script>
 {% endblock %}

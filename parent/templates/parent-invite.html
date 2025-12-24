@@ -1,104 +1,88 @@
 {% extends "base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90% ">
-    <form method="post" action="#">
-        {% csrf_token %}
-        <section class="h-100">
+    <body class="bg-background-light dark:bg-background-dark font-display">
+    <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div class="flex h-full grow">
 
-            <div class="container py-5 h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
-                                <div class="col">
-                                    <div class="card-body p-md-5" style="color: #75736B">
-                                        {% if messages %}
-                                            {% for message in messages %}
-                                                <div class="alert alert-{{ message.tags }}"
-                                                     style="background-color: #FF5F57; color: white; text-align: center; font-size: 30px">
-                                                    {{ message }}
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                        <div class="row">
-                                            <div class="col mb-4">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'list_kids' %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col mb-4">
-                                                <h2 class="text-uppercase d-flex justify-content-end"
-                                                    style="color: #75736B">Dodaj
-                                                    Rodzica</h2>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
+            <main class="flex-1 p-6 lg:p-10">
+                <div class="max-w-4xl mx-auto">
 
-                                                    <label class="form-label" for="form3Example1n">Imię
-                                                        dziecka:</label>
-                                                    <input type="text" id="form3Example1n" readonly
-                                                           class="form-control form-control-lg"
-                                                           value="{{ kid.first_name }}"/>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                <label class="form-label" for="form3Example1n">Nazwisko
-                                                    dziecka:</label>
-                                                <input type="text" id="form3Example1n" readonly
-                                                       class="form-control form-control-lg"
-                                                       value="{{ kid.last_name }}"/>
+                    <div class="flex flex-wrap gap-2 mb-4 pt-4">
+                        <a class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal hover:underline" href="{% url 'list_kids' %}">Dzieci</a>
+                        <span class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal">/</span>
+                        <span class="text-gray-900 dark:text-white text-sm font-medium leading-normal">Zaproś Rodzica</span>
+                    </div>
 
-                                            </div>
+                    <div class="flex flex-wrap justify-between gap-3 mb-8">
+                        <p class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">Zaproś Rodzica dla {{ kid.first_name }}</p>
+                    </div>
 
-                                        </div>
-                                        <div class="col-md-6 mb-4">
-                                            <div class="form-outline">
-                                                <label class="form-label" for="form3Example1n">Email rodzica:</label>
-                                                <input type="email" id="form3Example1n"
-                                                       class="form-control form-control-lg" name="email"/>
+                    <div class="bg-white dark:bg-background-dark rounded-xl border border-gray-200 dark:border-gray-700 p-6 md:p-8 space-y-8">
 
-                                            </div>
-                                        </div>
-                                        <div class="d-flex justify-content-end pt-3">
-                                            <button type="submit" class="btn"
-                                                    style="background-color: #75736B; color: white; width: 35%">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                     fill="currentColor" class="bi bi-envelope-fill"
-                                                     viewBox="0 0 16 16">
-                                                    <path d=
-                                                                  "M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"
-                                                    />
-                                                </svg>
-                                                <i class="bi bi-envelope-fill"></i>WYŚLIJ ZAPROSZENIE
-                                            </button>
-                                        </div>
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="rounded-lg bg-red-500/10 p-4 flex items-start gap-4 border border-red-500 text-red-700 dark:text-red-300">
+                                    <span class="material-symbols-outlined flex-shrink-0">error</span>
+                                    <p class="text-sm font-medium">{{ message }}</p>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
 
-                                    </div>
+                        <form method="post" action="#">
+                            {% csrf_token %}
+
+                            <div>
+                                <h3 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-4 border-b border-gray-200 dark:border-gray-700">Dane Dziecka</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+
+                                    <label class="flex flex-col w-full">
+                                        <p class="text-gray-900 dark:text-white text-base font-medium leading-normal pb-2">Imię Dziecka</p>
+                                        <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-white border border-[#dbe6db] dark:border-gray-600 bg-gray-100 dark:bg-gray-800 focus:ring-0 h-14 placeholder:text-[#618961] dark:placeholder:text-gray-500 p-[15px] text-base font-normal leading-normal cursor-default"
+                                               type="text"
+                                               value="{{ kid.first_name }}"
+                                               readonly/>
+                                    </label>
+
+                                    <label class="flex flex-col w-full">
+                                        <p class="text-gray-900 dark:text-white text-base font-medium leading-normal pb-2">Nazwisko Dziecka</p>
+                                        <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-white border border-[#dbe6db] dark:border-gray-600 bg-gray-100 dark:bg-gray-800 focus:ring-0 h-14 placeholder:text-[#618961] dark:placeholder:text-gray-500 p-[15px] text-base font-normal leading-normal cursor-default"
+                                               type="text"
+                                               value="{{ kid.last_name }}"
+                                               readonly/>
+                                    </label>
                                 </div>
                             </div>
-                        </div>
+
+                            <div>
+                                <h3 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-4 border-b border-gray-200 dark:border-gray-700">Dane Rodzica</h3>
+                                <div class="grid grid-cols-1 gap-6 mt-6">
+
+                                    <label class="flex flex-col w-full">
+                                        <p class="text-gray-900 dark:text-white text-base font-medium leading-normal pb-2">Email Rodzica (Zaproszenie)</p>
+                                        <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#dbe6db] dark:border-gray-600 bg-white dark:bg-gray-800 focus:border-primary/50 h-14 placeholder:text-[#618961] dark:placeholder:text-gray-500 p-[15px] text-base font-normal leading-normal"
+                                               placeholder="Wpisz email rodzica"
+                                               type="email"
+                                               name="email"
+                                               required/>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
+                                <button type="submit" class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-primary text-gray-900 text-base font-bold leading-normal tracking-[0.015em] hover:opacity-90">
+                                    <span class="material-symbols-outlined">mail</span>
+                                    <span class="truncate ml-2">WYŚLIJ ZAPROSZENIE</span>
+                                </button>
+                            </div>
+
+                        </form>
                     </div>
                 </div>
-            </div>
-        </section>
-    </form>
+            </main>
+        </div>
+    </div>
+    </body>
 {% endblock %}

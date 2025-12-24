@@ -1,164 +1,126 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block content %}
-    <link rel="stylesheet" href="{% static 'input_foucs.css' %}">
-    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
-        <!-- Container wrapper -->
-        <div class="container-fluid">
-            <!-- Left links -->
-            <ul class="navbar-nav flex-row">
+    <div class="flex flex-1">
+        <main class="flex-1 p-8">
+            <div class="max-w-5xl mx-auto">
 
-                <li class="nav-item me-2 me-lg-0">
-                    <h2>
-                        <a href="{% url 'home_page' %}" role="button"
-                           style="color: #75736B; text-decoration:none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                 height="32"
-                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                 viewBox="0 0 16 16">
-                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                            </svg>
-
-                            MENU
-
-                        </a>
-                    </h2>
-                </li>
-
-            </ul>
-            <!-- Left links -->
-            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <!-- Left links -->
-                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
-                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>IKONKI</b></li>
-                </ul>
-            </div>
-            {% if perms.director.is_director %}
-                <ul class="navbar-nav d-flex flex-row me-1">
-                    <li class="nav-item">
-                        <button class="btn" onclick="location.href='{% url 'photo_add' %}'"
-                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
-                            DODAJ IKONKĘ
-                        </button>
-                    </li>
-                </ul>
-            {% endif %}
-        </div>
-        <!-- Container wrapper -->
-    </nav>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}"
-                 style=" color: white; text-align: center; font-size: 30px">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    {% for photo in page_obj %}
-
-
-        <div class="container-fluid mb-1 mt-5"
-             style="background-color: white">
-            <div class="row align-item-center" style="padding-top: 10px; font-size: 30px; color: #75736B;">
-                <div class="col-3 mb-3 ml-3"
-                     style="justify-content: start;">
-
-                    <img src="{{ photo }}">
-
-                </div>
-                <div class="col-2  mt-5">
-                    {{ photo.name }}
-
-                </div>
-                <div class="col"></div>
-                <div class="col-3  mt-5">
-                    {% if photo.meal_photos %}
-                        DO PLANÓW ŻYWIENIOWYCH
-                    {% else %}
-                        DO GRUP
-                    {% endif %}
-
-                </div>
-                <div class="col"></div>
-
-                <div class="col mt-5">
-
-                    <div class="dropdown">
-                        <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                           href="#"
-                           id="navbarDropdownMenuAvatar"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false"
-                           style="  text-decoration:none; color: #75736B; ">
-                            Opcje
-                        </a>
-                        <ul
-                                class="dropdown-menu dropdown-menu-end"
-                                aria-labelledby="navbarDropdownMenuAvatar"
-                        >
-
-                            {% if perms.director.is_director %}
-                                <li>
-                                    <form method="POST"
-                                          action="{% url 'photo_delete' pk=photo.id %}">
-                                        {% csrf_token %}
-                                        {% if photo.meal_photos %}
-                                            <button class="dropdown-item"
-                                                    type="submit"
-                                                    name="delete"
-                                                    value="2"
-                                                    onclick="return confirm('Jestes pewny ze chcesz usunac zdjecie {{ photo.name }}');"
-                                            >Usuń
-                                            </button>
-                                        {% else %}
-                                            <button class="dropdown-item"
-                                                    type="submit"
-                                                    name="delete"
-                                                    value="1"
-                                                    onclick="return confirm('Jestes pewny ze chcesz usunac zdjecie {{ photo.name }}');"
-                                            >Usuń
-                                            </button>
-                                        {% endif %}
-                                    </form>
-                                </li>
-                            {% endif %}
-                        </ul>
+                <div class="flex flex-wrap justify-between items-end gap-3 mb-6">
+                    <div class="flex min-w-72 flex-col gap-2">
+                        <h2 class="text-[#111811] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Zarządzaj Ikonami</h2>
+                        <p class="text-[#618961] dark:text-gray-400 text-base font-normal leading-normal">Przeglądaj i zarządzaj ikonami dla grup oraz planów żywieniowych.</p>
                     </div>
+                    {% if perms.director.is_director %}
+                        <a href="{% url 'photo_add' %}" class="flex items-center justify-center rounded-lg bg-[#13ec13] px-4 py-2 text-sm font-bold text-[#111811] hover:bg-[#13ec13]/90 transition-colors shadow-sm">
+                            <span class="material-symbols-outlined mr-2 text-xl">add</span>
+                            Dodaj Nową Ikonkę
+                        </a>
+                    {% endif %}
                 </div>
-            </div>
-        </div>
-        <hr>
 
-    {% endfor %}
-    {% if page_obj.has_other_pages %}
-        <div style="position: absolute; bottom: auto; left:45%">
-            {% if page_obj.has_previous %}
-
-                <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
-                   style=" font-size: 50px; color:#75736B">< </a>
-            {% else %}
-                <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
-                   style=" font-size: 50px; color:#75736B">< </a>
-            {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <a class="btn mb-4" href="?page={{ num }}"
-                       style=" font-size: 50px; color:#75736B">{{ num }}</a>
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mb-4 p-4 rounded-lg bg-primary text-background-dark font-bold text-center">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 {% endif %}
 
-            {% endfor %}
+                <div class="bg-white dark:bg-background-dark/50 rounded-lg border border-[#dbe6db] dark:border-gray-800 overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                            <tr class="border-b border-b-[#dbe6db] dark:border-gray-800 bg-gray-50 dark:bg-white/5">
+                                <th class="px-6 py-4 text-left text-[#111811] dark:text-gray-300 text-xs font-bold uppercase tracking-wider w-24">Podgląd</th>
+                                <th class="px-6 py-4 text-left text-[#111811] dark:text-gray-300 text-xs font-bold uppercase tracking-wider">Nazwa</th>
+                                <th class="px-6 py-4 text-left text-[#111811] dark:text-gray-300 text-xs font-bold uppercase tracking-wider">Kategoria</th>
+                                <th class="px-6 py-4 text-right text-[#111811] dark:text-gray-300 text-xs font-bold uppercase tracking-wider">Akcje</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for photo in page_obj %}
+                                <tr class="border-t border-t-[#dbe6db] dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                                    <td class="px-6 py-3">
+                                        {% if photo.group_photos %}
+                                            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-12 h-12 border border-gray-200 dark:border-gray-700"
+                                                 style='background-image: url("{{ photo.group_photos.url }}");'>
+                                            </div>
+                                        {% elif photo.meal_photos %}
+                                            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg w-12 h-12 border border-gray-200 dark:border-gray-700"
+                                                 style='background-image: url("{{ photo.meal_photos.url }}");'>
+                                            </div>
+                                        {% else %}
+                                            <div class="flex items-center justify-center bg-gray-100 rounded-lg w-12 h-12 text-gray-400">
+                                                <span class="material-symbols-outlined">image</span>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-3 text-[#111811] dark:text-gray-100 text-sm font-medium">
+                                        {{ photo.name }}
+                                    </td>
+                                    <td class="px-6 py-3">
+                                        {% if photo.meal_photos %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                                        Posiłki
+                                    </span>
+                                        {% else %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                        Grupy
+                                    </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-3 text-right">
+                                        {% if perms.director.is_director %}
+                                            <form method="POST" action="{% url 'photo_delete' pk=photo.id %}" class="inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="delete" value="{% if photo.meal_photos %}2{% else %}1{% endif %}">
+                                                <button type="submit"
+                                                        class="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                        onclick="return confirm('Czy na pewno chcesz usunąć: {{ photo.name }}?');">
+                                                    <span class="material-symbols-outlined text-base">delete</span>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4" class="px-6 py-10 text-center text-gray-500">Brak dostępnych ikon.</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-            {% if page_obj.has_next %}
-                <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
-                   style=" text-decoration: none; font-size: 50px; color:#75736B"> ></a>
-            {% else %}
+                {% if page_obj.has_other_pages %}
+                    <div class="mt-6 flex justify-center items-center gap-4">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}" class="p-2 text-[#618961] hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined">arrow_back_ios</span>
+                            </a>
+                        {% endif %}
 
-                <a class="btn mb-4" href="?page=1"
-                   style=" font-size: 50px; color:#75736B"> > </a>
-            {% endif %}
-        </div>
-    {% endif %}
+                        <div class="flex gap-2">
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <span class="px-4 py-2 rounded-lg bg-primary text-background-dark font-bold">{{ num }}</span>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <a href="?page={{ num }}" class="px-4 py-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 text-[#111811] dark:text-white">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}" class="p-2 text-[#618961] hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined">arrow_forward_ios</span>
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+            </div>
+        </main>
+    </div>
 {% endblock %}

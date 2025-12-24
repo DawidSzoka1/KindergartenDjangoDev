@@ -103,11 +103,31 @@ class PhotoDeleteView(PermissionRequiredMixin, View):
         return redirect('photos_list')
 
 
-class DirectorProfileView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
+class DirectorProfileView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        director = get_object_or_404(Director, id=pk)
+        user = request.user
 
-    def get(self, request):
-        director = get_object_or_404(Director, user=request.user.id)
+        # Logika uprawnień: Sprawdzamy czy użytkownik ma prawo widzieć ten profil
+        has_access = False
+
+        if user.get_all_permissions() == {'director.is_director'}:
+            # Dyrektor widzi swój profil (i opcjonalnie innych dyrektorów w tej samej placówce)
+            has_access = True
+        elif user.get_all_permissions() == {'teacher.is_teacher'}:
+            # Nauczyciel widzi profil swojego dyrektora
+            employee = get_object_or_404(Employee, user=user)
+            if director in employee.principal.all():
+                has_access = True
+        else:
+            # Rodzic widzi profil dyrektora swojej placówki
+            parent = get_object_or_404(ParentA, user=user)
+            if director in parent.principal.all():
+                has_access = True
+
+        if not has_access:
+            raise PermissionDenied
+
         groups = director.groups_set.filter(is_active=True)
         kids = director.kid_set.filter(is_active=True)
         return render(request, 'director-profile.html', {'director': director, 'groups': groups, 'kids': kids})
@@ -135,14 +155,39 @@ class DirectorUpdateView(PermissionRequiredMixin, View):
 class ContactView(LoginRequiredMixin, View):
     def get(self, request):
         user = request.user
-        if user.get_all_permissions() == {'director.is_director'}:
-            contact = ContactModel.objects.get(director=Director.objects.get(user=user.id))
-        elif user.get_all_permissions() == {'teacher.is_teacher'}:
-            contact = ContactModel.objects.get(director=Employee.objects.get(user=user.id).principal.all().first())
-        else:
-            contact = ContactModel.objects.get(director=ParentA.objects.get(user=user.id).principal.all().first())
+        context = {}
 
-        return render(request, 'contact.html', {'contact': contact})
+        # Pobieranie podstawowych danych kontaktowych placówki
+        if 'director.is_director' in user.get_all_permissions():
+            director_obj = Director.objects.get(user=user.id)
+            contact = ContactModel.objects.filter(director=director_obj).first()
+        elif 'teacher.is_teacher' in user.get_all_permissions():
+            employee = Employee.objects.get(user=user.id)
+            director_obj = employee.principal.all().first()
+            contact = ContactModel.objects.filter(director=director_obj).first()
+
+            # Paginacja dyrektorów dla nauczyciela
+            principals_list = employee.principal.all().order_by('last_name')
+            p_paginator = Paginator(principals_list, 5)
+            context['principals'] = p_paginator.get_page(request.GET.get('p_page'))
+        else:
+            parent = ParentA.objects.get(user=user.id)
+            director_obj = parent.principal.all().first()
+            contact = ContactModel.objects.filter(director=director_obj).first()
+
+            # Paginacja dyrektorów dla rodzica
+            principals_list = parent.principal.all().order_by('last_name')
+            p_paginator = Paginator(principals_list, 3)
+            context['principals'] = p_paginator.get_page(request.GET.get('p_page'))
+
+            # Paginacja nauczycieli dla rodzica
+            kids_groups = parent.kids.filter(is_active=True).values_list('group', flat=True)
+            teachers_list = Employee.objects.filter(group__in=kids_groups, is_active=True).order_by('last_name')
+            t_paginator = Paginator(teachers_list, 5)
+            context['teachers'] = t_paginator.get_page(request.GET.get('t_page'))
+
+        context['contact'] = contact
+        return render(request, 'contact.html', context)
 
 
 class ContactUpdateView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
@@ -171,6 +216,7 @@ class GiveDirectorPermissions(PermissionRequiredMixin, LoginRequiredMixin, View)
     permission_required = 'director.is_director'
 
     def get(self, request):
+        # Pobieramy tylko tych pracowników, którzy są przypisani do dyrektora
         employees = Employee.objects.filter(principal=Director.objects.get(user=request.user)).order_by('-id')
         paginator = Paginator(employees, 10)
         page = request.GET.get('page')
@@ -178,19 +224,31 @@ class GiveDirectorPermissions(PermissionRequiredMixin, LoginRequiredMixin, View)
         return render(request, 'give-director-permission.html', context={'page_obj': page_obj})
 
     def post(self, request):
+        action = request.POST.get('action')
         search = request.POST.get('search')
-        if search:
-            employees = Employee.objects.filter(principal=Director.objects.get(user=request.user)).filter(
+        director = Director.objects.get(user=request.user)
+
+        # Obsługa wyszukiwania
+        if action == 'search' or search:
+            employees = Employee.objects.filter(principal=director).filter(
                 user__email__icontains=search).order_by('-id')
             paginator = Paginator(employees, 10)
             page = request.GET.get('page')
             page_obj = paginator.get_page(page)
             return render(request, 'give-director-permission.html', context={'page_obj': page_obj})
-        content_type = ContentType.objects.get_for_model(Director)
-        permission = Permission.objects.get(content_type=content_type, codename='is_director')
-        pk = list(map(int, request.POST.getlist('pk')))
-        employees = Employee.objects.filter(id__in=pk)
-        for employee in employees:
-            employee.user.user_permissions.add(permission)
+
+        # Obsługa nadawania uprawnień
+        if action == 'grant':
+            content_type = ContentType.objects.get_for_model(Director)
+            permission = Permission.objects.get(content_type=content_type, codename='is_director')
+            pk_list = request.POST.getlist('pk')
+
+            if pk_list:
+                employees = Employee.objects.filter(id__in=pk_list)
+                for employee in employees:
+                    employee.user.user_permissions.add(permission)
+                messages.success(request, f'Pomyślnie nadano uprawnienia dla {employees.count()} pracowników.')
+            else:
+                messages.error(request, 'Nie wybrano żadnego pracownika.')
 
         return redirect('give-permissions')

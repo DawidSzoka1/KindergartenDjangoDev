@@ -1,141 +1,359 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90%">
-    <form method="post" action="#">
-        {% csrf_token %}
-        <section class="h-100">
+    <div class="mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
 
-            <div class="container h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
+        <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'kid_details' pk=kid.id %}"
+                   class="flex items-center gap-2 text-primary hover:underline font-bold">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Powrót do profilu
+                </a>
+            </div>
+            <h1 class="text-4xl font-black tracking-tight text-gray-900 dark:text-white">
+                Edytuj profil dziecka
+            </h1>
+        </div>
 
-                                <div class="col" style="color: #75736B">
-                                    <div class="card-body p-md-5 ">
-                                        {% if form.errors %}
-                                            <div class="alert alert-danger">
-                                                {{ form.errors }}
-                                            </div>
-                                        {% endif %}
-                                        <div class="row">
+        <div class="mb-10 flex flex-col sm:flex-row items-center gap-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8">
+            <div class="w-36 h-36 rounded-full bg-cover bg-center shadow-2xl border-4 border-white dark:border-gray-800"
+                 style="background-image: url('{% if kid.gender == 1 %}{% static 'boy.jpg' %}{% else %}{% static 'girl.jpg' %}{% endif %}')">
+            </div>
+            <div class="text-center sm:text-left">
+                <h2 class="text-3xl font-black text-gray-900 dark:text-white">{{ kid }}</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 mt-2">
+                    Zapisany: {{ kid.start|date:"d.m.Y" }}
+                </p>
+            </div>
+        </div>
 
-                                            <div class="col mb-2">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'kid_details' pk=kid.id %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col mb-4">
-                                                <h2 class="text-uppercase d-flex justify-content-end"
-                                                    style="color: #75736B">Zmień
-                                                    Informacje</h2>
-                                            </div>
-
-
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 ">
-                                                <div class="form-outline">
-                                                    {{ form.principal }}
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                        <div class="row">
-
-                                            <div class="form-group col-lg-6">
-                                                {{ form.first_name|as_crispy_field }}
-
-                                            </div>
-
-                                            <div class="form-group col-lg-6">
-                                                {{ form.last_name|as_crispy_field }}
-                                            </div>
-
-                                        </div>
-
-
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
-                                                {{ form.payment_plan|as_crispy_field }}
-
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                {{ form.gender|as_crispy_field }}
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
-                                                {{ form.kid_meals|as_crispy_field }}
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                <div class="form-outline">
-                                                    {% if form.group %}
-                                                        {{ form.group|as_crispy_field }}
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
-                                                {{ form.date_of_birth|as_crispy_field }}
-
-                                            </div>
-                                        </div>
-                                        <div class="form-outline mb-2">
-                                            {{ form.start|as_crispy_field }}
-                                            <div>
-                                                <label class="form-check-label mb-0 me-4" for="mySwitch">Umowa na czas
-                                                    nieokteślony:</label>
-
-                                                <div class="form-check form-switch">
-
-                                                    <input class="form-check-input" type="checkbox" id="mySwitch"
-                                                           onclick="myFunction()"
-                                                           name="indefinite" value="yes">
-
-                                                </div>
-                                            </div>
-                                            <div id="end">
-                                                {{ form.end|as_crispy_field }}
-                                            </div>
-
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="d-flex justify-content-end pt-3">
-                                                <button type="submit" class="btn"
-                                                        style="background-color: #75736B; color: white; width: 35%">
-                                                    ZATWIERDŹ ZMIANY
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        {% if form.non_field_errors %}
+            <div class="mb-8 rounded-xl bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-600 p-6 shadow-lg">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-red-600 text-3xl">error</span>
+                    <div class="text-red-800 dark:text-red-300 font-medium">
+                        {{ form.non_field_errors|join:"<br>" }}
                     </div>
                 </div>
             </div>
-        </section>
-    </form>
-    <script src="{% static 'checkbox.js' %}"></script>
+        {% endif %}
+
+        <form method="post" class="space-y-10">
+            {% csrf_token %}
+
+            <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8">
+                <h2 class="mb-8 text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary text-3xl">person</span>
+                    Podstawowe informacje
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Imię *</label>
+                        <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" required
+                               class="w-full h-12 px-4 rounded-xl border-2 {% if form.first_name.errors %}border-red-500 bg-red-50 dark:bg-red-900/20{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-gray-50 dark:bg-gray-800 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Nazwisko *</label>
+                        <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" required
+                               class="w-full h-12 px-4 rounded-xl border-2 {% if form.last_name.errors %}border-red-500 bg-red-50 dark:bg-red-900/20{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-gray-50 dark:bg-gray-800 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Data urodzenia *</label>
+                        <input type="date" name="date_of_birth" value="{% if form.date_of_birth.value %}{{ form.date_of_birth.value|date:'Y-m-d' }}{% else %}{{ kid.date_of_birth|date:'Y-m-d' }}{% endif %}" required
+                               class="w-full h-12 px-4 rounded-xl border-2 {% if form.date_of_birth.errors %}border-red-500 bg-red-50 dark:bg-red-900/20{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-gray-50 dark:bg-gray-800 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Płeć</label>
+                        <select name="gender"
+                                class="w-full h-12 px-4 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 transition">
+                            <option value="">--- Wybierz ---</option>
+                            <option value="1" {% if kid.gender == 1 %}selected{% endif %}>Chłopiec</option>
+                            <option value="2" {% if kid.gender == 2 %}selected{% endif %}>Dziewczynka</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-900 rounded-3xl shadow-xl border-2 border-primary/20 p-10">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-primary flex items-center gap-4">
+                        <span class="material-symbols-outlined text-5xl">family_restroom</span>
+                        Rodzice / Opiekunowie
+                    </h2>
+                    <button type="button" onclick="openAddParentModal()" class="px-6 py-3 bg-primary text-white rounded-xl font-bold flex items-center gap-2 hover:bg-primary/90 transition shadow-lg">
+                        <span class="material-symbols-outlined">person_add</span> Dodaj nowego
+                    </button>
+                </div>
+
+                <div id="parents-list" class="space-y-4 mb-8">
+                    {% for parent in kid.parenta_set.all %}
+                        <div class="flex items-center justify-between p-5 bg-gradient-to-r from-primary/5 rounded-2xl border {% if parent == kid.principal %}border-primary shadow-lg{% else %}border-gray-300 dark:border-gray-700{% endif %}"
+                             data-parent-id="{{ parent.id }}"
+                             data-parent-text="{{ parent.first_name|default:'' }} {{ parent.last_name|default:'' }} – {{ parent.user.email }}">
+
+                            <div class="flex items-center gap-5">
+                                <div class="w-14 h-14 rounded-full bg-gray-300 dark:bg-gray-700 bg-cover bg-center"
+                                     style="background-image: url('{% if parent.gender == 1 %}{% static 'parent_male.jpg' %}{% else %}{% static 'parent_female.jpg' %}{% endif %}')"></div>
+                                <div>
+                                    <p class="font-bold text-lg">
+                                        {{ parent.user.get_full_name|default:parent.user.email }}
+                                    </p>
+                                    <p class="text-gray-600 dark:text-gray-400">{{ parent.user.email }}</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="removeParent({{ parent.id }})" class="text-red-600 hover:text-red-800">
+                                <span class="material-symbols-outlined">delete</span>
+                            </button>
+                        </div>
+                    {% empty %}
+                        <p class="text-center text-gray-500 py-10">Brak przypisanych rodziców</p>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-lg font-semibold mb-3">Dodaj istniejącego rodzica</label>
+                    <select id="available-parents" class="w-full p-4 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-base">
+                        <option value="">— Wybierz rodzica do dodania —</option>
+                        {% for parent in all_parents %}
+                            {% if parent not in kid.parenta_set.all %}
+                                <option value="{{ parent.id }}"
+                                        data-image="{% if parent.gender == 1 %}{% static 'parent_male.jpg' %}{% else %}{% static 'parent_female.jpg' %}{% endif %}">
+                                    {{ parent.first_name|default:'' }} {{ parent.last_name|default:'' }} – {{ parent.user.email }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <button type="button" onclick="addExistingParent()" class="mt-3 px-6 py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700">
+                        Dodaj wybranego
+                    </button>
+                </div>
+
+                <input type="hidden" name="parents" id="parents-hidden" value="{% for p in kid.parenta_set.all %}{{ p.id }}{% if not forloop.last %},{% endif %}{% endfor %}">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8">
+                    <label class="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Grupa</label>
+                    <select name="group" class="w-full h-12 px-4 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 focus:border-primary focus:ring-4 focus:ring-primary/20">
+                        <option value="">--- Brak ---</option>
+                        {% for group in form.fields.group.queryset %}
+                            <option value="{{ group.pk }}" {% if kid.group == group %}selected{% endif %}>{{ group.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8">
+                    <label class="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Plan płatności</label>
+                    <select name="payment_plan" class="w-full h-12 px-4 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 focus:border-primary focus:ring-4 focus:ring-primary/20">
+                        <option value="">--- Brak ---</option>
+                        {% for plan in form.fields.payment_plan.queryset %}
+                            <option value="{{ plan.pk }}" {% if kid.payment_plan == plan %}selected{% endif %}>{{ plan.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8">
+                    <label class="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Plan żywieniowy</label>
+                    <select name="kid_meals" class="w-full h-12 px-4 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 focus:border-primary focus:ring-4 focus:ring-primary/20">
+                        <option value="">--- Brak ---</option>
+                        {% for meal in form.fields.kid_meals.queryset %}
+                            <option value="{{ meal.pk }}" {% if kid.kid_meals == meal %}selected{% endif %}>{{ meal.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8">
+                <h2 class="mb-8 text-2xl font-bold text-gray-900 dark:text-white">Okres pobytu</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Data rozpoczęcia *</label>
+                        <input type="date" name="start" value="{{ kid.start|date:'Y-m-d' }}" required
+                               class="w-full h-12 px-4 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 focus:border-primary focus:ring-4 focus:ring-primary/20">
+                    </div>
+                    <div id="end-date-container">
+                        <label class="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Data zakończenia <span class="text-gray-500">(opcjonalnie)</span></label>
+                        <input type="date" name="end" value="{% if kid.end %}{{ kid.end|date:'Y-m-d' }}{% endif %}"
+                               class="w-full h-12 px-4 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 focus:border-primary focus:ring-4 focus:ring-primary/20">
+                    </div>
+                </div>
+                <div class="mt-6 flex items-center gap-4">
+                    <input type="checkbox" id="indefinite" name="indefinite" class="w-6 h-6 text-primary rounded"
+                           onchange="toggleEndDate()" {% if not kid.end %}checked{% endif %}>
+                    <label for="indefinite" class="text-lg font-medium cursor-pointer">Umowa na czas nieokreślony</label>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-6 pt-10 border-t-4 border-primary/20">
+                <a href="{% url 'kid_details' pk=kid.id %}"
+                   class="px-10 py-4 bg-gray-200 dark:bg-gray-700 rounded-2xl font-bold text-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                    Anuluj
+                </a>
+                <button type="submit"
+                        class="px-12 py-4 bg-primary text-white rounded-2xl font-bold text-lg hover:bg-primary/90 shadow-2xl transition transform hover:scale-105">
+                    Zapisz zmiany
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div id="add-parent-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden" role="dialog">
+        <div class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 p-8 shadow-2xl transition-all">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Dodaj nowego rodzica</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">Wpisz adres e-mail rodzica. Wyślemy mu zaproszenie do utworzenia konta.</p>
+
+            <div class="mb-6">
+                <label for="new-parent-email" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Adres e-mail</label>
+                <input type="email" id="new-parent-email" class="w-full h-12 px-4 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 focus:border-primary focus:ring-4 focus:ring-primary/20" placeholder="np. jan@kowalski.pl">
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button onclick="closeAddParentModal()" class="px-5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 font-bold hover:bg-gray-100 dark:hover:bg-gray-800">
+                    Anuluj
+                </button>
+                <button onclick="createParentAndSelect()" class="px-5 py-2.5 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 flex items-center gap-2">
+                    <svg id="create-parent-spinner" class="hidden h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span id="create-parent-text">Wyślij zaproszenie</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Logika dodawania istniejącego rodzica (lista -> przypisani)
+        function addExistingParent() {
+            const select = document.getElementById('available-parents');
+            const selectedOption = select.options[select.selectedIndex];
+            const parentId = select.value;
+            const parentText = selectedOption.text;
+            const parentImage = selectedOption.getAttribute('data-image');
+
+            if (!parentId) return;
+
+            const list = document.getElementById('parents-list');
+            list.insertAdjacentHTML('beforeend', `
+            <div class="flex items-center justify-between p-5 bg-gradient-to-r from-primary/5 to-transparent rounded-2xl border-2 border-gray-300 dark:border-gray-700 shadow-sm"
+                 data-parent-id="${parentId}" data-parent-text="${parentText.replace(/"/g, '&quot;')}">
+                <div class="flex items-center gap-5">
+                     <div class="w-14 h-14 rounded-full bg-gray-300 dark:bg-gray-700 bg-cover bg-center"
+                          style="background-image: url('${parentImage}')"></div>
+                    <div>
+                        <p class="font-bold text-lg text-gray-900 dark:text-white">${parentText}</p>
+                    </div>
+                </div>
+                <button type="button" onclick="removeParent(${parentId})"
+                        class="text-red-600 hover:text-red-800 transition">
+                    <span class="material-symbols-outlined text-2xl">delete</span>
+                </button>
+            </div>
+        `);
+
+            const hidden = document.getElementById('parents-hidden');
+            hidden.value = hidden.value ? hidden.value + ',' + parentId : parentId;
+
+            selectedOption.remove();
+            select.value = '';
+        }
+
+        // Logika usuwania rodzica
+        function removeParent(parentId) {
+            if (!confirm("Na pewno usunąć tego rodzica z dziecka?")) return;
+
+            const item = document.querySelector(`[data-parent-id="${parentId}"]`);
+            const parentText = item.getAttribute('data-parent-text');
+            const parentImage = item.querySelector('.bg-cover').style.backgroundImage.slice(5, -2);
+
+            item.remove();
+
+            const hidden = document.getElementById('parents-hidden');
+            hidden.value = hidden.value
+                .split(',')
+                .filter(id => id && id !== parentId.toString())
+                .join(',');
+
+            const select = document.getElementById('available-parents');
+            const option = document.createElement('option');
+            option.value = parentId;
+            option.textContent = parentText;
+            option.setAttribute('data-image', parentImage);
+            select.appendChild(option);
+        }
+
+        // --- NOWE FUNKCJE OBSŁUGI MODALA I AJAX ---
+
+        function openAddParentModal() {
+            document.getElementById('add-parent-modal').classList.remove('hidden');
+            document.getElementById('new-parent-email').focus();
+        }
+
+        function closeAddParentModal() {
+            document.getElementById('add-parent-modal').classList.add('hidden');
+            document.getElementById('new-parent-email').value = '';
+        }
+
+        function createParentAndSelect() {
+            const email = document.getElementById('new-parent-email').value.trim();
+            if (!email || !email.includes('@')) {
+                alert('Wpisz poprawny adres e-mail!');
+                return;
+            }
+
+            const spinner = document.getElementById('create-parent-spinner');
+            const text = document.getElementById('create-parent-text');
+            spinner.classList.remove('hidden');
+            text.classList.add('hidden');
+
+            // Wysyłamy zapytanie AJAX (zakładam, że URL 'create_parent_ajax' jest poprawny w urls.py)
+            fetch("{% url 'create_parent_ajax' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({ email: email })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Dodaj nowego rodzica do listy wyboru (Available Parents)
+                        const select = document.getElementById('available-parents');
+                        const option = document.createElement('option');
+                        option.value = data.parent_id;
+                        option.text = email;
+                        // Ustawiamy domyślny obrazek dla nowego rodzica (neutralny lub męski jako placeholder)
+                        option.setAttribute('data-image', "{% static 'parent_male.jpg' %}");
+
+                        select.add(option);
+                        select.value = data.parent_id; // Zaznacz go automatycznie
+
+                        closeAddParentModal();
+                        alert("Wysłano zaproszenie! Rodzic został dodany do listy. Kliknij 'Dodaj wybranego', aby przypisać.");
+                    } else {
+                        alert("Błąd: " + data.error);
+                    }
+                })
+                .catch(error => {
+                    alert("Wystąpił błąd połączenia z serwerem.");
+                    console.error(error);
+                })
+                .finally(() => {
+                    spinner.classList.add('hidden');
+                    text.classList.remove('hidden');
+                });
+        }
+
+        function toggleEndDate() {
+            const container = document.getElementById('end-date-container');
+            if (document.getElementById('indefinite').checked) {
+                container.style.display = 'none';
+                container.querySelector('input').value = '';
+            } else {
+                container.style.display = 'block';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', toggleEndDate);
+    </script>
 {% endblock %}

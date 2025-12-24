@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <main class="flex-1 p-6 lg:p-10">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex flex-wrap gap-2 mb-4">
+                <a class="text-primary dark:text-secondary text-sm font-medium" href="{% url 'list_groups' %}">Grupy</a>
+                <span class="text-gray-400 dark:text-gray-500 text-sm font-medium">/</span>
+                <a class="text-primary dark:text-secondary text-sm font-medium" href="{% url 'group_details' pk=group.pk %}">{{ group.name }}</a>
+                <span class="text-gray-400 dark:text-gray-500 text-sm font-medium">/</span>
+                <span class="text-neutral-text dark:text-neutral-background text-sm font-medium">Przypisz Nauczycieli</span>
+            </div>
+
+            <header class="mb-8">
+                <h1 class="text-neutral-text dark:text-white text-3xl font-bold tracking-tight">Przypisz Nauczycieli do Grupy {{ group.name }}</h1>
+                <p class="text-gray-500 dark:text-gray-400 text-base font-normal mt-1">Wybierz nauczycieli, którzy zostaną przypisani jako obsługa tej grupy.</p>
+            </header>
+
+            <form method="post" class="bg-white dark:bg-gray-800 rounded-xl border border-neutral-border dark:border-gray-700 p-6 shadow-lg">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="mb-4 p-3 bg-status-warning/10 text-status-warning rounded-lg">
+                        {{ form.non_field_errors|join:", " }}
+                    </div>
+                {% endif %}
+
+                <div class="mb-6">
+                    <label class="block text-lg font-semibold mb-3">Dostępni Nauczyciele:</label>
+
+                    {% if form.teachers_to_assign.errors %}
+                        <p class="text-status-warning mb-3">Wybierz co najmniej jednego nauczyciela.</p>
+                    {% endif %}
+
+                    <div class="space-y-3 max-h-96 overflow-y-auto">
+                        {% for checkbox in form.teachers_to_assign %}
+                            <label class="flex items-center gap-4 p-3 rounded-lg hover:bg-neutral-background dark:hover:bg-gray-700/50 cursor-pointer border border-transparent has-[:checked]:border-primary has-[:checked]:bg-primary/10">
+                                {{ checkbox.tag }}
+                                <img class="size-10 rounded-full object-cover" data-alt="Teacher avatar" src="{% static 'boy.jpg' %}"/>
+                                <div class="flex-1">
+                                    <p class="font-medium text-sm text-neutral-text dark:text-neutral-background">{{ checkbox.choice_label }}</p>
+                                </div>
+                            </label>
+                        {% empty %}
+                            <p class="text-center text-gray-500 py-4">Brak nauczycieli do przypisania. Wszyscy są już przypisani lub nie należą do Twojej placówki.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 border-t border-neutral-border dark:border-gray-700 pt-4">
+                    <a href="{% url 'group_details' pk=group.pk %}" class="rounded-lg h-10 px-4 bg-white dark:bg-gray-700 border border-neutral-border dark:border-gray-600 text-neutral-text dark:text-white text-sm font-semibold hover:bg-neutral-background dark:hover:bg-gray-600 flex items-center">
+                        Anuluj
+                    </a>
+                    <button type="submit" class="rounded-lg h-10 px-4 bg-primary text-white text-sm font-semibold hover:bg-primary/90 flex items-center">
+                        Potwierdź Przypisanie
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+{% endblock %}

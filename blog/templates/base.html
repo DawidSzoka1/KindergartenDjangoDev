@@ -1,139 +1,284 @@
 {% load static %}
-{% load bootstrap_icons %}
+
 <!DOCTYPE html>
-<html lang="en">
+<html class="light" lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Title</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'bootstrap_icons/css/bootstrap_icons.css' %}">
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
-            crossorigin="anonymous"></script>
+    <title>
+        {% if user.is_authenticated %}
+            {% if perms.director.is_director %}
+                Panel Dyrektora
+            {% elif perms.teacher.is_teacher %}
+                Panel Nauczyciela
+            {% elif perms.parent.is_parent %}
+                Panel Rodzica
+            {% else %}
+                Panel
+            {% endif %}
+        {% else %}
+            KinderManage - Zarządzaj przedszkolem
+        {% endif %}
+    </title>
 
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
+    <!-- Czcionki -->
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#a78bfa",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102210",
+                    },
+                    fontFamily: {
+                        display: ["Lexend", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24;
+        }
+        .select2-container--default .select2-selection--single {
+            height: 48px !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.5rem !important;
+            padding-left: 2.5rem !important;
+            padding-top: 0.5rem !important;
+            background-color: white !important;
+        }
+        .select2-container--default.dark .select2-selection--single {
+            background-color: #1f2937 !important;
+            border-color: #374151 !important;
+        }
+        .select2-container .select2-selection--single .select2-selection__rendered {
+            line-height: 36px !important;
+            padding-left: 0 !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 46px !important;
+            right: 12px !important;
+        }
+    </style>
 </head>
-<body>
+<!-- Modal do dodawania rodzica -->
+<div id="add-parent-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex min-h-screen items-center justify-center px-4 pt-5 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" onclick="closeAddParentModal()"></div>
+        <span class="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
 
-<header class="page-header">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg justify-content-around" id="navbar" style="background-color: #BAB1AB">
-        <!-- Container wrapper -->
-        <div class="container-fluid">
-            <div class="navbar-nav ms-auto">
-                {% if user.is_authenticated %}
-                    <!-- Toggle button -->
-                    <a href="{% url 'contact' %} " style="font-size: 20px; color: white; text-decoration:none ">KONTAKT
-                        &nbsp; &nbsp; &nbsp;
+        <div class="inline-block transform overflow-hidden rounded-2xl bg-white dark:bg-gray-900 text-left align-bottom shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
+            <div class="bg-white dark:bg-gray-900 px-6 pt-5 pb-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Dodaj nowego rodzica</h3>
+                    <button onclick="closeAddParentModal()" class="text-gray-400 hover:text-gray-600">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">E-mail rodzica</label>
+                    <input type="email" name="email" id="new-parent-email" class="mt-2 h-12 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 focus:border-primary focus:outline-none" placeholder="np. anna.kowalska@gmail.com">
+                    <p class="mt-2 text-sm text-gray-500">Hasło zostanie wygenerowane automatycznie i wysłane na e-mail.</p>
+                </div>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-800 px-6 py-4 flex justify-end gap-3">
+                <button onclick="closeAddParentModal()" class="px-5 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium">Anuluj</button>
+                <button onclick="createParentAndSelect()" class="px-6 py-2.5 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 shadow-md">
+                    <span id="create-parent-text">Dodaj i wybierz</span>
+                    <span id="create-parent-spinner" class="hidden">Trwa dodawanie...</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<body class=" ">
+
+<div class="flex min-h-screen w-full">
+{% if user.is_authenticated %}
+
+        <!-- ======================= -->
+        <!--    SIDEBAR PANELU       -->
+        <!-- ======================= -->
+        <aside class="flex h-screen w-64 flex-col bg-white dark:bg-[#0f1d0f] border-r border-gray-300 dark:border-gray-800">
+
+            <div class="p-4 flex flex-col gap-8">
+
+                <!-- Logo -->
+                <a href="{% url 'home_page' %}" class="flex items-center gap-3">
+                    <div class="size-7 text-primary">
+                        <svg fill="none" viewBox="0 0 48 48">
+                            <path d="M6 6H42L36 24L42 42H6L12 24L6 6Z" fill="currentColor"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-base font-semibold text-gray-900 dark:text-white">KinderManage</h1>
+                </a>
+
+                <!-- Nawigacja -->
+                <nav class="flex flex-col gap-2">
+
+                    <!-- Panel główny -->
+                    <a href="{% url 'home_page' %}"
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary">
+                        <span class="material-symbols-outlined">grid_view</span>
+                        Panel główny
+                    </a>
+                    {% if perms.director.is_director %}
+                        <a href="{% url 'list_groups' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary" href="#">
+                            <span class="material-symbols-outlined">groups</span>
+                            <p class="text-sm font-medium leading-normal">Grupy</p>
+                        </a>
+                        <a  href="{% url 'list_kids' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary" href="#">
+                            <span class="material-symbols-outlined">child_care</span>
+                            <p class="text-sm font-medium leading-normal">Dzieci</p>
+                        </a>
+                        <a href="{% url 'list_teachers' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary" href="#">
+                            <span class="material-symbols-outlined">school</span>
+                            <p class="text-sm font-medium leading-normal">Nauczyciele</p>
+                        </a>
+                        <a href="{% url 'list_parent' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary" href="#">
+                            <span class="material-symbols-outlined">escalator_warning</span>
+                            <p class="text-sm font-medium leading-normal">Rodzice</p>
+                        </a>
+                        <a href="{% url 'list_meals' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary" href="#">
+                            <span class="material-symbols-outlined">restaurant_menu</span>
+                            <p class="text-sm font-medium leading-normal">Menu (Jadłospis)</p>
+                        </a>
+                        <a href="{% url 'list_payments_plans' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">payments</span>
+                            <p class="text-sm font-medium leading-normal">Plany Płatnicze</p>
+                        </a>
+                        <div class="my-2 border-t border-gray-100 dark:border-gray-800"></div>
+
+                        <a href="{% url 'photos_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">image</span>
+                            <p class="text-sm font-medium">Zarządzaj Ikonami</p>
+                        </a>
+                        <a href="{% url 'contact' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">contact_phone</span>
+                            <p class="text-sm font-medium">Dane Kontaktowe</p>
+                        </a>
+                        <a href="{% url 'give-permissions' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">verified_user</span>
+                            <p class="text-sm font-medium">Uprawnienia Kadry</p>
+                        </a>
+                    {% endif %}
+                    <!-- Moja grupa — tylko nauczyciel -->
+                    {% if perms.teacher.is_teacher %}
+                        <a href="#"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary">
+                            <span class="material-symbols-outlined">groups</span> Moja grupa
+                        </a>
+                    {% endif %}
+
+                    <!-- Obecność -->
+                    {% if perms.parent.is_parent %}
+                        <a href="{% url 'presence_calendar' %}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">event_available</span>
+                            <p class="text-sm font-medium leading-normal">Obecności</p>
+                        </a>
+
+                        <a href="{% url 'post_list_view' %}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">campaign</span>
+                            <p class="text-sm font-medium leading-normal">Wydarzenia</p>
+                        </a>
+
+
+                        <div class="my-2 border-t border-gray-100 dark:border-gray-800"></div>
+
+                        <a href="{% url 'contact' %}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">contact_support</span>
+                            <p class="text-sm font-medium leading-normal">Kontakt</p>
+                        </a>
+                    {% endif %}
+
+                    <!-- Wydarzenia -->
+                    <a href="{% url 'post_list_view' %}"
+                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary">
+                        <span class="material-symbols-outlined">event</span> Wydarzenia
                     </a>
 
-                {% endif %}
-            </div>
-            <!-- Collapsible wrapper -->
-            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <!-- Left links -->
-                <ul class="navbar-nav mb-2 mb-lg-0">
+                </nav>
 
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'post_list_view' %} "
-                               style="font-size: 20px; color: white; text-decoration:none">WYDARZENIA</a>
-                        </li>
+                <!-- Profil użytkownika -->
+                <div class="border-t border-gray-300 dark:border-gray-800 pt-4">
 
-                        <li class="nav-item mt-1">
-                            <a href="{% url 'home_page' %}"
-                               style="font-size: 25px; color: white; text-decoration:none">| &nbsp;<b>DS</b>
-                                &nbsp;|</a>
-                        </li>
-                        {% if perms.director.is_director %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'director_profile' %}"
-                                   style="font-size: 20px; color: white; text-decoration:none">MÓJ PROFIL</a>
-                            </li>
-                        {% elif perms.parent.is_parent %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'parent_profile' user.parenta.id %}"
-                                   style="font-size: 20px; color: white; text-decoration:none">MÓJ PROFIL</a>
-                            </li>
-                            {% elif perms.teacher.is_teacher %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'teacher-profile' pk=user.employee.id %}"
-                                   style="font-size: 20px; color: white; text-decoration:none">MÓJ PROFIL</a>
-                            </li>
-                        {% endif %}
+                    {% if perms.teacher.is_teacher %}
+                        <a href="{% url 'teacher-profile' pk=user.employee.id %}"
+                    {% elif perms.parent.is_parent %}
+                        <a href="{% url 'parent_profile' user.parenta.id %}"
+                    {% elif perms.director.is_director %}
+                        <a href="{% url 'director_profile' pk=user.director.id %}"
                     {% else %}
-                        <li class="nav-item">
-
-                            <button type="button" class="btn btn-link px-3 me-2"
-                                    style="font-size: 20px; color: white; text-decoration:none "
-                                    onclick="location.href={% url 'login' %}">
-                                ZALOGUJ SIĘ
-                            </button>
-                        </li>
-                        <li class="nav-item mt-1">
-                            <a href="{% url 'home_page' %}"
-                               style="font-size: 25px; color: white; text-decoration:none ">| &nbsp;<b>DS</b>
-                                &nbsp;|</a>
-                        </li>
-                        <li class="nav-item">
-                            <button type="button" class="btn btn-link px-3 me-2"
-                                    style="font-size: 20px; color: white; text-decoration:none"
-                                    onclick="location.href={% url 'register' %}">
-                                ZAREJESTRUJ SIĘ
-                            </button>
-                        </li>
-
-
+                        <a href="#"
                     {% endif %}
-                </ul>
-                <!-- Left links -->
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary">
+
+
+                            <span class="material-symbols-outlined">account_circle</span>
+                            <p class="text-sm font-medium leading-normal">Profil</p>
+
+                    </a>
+
+                    <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary" href="{% url 'logout' %}">
+                        <span class="material-symbols-outlined">logout</span>
+                        <p class="text-sm font-medium leading-normal">Logout</p>
+                    </a>
+                </div>
             </div>
-            <!-- Collapsible wrapper -->
+        </aside>
+{% endif %}
+    <main class="flex-1 bg-background-light dark:bg-background-dark p-8">
+        {% if messages %}
+            <div class="max-w-4xl mx-auto mb-6 space-y-3">
+                {% for message in messages %}
+                    <div class="flex items-center gap-3 p-4 rounded-xl border shadow-sm transition-all animate-in fade-in slide-in-from-top-2
+                        {% if message.tags == 'success' %}
+                            bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300
+                        {% elif message.tags == 'error' %}
+                            bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300
+                        {% elif message.tags == 'warning' %}
+                            bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-300
+                        {% else %}
+                            bg-purple-50 border-purple-200 text-primary dark:bg-primary/10 dark:border-primary/20 dark:text-primary
+                        {% endif %}">
 
-            <!-- Right elements -->
+                        <span class="material-symbols-outlined">
+                            {% if message.tags == 'success' %}check_circle
+                            {% elif message.tags == 'error' %}error
+                            {% elif message.tags == 'warning' %}warning
+                            {% else %}info{% endif %}
+                        </span>
 
-            {% if user.is_authenticated %}
-                <ul class="navbar-nav d-flex flex-row me-auto">
+                        <p class="text-sm font-semibold leading-normal">{{ message }}</p>
 
-                    <li class="nav-item">
-                        <!-- Dropdown menu -->
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-link"
-                                style="font-size: 20px; color: white; text-decoration:none"
-                                onclick="location.href={% url 'logout' %}">
-                            <b>WYLOGUJ SIĘ</b>
+                        <button onclick="this.parentElement.remove()" class="ml-auto hover:opacity-70 transition-opacity">
+                            <span class="material-symbols-outlined text-sm">close</span>
                         </button>
-                    </li>
-
-                </ul>
-                <!-- Right elements -->
-            {% else %}
-            {% endif %}
-
-            <!-- Right elements -->
-        </div>
-        <!-- Container wrapper -->
-    </nav>
-</header>
-<!-- Navbar -->
-{#<div class="row">#}
-{#    <div class="col-md-8">#}
-{#        {% if messages %}#}
-{#            {% for message in messages %}#}
-{#                <div class="alert alert-{{ message.tags }}">#}
-{#                    {{ message }}#}
-{#                </div>#}
-{#            {% endfor %}#}
-{#        {% endif %}#}
-{#    </div>#}
-{#</div>#}
-
-{% block content %}{% endblock %}
-
-
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</div>
 </body>
 </html>

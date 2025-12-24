@@ -1,102 +1,59 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block content %}
-    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
-        <!-- Container wrapper -->
-        <div class="container-fluid">
-            <!-- Left links -->
-            <ul class="navbar-nav flex-row">
+    <div class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light dark:bg-background-dark">
+        <main class="w-full max-w-4xl mx-auto px-6 py-10">
 
-                <li class="nav-item me-2 me-lg-0">
-                    <h2>
-                        <a href="{% url 'list_meals' %}" role="button"
-                           style="color: #75736B; text-decoration:none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                 height="32"
-                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                 viewBox="0 0 16 16">
-                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                            </svg>
+            <a href="{% url 'list_meals' %}" class="inline-flex items-center gap-2 text-gray-500 hover:text-primary transition-colors font-bold mb-6">
+                <span class="material-symbols-outlined">arrow_back</span> POWRÓT DO LISTY
+            </a>
 
-                            POSIŁKI
+            <div class="bg-white dark:bg-[#0f1d0f] rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+                <div class="bg-primary p-8 text-white flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-black uppercase tracking-tight">{{ meal.name }}</h1>
+                        <p class="opacity-90 font-medium">Szczegóły planu żywieniowego</p>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur-md rounded-2xl p-4 text-center border border-white/30">
+                        <p class="text-xs font-bold uppercase opacity-80">Stawka dzienna</p>
+                        <p class="text-3xl font-black">{{ meal.per_day }} zł</p>
+                    </div>
+                </div>
 
-                        </a>
-                    </h2>
-                </li>
+                <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="md:col-span-1 flex items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-2xl p-6">
+                        {% if meal.photo %}
+                            <img src="{{ meal.photo.meal_photos.url }}" alt="{{ meal.name }}" class="w-40 h-40 object-contain">
+                        {% else %}
+                            <span class="material-symbols-outlined text-8xl text-gray-200">restaurant</span>
+                        {% endif %}
+                    </div>
 
-            </ul>
-            <!-- Left links -->
-            <div class="collapse navbar-collapse justify-content-center align-item-center" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <!-- Left links -->
-                <ul class="navbar-nav mb-2 mb-lg-0" style="align-items: center">
-                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>{{ meal.name }}</b></li>
-                </ul>
-            </div>
-            {% if perms.director.is_director %}
-                <ul class="navbar-nav d-flex flex-row me-1">
-                    <li class="nav-item">
-                        <button class="btn" onclick="location.href='{% url 'meals_update' pk=meal.id %}'"
-                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
-                            EDYTUJ PLAN
-                        </button>
-                    </li>
-                </ul>
-            {% endif %}
-        </div>
-        <!-- Container wrapper -->
-    </nav>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}"
-                 style="color: white; text-align: center; font-size: 30px">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
-
-    <div class="container" style="margin-top: 30px">
-        <div class="row gutters">
-            <div class="col-12" style='margin-left: -15%; '>
-                <div class="card" style="background-color: #BAB1AB; border-color: #BAB1AB;">
-                    <div class="card-body text-white" style="height: 750px">
-                        <div class="col mt-4">
-                            <div class="form-group">
-
-                                <label class="mb-2" for="birth"
-                                       style="font-size: 50px; margin-left: 20px">OPIS</label>
-                                <label class="mb-2" for="per_day"
-                                       style="font-size: 25px; position: absolute; right: 18%">
-                                    DZIENNA OPŁATA ŻYWIENIOWA:
-                                </label>
-                                <input id="per_day" class="form-control"
-                                       style="position: absolute; right: 2%; width: 15%; top: 5%;font-size: 20px"
-                                       value="{{ meal.per_day }} zł" readonly>
-                                <br>
-                                <h4 style="text-align: start; margin-top: 20px; margin-left: 20px">
-
-                                    {{ meal.description }}
-                                </h4>
-
-                            </div>
+                    <div class="md:col-span-2">
+                        <h2 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-4">Opis posiłku / Skład</h2>
+                        <div class="prose dark:prose-invert max-w-none">
+                            <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed italic">
+                                "{{ meal.description|default:"Brak opisu dla tego posiłku." }}"
+                            </p>
                         </div>
 
-
+                        <div class="mt-10 flex flex-wrap gap-4 pt-6 border-t border-gray-100 dark:border-gray-800">
+                            {% if perms.director.is_director %}
+                                <a href="{% url 'meals_update' pk=meal.id %}" class="flex-1 flex items-center justify-center gap-2 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition-all">
+                                    <span class="material-symbols-outlined">edit</span> EDYTUJ PLAN
+                                </a>
+                                <form method="POST" action="{% url 'meals_delete' meal.id %}" class="flex-1">
+                                    {% csrf_token %}
+                                    <button type="submit" onclick="return confirm('Czy na pewno chcesz usunąć ten posiłek?')" class="w-full flex items-center justify-center gap-2 py-4 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-2xl transition-all">
+                                        <span class="material-symbols-outlined">delete</span> USUŃ POSIŁEK
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
-
-
-        </div>
+        </main>
     </div>
-    <form method="post" action="{% url 'meals_delete' meal.id %}">
-        {% csrf_token %}
-        <button type="submit" onclick="return confirm('Jestes pewny ze chcesz usunac posiłek {{ meal }}');">
-            <img src="{% static 'SMIETNIK.jpg' %}" alt="usun"
-                 style="position: absolute; right: 12%; bottom: 7%; height:20%">
-        </button>
-    </form>
-
-
 {% endblock %}

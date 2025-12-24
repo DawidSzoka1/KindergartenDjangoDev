@@ -1,140 +1,192 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block content %}
-    <link rel="stylesheet" href="{% static 'input_foucs.css' %}">
-    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
-        <!-- Container wrapper -->
-        <div class="container-fluid">
-            <!-- Left links -->
-            <ul class="navbar-nav flex-row">
+    <div class="max-w-[1200px] mx-auto w-full px-6 py-8 flex flex-col gap-8">
 
-                <li class="nav-item me-2 me-lg-0">
-                    <h2>
-                        <a href="{% url 'home_page' %}" role="button"
-                           style="color: #75736B; text-decoration:none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                 height="32"
-                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                 viewBox="0 0 16 16">
-                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                            </svg>
+        <div class="flex flex-col gap-6">
+            <nav class="flex text-sm font-medium text-gray-500 dark:text-gray-400">
+                <a href="{% url 'home_page' %}" class="hover:text-primary transition-colors">Dashboard</a>
+                <span class="mx-2 text-gray-400">/</span>
+                <span class="text-gray-900 dark:text-white font-bold">Plany Płatnicze</span>
+            </nav>
 
-                            MENU
-
-                        </a>
-                    </h2>
-                </li>
-
-            </ul>
-            <!-- Left links -->
-            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <!-- Left links -->
-                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
-                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>PLANY PŁATNICZE</b></li>
-                </ul>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex flex-col gap-1">
+                    <h2 class="text-3xl font-black tracking-tight text-gray-900 dark:text-white uppercase">Zarządzanie Planami</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-base">Zarządzaj stawkami czesnego, częstotliwością płatności i zniżkami.</p>
+                </div>
+                {% if perms.director.is_director %}
+                    <button onclick="location.href='{% url 'add_payment_plans' %}'"
+                            class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg active:scale-95">
+                        <span class="material-symbols-outlined">add</span>
+                        NOWY PLAN
+                    </button>
+                {% endif %}
             </div>
-            {% if perms.director.is_director %}
-                <ul class="navbar-nav d-flex flex-row me-1">
-                    <li class="nav-item">
-                        <button class="btn" onclick="location.href='{% url 'add_payment_plans' %}'"
-                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
-                            DODAJ PLAN
-                        </button>
-                    </li>
-                </ul>
-            {% endif %}
         </div>
-        <!-- Container wrapper -->
-    </nav>
-    {% for plan in page_obj %}
 
-
-        <div class="container-fluid mb-1 mt-5"
-             style="background-color: white">
-            <div class="row align-item-center" style="padding-top: 10px; font-size: 30px; color: #75736B;">
-                <div class="col mb-3 ml-3"
-                     style="justify-content: start;">
-                    {{ plan.name }}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white dark:bg-[#1a2e1a] p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm font-bold text-gray-500 uppercase tracking-wider">Wszystkie Plany</p>
+                    <span class="material-symbols-outlined text-green-500 filled">verified</span>
                 </div>
-                <div class="col-2 mb-3">
-                    {{ plan.price }} zł
+                <p class="text-3xl font-black text-gray-900 dark:text-white">{{ page_obj.paginator.count }}</p>
+            </div>
 
+            <div class="bg-white dark:bg-[#1a2e1a] p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm font-bold text-gray-500 uppercase tracking-wider">Najpopularniejszy</p>
+                    <span class="material-symbols-outlined text-primary">trending_up</span>
                 </div>
-                <div class="col-8"></div>
+                <p class="text-2xl font-black text-gray-900 dark:text-white truncate">{{ most_popular.name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ most_popular.kid_set.count }} przypisanych dzieci</p>
+            </div>
 
-                <div class="col mb-3">
+            <div class="bg-white dark:bg-[#1a2e1a] p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm font-bold text-gray-500 uppercase tracking-wider">Średni Abonament</p>
+                    <span class="material-symbols-outlined text-primary">payments</span>
+                </div>
+                <p class="text-3xl font-black text-gray-900 dark:text-white">{{ avg_price }} zł</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Na aktywne dziecko</p>
+            </div>
+        </div>
 
-                    <div class="drodown">
-                        <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                           href="#"
-                           id="navbarDropdownMenuAvatar"
-                           role="button"
-                           data-bs-toggle="dropdown"
-                           aria-expanded="false"
-                           style="  text-decoration:none; color: #75736B; ">
-                            Opcje
+            <form method="GET" action="{% url 'list_payments_plans' %}" class="bg-white dark:bg-[#1a2e1a] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col lg:flex-row gap-4 justify-between items-center">
+
+                <div class="relative w-full lg:max-w-md">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <span class="material-symbols-outlined text-gray-400 text-xl">search</span>
+                    </div>
+                    <input type="text" name="search" value="{{ current_search }}"
+                           class="block w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-[#142414] border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-primary focus:border-primary dark:text-white transition-all"
+                           placeholder="Szukaj po nazwie planu...">
+                </div>
+
+                <div class="flex items-center gap-3 w-full lg:w-auto">
+                    <select name="frequency" onchange="this.form.submit()"
+                            class="flex-1 lg:flex-none pl-4 pr-10 py-3 bg-gray-50 dark:bg-[#142414] border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-primary dark:text-gray-200 cursor-pointer">
+                        <option value="">Wszystkie częstotliwości</option>
+                        <option value="monthly" {% if current_frequency == 'monthly' %}selected{% endif %}>Miesięcznie</option>
+                        <option value="quarterly" {% if current_frequency == 'quarterly' %}selected{% endif %}>Kwartalnie</option>
+                        <option value="annually" {% if current_frequency == 'annually' %}selected{% endif %}>Rocznie</option>
+                        <option value="onetime" {% if current_frequency == 'onetime' %}selected{% endif %}>Jednorazowo</option>
+                    </select>
+
+                    <select name="status" onchange="this.form.submit()"
+                            class="flex-1 lg:flex-none pl-4 pr-10 py-3 bg-gray-50 dark:bg-[#142414] border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:ring-2 focus:ring-primary dark:text-gray-200 cursor-pointer">
+                        <option value="">Wszystkie statusy</option>
+                        <option value="active" {% if current_status == 'active' %}selected{% endif %}>Aktywne</option>
+                        <option value="archived" {% if current_status == 'archived' %}selected{% endif %}>Archiwalne</option>
+                    </select>
+
+                    <button type="submit" class="p-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors">
+                        <span class="material-symbols-outlined">filter_alt</span>
+                    </button>
+
+                    {% if current_search or current_frequency or current_status %}
+                        <a href="{% url 'list_payments_plans' %}" class="p-3 bg-gray-100 dark:bg-gray-800 text-gray-500 rounded-xl hover:bg-red-50 hover:text-red-500 transition-all">
+                            <span class="material-symbols-outlined">filter_alt_off</span>
                         </a>
-                        <ul
-                                class="dropdown-menu dropdown-menu-end"
-                                aria-labelledby="navbarDropdownMenuAvatar"
-                        >
+                    {% endif %}
+                </div>
+            </form>
 
-                            {% if perms.director.is_director %}
-                                <li>
-                                    <a href="{% url 'payment_plan_update' pk=plan.id %}"
-                                       class="dropdown-item">Zmien
-                                        informacje</a>
-                                </li>
-                                <li>
-                                    <form method="POST"
-                                          action="{% url 'payment_plan_delete' pk=plan.id %}">
+        <div class="bg-white dark:bg-[#1a2e1a] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+                    <thead class="bg-gray-50 dark:bg-[#142414]">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Plan</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-widest">Częstotliwość</th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-widest">Kwota</th>
+                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">Dzieci</th>
+                        <th class="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-widest">Akcje</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    {% for plan in page_obj %}
+                        <tr class="hover:bg-primary/5 transition-colors group">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-bold text-gray-900 dark:text-white">{{ plan.name }}</div>
+                                <div class="text-[10px] font-bold text-primary uppercase">{{ plan.discount_info|default:"Standardowy" }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                                {{ plan.get_frequency_display }}
+                            </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <span class="text-sm font-black text-gray-900 dark:text-white">{{ plan.price }} zł</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <span class="material-symbols-outlined text-gray-400 text-lg">child_care</span>
+                                    <span class="text-sm font-bold">{{ plan.kid_set.count }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{% url 'payment_plan_details' plan.id %}"
+                                       class="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl font-bold text-xs transition-all">
+                                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                                        SZCZEGÓŁY
+                                    </a>
+                                    <a href="{% url 'payment_plan_update' plan.id %}"
+                                       class="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all">
+                                        <span class="material-symbols-outlined text-xl">edit</span>
+                                    </a>
+                                    <form method="POST" action="{% url 'payment_plan_delete' plan.id %}" class="inline">
                                         {% csrf_token %}
-                                        <button class="dropdown-item"
-                                                type="submit"
-                                                name="delete"
-                                                value="Usuń"
-                                                onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ plan }}');"
-                                        >Usuń
+                                        <button type="submit"
+                                                onclick="return confirm('Czy na pewno chcesz usunąć ten plan? Dzieci zostaną odpięte.');"
+                                                class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                                            <span class="material-symbols-outlined text-xl">delete</span>
                                         </button>
                                     </form>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center text-gray-400 italic">Brak zdefiniowanych planów.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-        <hr>
 
-    {% endfor %}
-    {% if page_obj.has_other_pages %}
-        <div style="position: absolute; bottom: auto; left:45%">
-            {% if page_obj.has_previous %}
-
-                <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
-                   style=" font-size: 50px; color:#75736B">< </a>
-            {% else %}
-                <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
-                   style=" font-size: 50px; color:#75736B">< </a>
-            {% endif %}
-
-            {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                    <a class="btn mb-4" href="?page={{ num }}"
-                       style=" font-size: 50px; color:#75736B">{{ num }}</a>
+        {% if page_obj.has_other_pages %}
+            <div class="flex justify-center items-center gap-2 mt-4">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}" class="size-10 flex items-center justify-center rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-primary transition-all shadow-sm">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </a>
                 {% endif %}
 
-            {% endfor %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="size-10 flex items-center justify-center rounded-xl bg-primary text-white font-black shadow-md shadow-primary/20">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <a href="?page={{ num }}" class="size-10 flex items-center justify-center rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-primary transition-all">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
 
-            {% if page_obj.has_next %}
-                <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
-                   style=" text-decoration: none; font-size: 50px; color:#75736B"> ></a>
-            {% else %}
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="size-10 flex items-center justify-center rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-primary transition-all shadow-sm">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
 
-                <a class="btn mb-4" href="?page=1"
-                   style=" font-size: 50px; color:#75736B"> > </a>
-            {% endif %}
-        </div>
-    {% endif %}
+    <style>
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
 {% endblock %}

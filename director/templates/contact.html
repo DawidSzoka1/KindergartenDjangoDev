@@ -1,53 +1,109 @@
 {% extends "base.html" %}
-{% load static %}
 {% block content %}
-    <section class="">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-6 vh-100 ml-3" style="background-color: #E6DCD3; color: #8D847B;">
-
-
-                    <div class="text-left ml-4 mr-4 mt-5"
-                         style="font-size: 35px; margin-left: 30px; margin-right: 100px">
-                        <label class="mb-4" for="birth">LOKALIZACJA:</label>
-                        {% if perms.director.is_director %}
-                            <button class="btn mb-4" onclick="location.href='{% url 'contact-update' pk=contact.id %}'"
-                                    style="color: white; background-color: #8D847B; width: 30%; height: 70px; font-size: 30px; margin-left: 43%">
-                                EDYTUJ DANE
-                            </button>
-                        {% endif %}
-                        <input class="form-control" style="font-size: 25px;" name="birth"
-                               type="text"
-                               id="birth"
-                               value="{{ contact.localization }}" readonly>
-                    </div>
-                    <div class="text-left ml-4 mr-4 mt-5"
-                         style="font-size: 35px; margin-left: 30px; margin-right: 100px">
-                        <label class="mb-4" for="birth">NR KONTAKTOWY:</label>
-                        <input class="form-control" style="font-size: 25px;" name="birth"
-                               type="text"
-                               id="birth"
-                               value="{{ contact.phone }}" readonly>
-                    </div>
-                    <div class="text-left ml-4 mr-4 mt-5"
-                         style="font-size: 35px; margin-left: 30px; margin-right: 100px">
-                        <label class="mb-4" for="birth">E-MAIL KONTAKTOWY:</label>
-                        <input class="form-control" style="font-size: 25px;" name="birth"
-                               type="text"
-                               id="birth"
-                               value="{{ contact.email_address }}" readonly>
-                    </div>
-
-                </div>
-                <div class="col-lg-6 vh-100" style="background-color: white; ">
-                    <img style="width: 50%; position: absolute;
-                            right: 0; bottom: 0;"
-                         src="{% static 'podworko.jpg' %}"
-                         alt="zdjecie"
-                    >
-                </div>
-            </div>
+    <div class="max-w-5xl mx-auto px-4 py-12">
+        <div class="text-center mb-16">
+            <h1 class="text-5xl font-black text-gray-900 dark:text-white uppercase tracking-tighter mb-4">Kontakt</h1>
+            <p class="text-gray-500">Jesteśmy tutaj, aby pomóc Twojemu dziecku rosnąć.</p>
         </div>
 
-    </section>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div class="lg:col-span-1 space-y-8">
+                <div class="p-8 bg-primary rounded-3xl text-white shadow-xl shadow-primary/20">
+                    <h3 class="text-xl font-black uppercase mb-6">Biuro Placówki</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4">
+                            <span class="material-symbols-outlined">location_on</span>
+                            <p class="text-sm font-bold">{{ contact.address|default:"ul. Kwiatowa 15" }},<br>{{ contact.zip_code|default:"00-001" }} {{ contact.city|default:"Warszawa" }}</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="material-symbols-outlined">call</span>
+                            <p class="text-sm font-bold">{{ contact.phone|default:"+48 123 456 789" }}</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="material-symbols-outlined">mail</span>
+                            <p class="text-sm font-bold">{{ contact.director.user.email|default:"kontakt@kindermanage.pl" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 space-y-12">
+                <section>
+                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Dyrekcja i Administracja</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {% for p in principals %}
+                            <div class="p-4 bg-white dark:bg-[#0f1d0f] rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center justify-between group">
+                                <div class="flex items-center gap-4">
+                                    <div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                                        {{ p.first_name|slice:":1" }}
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900 dark:text-white">{{ p.first_name }} {{ p.last_name }}</p>
+                                        <p class="text-xs text-gray-400">Dyrektor</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <a href="{% url 'director_profile' p.id %}" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-primary transition-all" title="Profil">
+                                        <span class="material-symbols-outlined text-sm">person</span>
+                                    </a>
+                                    <a href="mailto:{{ p.user.email }}" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-primary transition-all" title="E-mail">
+                                        <span class="material-symbols-outlined text-sm">mail</span>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if principals.has_other_pages %}
+                        <div class="mt-4 flex gap-2">
+                            {% if principals.has_previous %}<a href="?p_page={{ principals.previous_page_number }}" class="text-xs font-bold text-primary">Poprzednia</a>{% endif %}
+                            <span class="text-xs text-gray-400">Strona {{ principals.number }} z {{ principals.paginator.num_pages }}</span>
+                            {% if principals.has_next %}<a href="?p_page={{ principals.next_page_number }}" class="text-xs font-bold text-primary">Następna</a>{% endif %}
+                        </div>
+                    {% endif %}
+                </section>
+
+                <section>
+                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Nauczyciele Twoich Dzieci</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {% for t in teachers %}
+                            <div class="p-4 bg-white dark:bg-[#0f1d0f] rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center justify-between group">
+                                <div class="flex items-center gap-4">
+                                    <div class="size-12 rounded-full bg-blue-50 dark:bg-gray-800 flex items-center justify-center text-blue-500 font-bold">
+                                        {% if t.first_name %}
+                                        {{ t.first_name|slice:":1" }}
+                                            {% else %}
+                                            {{ t.user.email|slice:":1" }}
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900 dark:text-white">{% if t.first_name or t.last_name %}
+                                            {{ t.first_name }} {{ t.last_name }}
+                                        {% else %}
+                                            {{ t.user.email }}
+                                        {% endif %}</p>
+                                        <p class="text-xs text-gray-400">Grupa: {{ t.group.name|default:"Brak przypisanej grupy" }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <a href="{% url 'teacher-profile' t.id %}" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-primary transition-all" title="Profil">
+                                        <span class="material-symbols-outlined text-sm">person</span>
+                                    </a>
+                                    <a href="mailto:{{ t.user.email }}" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-primary transition-all" title="E-mail">
+                                        <span class="material-symbols-outlined text-sm">mail</span>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if teachers.has_other_pages %}
+                        <div class="mt-4 flex gap-2">
+                            {% if teachers.has_previous %}<a href="?t_page={{ teachers.previous_page_number }}" class="text-xs font-bold text-primary">Poprzednia</a>{% endif %}
+                            <span class="text-xs text-gray-400">Strona {{ teachers.number }} z {{ teachers.paginator.num_pages }}</span>
+                            {% if teachers.has_next %}<a href="?t_page={{ teachers.next_page_number }}" class="text-xs font-bold text-primary">Następna</a>{% endif %}
+                        </div>
+                    {% endif %}
+                </section>
+            </div>
+        </div>
+    </div>
 {% endblock %}

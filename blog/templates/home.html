@@ -1,235 +1,41 @@
 {% extends "base.html" %}
-{% load static %}
+
 {% block content %}
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}"
-                 style="color: white; text-align: center; font-size: 30px">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    {% if user.is_authenticated %}
-        {% if perms.director.is_director %}
-            <div class="row">
-                <div class="row">
-                    <img style="width: 25%; position: absolute;
-                            left: 0px; bottom: 0px;"
-                         src="{% static '363862586_1034654530880137_1579384359482540064_n.jpg' %}" alt="zdjecie">
 
-                </div>
-                <div class="row">
-                    <div class="text-center" style="margin-top: 4.5%">
-                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
-                            <button type="button" class="btn  me-3" onclick="location.href='{% url 'list_kids' %}'"
-                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px">
-                                <b>DZIECI</b>
-                            </button>
-                        </div>
-                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
-                            <button type="button" class="btn  me-3"
-                                    onclick="location.href='{% url 'presence_calendar' %}'"
-                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px">
-                                <b>LISTA OBECNOSCI</b>
-                            </button>
-                        </div>
-
-                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
-                            <button type="button" class="btn  me-3"
-                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px"
-                                    onclick="location.href='{% url 'list_groups' %}'">
-                                <b>GRUPY</b>
-                            </button>
-                        </div>
-                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
-                            <button type="button" class="btn  me-3"
-                                    onclick="location.href='{% url 'list_payments_plans' %}'"
-                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px">
-                                <b>PLANY PŁATNICZE</b>
-                            </button>
-                        </div>
-
-                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
-                            <button type="button" class="btn  me-3" onclick="location.href='{% url 'list_meals' %}'"
-                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px">
-                                <b>POSIŁKI</b>
-                            </button>
-                        </div>
-                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
-                            <button type="button" class="btn  me-3"
-                                    onclick="location.href='{% url 'list_teachers' %}'"
-                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px">
-                                <b>KADRA</b>
-                            </button>
-                        </div>
-                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
-                            <button type="button" class="btn me-3"
-                                    onclick="location.href='{% url 'list_parent' %}'"
-                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px"
-                            >
-                                <b>RODZICE</b>
-                            </button>
-                        </div>
-
-                        <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
-                            <button type="button" class="btn  me-3"
-                                    onclick="location.href='{% url 'photos_list' %}'"
-                                    style="color: #8D847B; background-color: #E6DCD3; width: 45%; height: 70px; font-size: 30px">
-                                <b>IKONKI</b>
-                            </button>
-                        </div>
-
-                    </div>
-
-                </div>
-                <div class="row">
-                    <div class="row">
-                        <img style="width: 30%; position: absolute;
-                            right: 0; bottom: 0;"
-                             src="{% static '363741324_298073572761425_7735044390012477660_n.jpg' %}" alt="zdjecie">
-
-
-                    </div>
-
-                </div>
-            </div>
-
-        {% elif perms.teacher.is_teacher %}
-
-            {% if user.employee.role == 2 %}
-                <div class="col-3 d-flex"
-                     style="background-color: white; color: #8D847B; width: 90%; margin-left: auto; margin-right: auto; margin-top: 10%">
-                    <div class="d-flex justify-content-center" style="width: 90%;">
-                        <button type="button" class="btn"
-                                style="color: #8D847B; background-color: #E6DCD3; width: 80%; height: 100px; font-size: 30px; margin-left: 15%"
-                                onclick="location.href='{% url 'list_kids' %}'">
-                            <b>DZIECI</b>
-                        </button>
-                    </div>
-                    <div class="d-flex justify-content-center" style="width: 90%;">
-                        <button type="button" class="btn"
-                                style="color: #8D847B; background-color: #E6DCD3; width: 80%; height: 100px; font-size: 30px; margin-right: 15%"
-                                onclick="location.href='{% url 'group_details' pk=teacher.group.id %}'">
-                            <b>{{ teacher.group.name.upper }}</b>
-                        </button>
-                    </div>
-                </div>
-                <div class="col-3  mt-5 d-flex"
-                     style="background-color: white; color: #8D847B; width: 90%; margin-left: auto; margin-right: auto">
-                    <div class="d-flex justify-content-center" style="width: 90%;">
-                        <button type="button" class="btn"
-                                style="color: #8D847B; background-color: #E6DCD3; width: 80%; height: 100px; font-size: 30px; margin-left: 15%"
-                                onclick="location.href='{% url 'list_parent' %}'">
-                            <b>RODZICE</b>
-                        </button>
-                    </div>
-                    <div class="d-flex justify-content-center" style="width: 90%;">
-                        <button type="button" class="btn"
-                                style="color: #8D847B; background-color: #E6DCD3; width: 80%; height: 100px; font-size: 30px; margin-right: 15%"
-                                onclick="location.href='{% url 'presence_calendar' %}'">
-                            <b>LISTA OBECNOŚCI</b>
-                        </button>
-                    </div>
-                </div>
-                <img src="{% static 'teacher_home_2.jpg' %}" alt=""
-                     style="position: absolute; bottom: 0; width: 25%; left: 5%">
-                <img src="{% static 'teacher_home_1.jpg' %}" alt=""
-                     style="position: absolute; bottom: 0; left: 30%; width: 40%">
-                <img src="{% static 'teacher_home_3.jpg' %}" alt=""
-                     style="position: absolute; bottom: 0; right: 5%;  width: 25%;">
-            {% endif %}
-        {% elif perms.parent.is_parent %}
-            <section class="">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-lg-6 vh-100 ml-3" style="background-color: white; color: #8D847B;">
-                            <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
-                                <button type="button" class="btn me-3"
-                                        style="color: #8D847B; background-color: #E6DCD3; width: 70%; height: 100px; font-size: 30px; margin-top: 15%"
-                                        onclick="location.href='{% url 'list_kids' %}'">
-                                    <b>DZIECI</b>
-                                </button>
-                            </div>
-
-                            <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
-                                <button type="button" class="btn  me-3"
-                                        style="color: #8D847B; background-color: #E6DCD3; width: 70%; height: 100px; font-size: 30px"
-                                        onclick="location.href='{% url 'list_groups' %}'">
-                                    <b>GRUPY</b>
-                                </button>
-                            </div>
-                            <div class="text-left ml-2" style="font-size: 35px">
-                                <img style=" position: absolute; bottom: 2%; margin-left: 5%; height: 35%"
-                                     src="{% static 'home_parent.jpg' %}"
-                                     alt="zdjecie"
-                                >
-                            </div>
-                        </div>
-                        <div class="col-lg-6 vh-100" style="background-color: #E6DCD3; ">
-                            <div class="d-flex justify-content-center mx-4 mb-5 mb-lg-4">
-                                <button type="button" class="btn  me-3 mt-5"
-                                        onclick="location.href='{% url 'presence_calendar' %}'"
-                                        style="color: #8D847B; background-color: #E6DCD3; width: 80%; height: 100px; font-size: 50px">
-                                    <b>KALENDARZ OBECNOŚCI</b>
-                                </button>
-                            </div>
-                            <img style=" position: absolute; bottom: 23%; margin-left: 13%; height: 50%;"
-                                 src="{% static 'home_parent_2.jpg' %}"
-                                 alt="zdjecie"
-                            >
-                        </div>
-                    </div>
-                </div>
-
-            </section>
-
-
-
-
-        {% endif %}
-
-
-    {% else %}
-        <section class="">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-6 vh-100 ml-3" style="background-color: #E6DCD3; color: #8D847B;">
-                        <h1 class="text-white text-center mt-5" style="font-size: 50px">CZYM JEST <b>DS</b>?</h1>
-                        <br><br>
-                        <div class="text-left ml-2" style="font-size: 35px">
-                            <b>DS</b> to<b> innowacyjna</b> aplikacja do zarządzania przedszkolami, stworzona w celu
-                            <b>ułatwienia</b> prowadzenia
-                            ww
-                            placówki
-                            oświatowej.
-                            <b>DS</b> przede wszystkim kładzie nacisk na <b>przejrzystość użytku</b> i <b>efektywność
-                            operacyjności</b>. Twórz zespoły i
-                            przydzielaj podopiecznych jako <b>dyrektor </b>, dziel się wydarzeniami jako
-                            <b>nauczyciel</b>
-                            lub
-                            sprawdzaj
-                            aktualności
-                            grupy, do której przypisane są <b>twoje pociechy</b>.
-                        </div>
-                    </div>
-                    <div class="col-lg-6 vh-100" style="background-color: white; ">
-                        <img style=" position: absolute; margin-left: 5%"
-                             src="{% static '364212157_969659007699021_4006858613897954353_n (1).jpg' %}"
-                             alt="zdjecie"
-                        >
-                        <img style="width: 50%; position: absolute;
-                            right: 0px; bottom: 0px;"
-                             src="{% static '364417276_938772220555437_8380212446515527340_n (1).jpg' %}"
-                             alt="zdjecie"
-                        >
-                    </div>
-                </div>
-            </div>
-
-        </section>
+{#    {% if messages %}#}
+{#        {% for message in messages %}#}
+{#            <div class="alert alert-{{ message.tags }}"#}
+{#                 style="color: white; text-align: center; font-size: 30px">#}
+{#                {{ message }}#}
+{#            </div>#}
+{#        {% endfor %}#}
+{#    {% endif %}#}
+    <!-- =============================== -->
+    <!--     Niezalogowany użytkownik     -->
+    <!-- =============================== -->
+    {% if not user.is_authenticated %}
+        {% include "public/homepage_guest.html" %}
     {% endif %}
 
+    <!-- =============================== -->
+    <!--     Panel nauczyciela           -->
+    <!-- =============================== -->
+    {% if user.is_authenticated and perms.teacher.is_teacher %}
+        {% include "dashboards/teacher_dashboard.html" %}
+    {% endif %}
 
+    <!-- =============================== -->
+    <!--     Panel dyrektora             -->
+    <!-- =============================== -->
+    {% if user.is_authenticated and perms.director.is_director %}
+        {% include "dashboards/director_dashboard.html" %}
+    {% endif %}
 
-    <link rel="stylesheet" href="{% static 'main.css' %}">
+    <!-- =============================== -->
+    <!--     Panel rodzica               -->
+    <!-- =============================== -->
+    {% if user.is_authenticated and perms.parent.is_parent %}
+        {% include "dashboards/parent_dashboard.html" %}
+    {% endif %}
+
 {% endblock %}

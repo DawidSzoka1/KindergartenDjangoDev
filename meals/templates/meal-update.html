@@ -1,150 +1,101 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90% ">
-    <form method="post" action="#">
-        {% csrf_token %}
-        <section class="h-100">
+    <div class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light dark:bg-background-dark">
+        <main class="flex-1 p-4 md:p-8">
+            <div class="max-w-4xl mx-auto">
 
-            <div class="container py-5 h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
+                <nav class="flex items-center gap-2 mb-6 text-sm font-bold">
+                    <a href="{% url 'list_meals' %}" class="text-gray-400 hover:text-primary transition-colors uppercase tracking-widest">Jadłospis</a>
+                    <span class="text-gray-300">/</span>
+                    <span class="text-primary uppercase tracking-widest">Edycja: {{ meal.name }}</span>
+                </nav>
 
-                                <div class="col" style="color: #75736B">
-                                    <div class="card-body p-md-5 ">
-                                       {% if messages %}
-                                            {% for message in messages %}
-                                                <div class="alert alert-{{ message.tags }}"
-                                                     style="background-color: #FF5F57; color: white; text-align: center; font-size: 30px">
-                                                    {{ message }}
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                        <div class="row">
+                <div class="bg-white dark:bg-[#0f1d0f] rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                    <div class="bg-primary p-6 text-white flex justify-between items-center">
+                        <h1 class="text-2xl font-black uppercase tracking-tighter">Edytuj Posiłek</h1>
+                        <span class="bg-white/20 px-3 py-1 rounded-lg text-xs font-bold">ID: {{ meal.id }}</span>
+                    </div>
 
-                                            <div class="col mb-4">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'list_meals' %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col mb-4">
-                                                <h2 class="text-uppercase d-flex justify-content-end"
-                                                    style="color: #75736B">Zmień
-                                                    posiłek</h2>
-                                            </div>
+                    <form method="POST" class="p-8 flex flex-col gap-8">
+                        {% csrf_token %}
 
-
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <label class="form-label" for="name">Nazwa posilku:</label>
-                                                    <input type="text" id="name"
-                                                           class="form-control form-control-lg" name="name"
-                                                           value="{{ meal.name }}"/>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <label class="form-label" for="description">Opis:</label>
-                                                    <input type="text" id="description"
-                                                           class="form-control form-control-lg" name="description"
-                                                           value="{{ meal.description }}"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="form-outline">
-                                                <label class="form-label" for="per_day">Dzienna oplata:</label>
-                                                <input type="number" id="per_day" min="1"
-                                                       class="form-control form-control-lg" name="per_day"
-                                                       placeholder="{{ meal.per_day }}"/>
-                                            </div>
-                                            <div class="col-md-6 mb-4 mt-4">
-                                                <div class="form-outline">
-                                                    <label class="mr-2 mb-2">Wybierz obrazek:</label><br>
-
-                                                    <div class="dropdown">
-                                                        <button type="button" class="btn dropdown-toggle"
-                                                                id="dropdownButton"
-                                                                data-bs-toggle="dropdown"
-                                                                style="background-color: #BAB1AB; color:white">
-                                                            Obrazki
-                                                        </button>
-                                                        <div class="dropdown-menu" id="dropdownMenu">
-                                                            {% for photo in photos %}
-                                                                {% if current_photo == photo %}
-                                                                    <div class="form-group">
-                                                                        <div class="form-check" id="options">
-                                                                            <label>
-                                                                                <input type="radio" name="photo"
-                                                                                       value="{{ photo.id }}"
-                                                                                       checked>
-                                                                                <img src="{{ photo.meal_photos.url }}"
-                                                                                     width="64" height="64"
-                                                                                     alt="Option {{ forloop.counter }}">
-                                                                                {{ photo.name }}
-                                                                            </label>
-                                                                        </div>
-                                                                    </div>
-                                                                {% else %}
-                                                                    <div class="form-group">
-                                                                        <div class="form-check" id="options">
-                                                                            <label>
-                                                                                <input type="radio" name="photo"
-                                                                                       value="{{ photo.id }}"
-                                                                                >
-                                                                                <img src="{{ photo.meal_photos.url }}"
-                                                                                     width="64" height="64"
-                                                                                     alt="Option {{ forloop.counter }}">
-                                                                                {{ photo.name }}
-                                                                            </label>
-                                                                        </div>
-                                                                    </div>
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="d-flex justify-content-end pt-3">
-                                                <button type="submit" class="btn"
-                                                        style="background-color: #75736B; color: white; width: 35%">
-                                                    ZATWIERDŹ ZMIANY
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                    </div>
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="p-4 rounded-xl {% if message.tags == 'error' %}bg-red-100 text-red-700 border-red-200{% else %}bg-purple-50 text-primary border-primary/20{% endif %} font-bold text-center border shadow-sm">
+                                    {{ message }}
                                 </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs font-black text-gray-400 uppercase tracking-widest">Nazwa Posiłku</label>
+                                <input type="text" name="name" value="{{ meal.name }}" required
+                                       class="h-12 rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-4 focus:ring-2 focus:ring-primary outline-none transition-all">
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <label class="text-xs font-black text-gray-400 uppercase tracking-widest">Stawka Dzienna (zł)</label>
+                                <input type="number" name="per_day" step="0.01" min="0" value="{{ meal.per_day|stringformat:'.2f' }}" required
+                                       class="h-12 rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-4 focus:ring-2 focus:ring-primary outline-none transition-all">
+                            </div>
+                            <div class="md:col-span-2 flex flex-col gap-2">
+                                <label class="text-xs font-black text-gray-400 uppercase tracking-widest">Opis / Składniki</label>
+                                <textarea name="description" rows="4" required
+                                          class="rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 focus:ring-2 focus:ring-primary outline-none transition-all">{{ meal.description }}</textarea>
                             </div>
                         </div>
+
+                        <div class="flex flex-col gap-4">
+                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest">Zmień Ikonę Posiłku</label>
+                            <div class="grid grid-cols-3 sm:grid-cols-6 gap-4">
+                                {% for photo in photos %}
+                                    <label class="relative cursor-pointer group">
+                                        <input type="radio" name="photo" value="{{ photo.id }}" class="peer sr-only"
+                                               {% if meal.photo.id == photo.id %}checked{% endif %}>
+
+                                        <div class="aspect-square rounded-2xl border-2 border-gray-100 dark:border-gray-800 flex items-center justify-center p-3 bg-white dark:bg-gray-900 peer-checked:border-primary peer-checked:bg-purple-50 dark:peer-checked:bg-primary/10 transition-all hover:shadow-md">
+                                            <img src="{{ photo.meal_photos.url }}" alt="{{ photo.name }}" class="h-full w-full object-contain">
+                                        </div>
+
+                                        <div class="absolute -top-2 -right-2 bg-primary text-white rounded-full p-0.5 shadow-lg scale-0 peer-checked:scale-100 transition-transform">
+                                            <span class="material-symbols-outlined text-sm font-black">done</span>
+                                        </div>
+
+                                        <p class="text-[10px] text-center mt-2 font-bold text-gray-400 group-hover:text-primary transition-colors uppercase truncate">
+                                            {{ photo.name }}
+                                        </p>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-4 mt-6 pt-6 border-t border-gray-100 dark:border-gray-800">
+                            <a href="{% url 'meal_details' meal.id %}" class="px-6 py-3 font-bold text-gray-400 hover:text-gray-600 transition-colors">
+                                Anuluj
+                            </a>
+                            <button type="submit" class="px-10 py-4 bg-primary text-white font-black rounded-2xl shadow-lg hover:scale-[1.02] transition-transform uppercase tracking-tighter">
+                                Zatwierdź Zmiany
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="mt-8 p-6 bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/20 flex items-center justify-between">
+                    <div>
+                        <p class="text-red-700 dark:text-red-400 font-bold">Strefa Niebezpieczna</p>
+                        <p class="text-red-600/70 dark:text-red-400/60 text-sm">Chcesz całkowicie usunąć ten posiłek z systemu?</p>
                     </div>
+                    <form method="POST" action="{% url 'meals_delete' meal.id %}">
+                        {% csrf_token %}
+                        <button type="submit" onclick="return confirm('Czy na pewno chcesz bezpowrotnie usunąć ten posiłek?')"
+                                class="px-4 py-2 border-2 border-red-200 dark:border-red-900/40 text-red-600 dark:text-red-400 rounded-xl font-bold hover:bg-red-600 hover:text-white transition-all text-xs">
+                            USUŃ POSIŁEK
+                        </button>
+                    </form>
                 </div>
             </div>
-        </section>
-    </form>
-    <script src="{% static 'photo.js' %}"></script>
+        </main>
+    </div>
 {% endblock %}

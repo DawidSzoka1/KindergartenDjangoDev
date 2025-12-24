@@ -1,122 +1,143 @@
 {% extends "base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt=""
-         style="position: absolute; bottom: 0; left: -5%; height: 90% ">
-    <form method="post" action="#">
-        {% csrf_token %}
-        <section class="h-100">
+    <body class="bg-background-light dark:bg-background-dark font-display">
+    <div class="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div class="flex h-full grow">
 
-            <div class="container py-5 h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
-                                <div class="col">
-                                    <div class="card-body p-md-5" style="color: #75736B">
-                                        {% if messages %}
-                                            {% for message in messages %}
-                                                <div class="alert alert-{{ message.tags }}"
-                                                     style="background-color: #FF5F57; color: white; text-align: center; font-size: 30px">
-                                                    {{ message }}
-                                                </div>
-                                            {% endfor %}
-                                        {% endif %}
-                                        <div class="row">
-                                            <div class="col mb-4">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'list_parent' %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col mb-4">
-                                                <h2 class="text-uppercase d-flex justify-content-end"
-                                                    style="color: #75736B">Dodaj
-                                                    Rodzica</h2>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <div class="dropdown">
-                                                        <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                                                           href="#"
-                                                           id="navbarDropdownMenuAvatar"
-                                                           role="button"
-                                                           data-bs-toggle="dropdown"
-                                                           aria-expanded="false"
-                                                           style="font-size: 20px;  text-decoration:none; color: #75736B; ">
-                                                            DZIECI
-                                                        </a>
-                                                        <ul
-                                                                class="dropdown-menu dropdown-menu-start"
-                                                                aria-labelledby="navbarDropdownMenuAvatar"
-                                                        >
-                                                            {% for kid in kids %}
-                                                                <li>
+            <main class="flex-1 p-6 lg:p-10">
+                <div class="max-w-4xl mx-auto">
 
-                                                                    <input type="checkbox" id="kid_{{ kid.id }}"
-                                                                           name="kids"
-                                                                           class="form-check-input"
-                                                                           value="{{ kid.id }}"/>
-                                                                    <label for="kid_{{ kid.id }}"
-                                                                           class="form-check-label">{{ kid.first_name }} {{ kid.last_name }}</label>
-                                                                </li>
-                                                            {% endfor %}
+                    <div class="flex flex-wrap justify-between items-center gap-3 mb-8 pt-4">
+                        <p class="text-gray-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">Linkuj Dzieci do Rodzica</p>
+                        <a href="{% url 'parent_profile' parent.pk %}" class="flex items-center gap-2 text-[#618961] dark:text-gray-400 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">arrow_back</span>
+                            <span class="text-base font-medium">POWRÓT do Profilu rodzica</span>
+                        </a>
+                    </div>
 
-                                                        </ul>
-                                                    </div>
-
-
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <label class="form-label" for="parent">
-                                                        RODZIC:
-                                                    </label>
-                                                    <input id="parent" class="form-control form-control-lg" type="text" readonly value="{{ parent.user.email }}">
-                                                </div>
-                                            </div>
-
-
-                                        </div>
-                                        <div class="d-flex justify-content-end pt-3">
-                                            <button type="submit" class="btn"
-                                                    style="background-color: #75736B; color: white; width: 35%">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                     fill="currentColor" class="bi bi-envelope-fill"
-                                                     viewBox="0 0 16 16">
-                                                    <path d=
-                                                                  "M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"
-                                                    />
-                                                </svg>
-                                                <i class="bi bi-envelope-fill"></i>DODAJ DZIECKO/I
-                                            </button>
-                                        </div>
-
-                                    </div>
-                                </div>
+                    <div class="flex p-4 @container mb-6 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex w-full flex-col md:flex-row gap-4 items-center">
+                            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full flex-shrink-0 w-16 h-16">
+                                {% if parent.gender == 2 %}
+                                    <img class="rounded-full w-16 h-16 object-cover" src="{% static 'parent_female.jpg' %}" alt="Avatar kobiety"/>
+                                {% elif parent.gender == 1 %}
+                                    <img class="rounded-full w-16 h-16 object-cover" src="{% static 'parent_male.jpg' %}" alt="Avatar mężczyzny"/>
+                                {% else %}
+                                    <img class="rounded-full w-16 h-16 object-cover" src="{% static 'gander_null.jpg' %}" alt="Avatar neutralny"/>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow">
+                                <p class="text-[#111811] dark:text-white text-xl font-bold">
+                                    {{ parent.first_name|default:'' }} {{ parent.last_name|default:'' }} ({{ parent.user.email }})
+                                </p>
+                                <p class="text-[#618961] dark:text-gray-400 text-sm">Wybierz dzieci do przypisania.</p>
                             </div>
                         </div>
                     </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="p-3 mb-4 rounded-lg text-white text-center font-semibold
+                        {% if message.tags == 'success' %}bg-green-600{% elif message.tags == 'error' %}bg-red-600{% else %}bg-blue-600{% endif %}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="GET" action="{% url 'add_parent_to_kid' parent.id %}" class="relative mb-4">
+                        <input type="hidden" name="page" value="1"/>
+
+                        <div class="flex">
+                            <input class="form-input pl-4 flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-l-lg text-gray-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#dbe6db] dark:border-gray-600 bg-white dark:bg-gray-800 focus:border-primary/50 h-14 placeholder:text-[#618961] dark:placeholder:text-gray-500 p-[15px] text-base font-normal leading-normal"
+                                   placeholder="Wyszukaj dziecko po imieniu lub nazwisku..."
+                                   type="text"
+                                   name="search"
+                                   value="{{ search_query|default:'' }}"
+                            />
+
+                            <button type="submit" name="search_button" class="flex items-center justify-center overflow-hidden rounded-r-lg h-14 px-6 bg-primary text-gray-900 text-sm font-bold leading-normal tracking-[0.015em] hover:opacity-90">
+                                <span class="material-symbols-outlined">search</span>
+                            </button>
+                        </div>
+                    </form>
+                    <form method="post" action="{% url 'add_parent_to_kid' parent.id %}">
+                        {% csrf_token %}
+
+                        <div class="bg-white dark:bg-background-dark rounded-xl border border-gray-200 dark:border-gray-700 p-6 md:p-8 space-y-8">
+
+                            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Dzieci dostępne do linkowania:</h2>
+
+                            {% if search_query or kids_list.object_list %}
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg max-h-96 overflow-y-auto">
+                                    {% if kids_list %}
+                                        {% for kid in kids_list %}
+                                            <label class="flex gap-x-4 py-4 px-4 flex-row items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700">
+
+                                                {% comment %}
+                                        Używamy pętli kids_list (Paginated Object).
+                                        Sprawdzamy, czy ID dziecka jest w previously_selected_kids (z sesji)
+                                    {% endcomment %}
+                                                <input class="h-5 w-5 rounded border-[#dbe6db] dark:border-gray-600 border-2 bg-transparent text-primary checked:bg-primary checked:border-primary focus:ring-0 focus:ring-offset-0"
+                                                       type="checkbox"
+                                                       id="kid_{{ kid.id }}"
+                                                       name="kids"
+                                                       value="{{ kid.id }}"
+                                                       {% if kid.id|slugify in previously_selected_kids %}checked{% endif %}
+                                                />
+
+                                                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-cover bg-center">
+                                                </div>
+                                                <div class="flex-grow">
+                                                    <p class="text-[#111811] dark:text-white text-base font-medium leading-normal">{{ kid.first_name }} {{ kid.last_name }}</p>
+                                                    <p class="text-sm text-[#618961] dark:text-gray-400">{{ kid.group|default:"Brak Grupy" }}</p>
+                                                </div>
+                                            </label>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p class="text-center text-gray-500 dark:text-gray-400 p-6">Nie znaleziono dzieci pasujących do frazy "{{ search_query }}".</p>
+                                    {% endif %}
+                                </div>
+
+                                {% if kids_list.has_other_pages %}
+                                    <div class="flex justify-center items-center gap-2 pt-4">
+                                        {% if kids_list.has_previous %}
+                                            <a href="?page={{ kids_list.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" class="flex items-center justify-center size-8 rounded-lg text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">
+                                                <span class="material-symbols-outlined text-base">chevron_left</span>
+                                            </a>
+                                        {% endif %}
+
+                                        <span class="text-sm text-gray-500 dark:text-gray-400">
+                                    Strona {{ kids_list.number }} z {{ kids_list.paginator.num_pages }}
+                                </span>
+
+                                        {% if kids_list.has_next %}
+                                            <a href="?page={{ kids_list.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}" class="flex items-center justify-center size-8 rounded-lg text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">
+                                                <span class="material-symbols-outlined text-base">chevron_right</span>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+
+                            {% else %}
+                                <div class="rounded-lg bg-yellow-500/10 p-4 text-yellow-700 dark:text-yellow-300 border border-yellow-500">
+                                    <p class="text-sm font-medium">Wpisz frazę wyszukiwania, aby znaleźć dzieci do linkowania.</p>
+                                </div>
+                            {% endif %}
+
+
+                            <div class="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700 mt-6">
+                                <button type="submit" class="flex items-center justify-center font-bold text-base h-12 px-6 rounded-lg w-full sm:w-auto transition-colors bg-primary text-black hover:bg-opacity-80">
+                                    DODAJ DZIECKO/I
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </div>
-        </section>
-    </form>
+            </main>
+        </div>
+    </div>
+    </body>
 {% endblock %}

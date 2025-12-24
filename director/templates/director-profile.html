@@ -1,181 +1,131 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
 {% load static %}
+
 {% block content %}
-    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
-        <!-- Container wrapper -->
-        <div class="container-fluid">
-            <!-- Left links -->
-            <ul class="navbar-nav flex-row">
+    <div class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light dark:bg-background-dark relative">
+        <main class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col gap-6">
 
-                <li class="nav-item me-2 me-lg-0">
-                    <h2>
+                <div class="flex flex-wrap gap-2 text-sm">
+                    <a class="text-primary hover:underline font-medium leading-normal" href="{% url 'home_page' %}">Dashboard</a>
+                    <span class="text-[#618961] dark:text-[#8cb88c] font-medium leading-normal">/</span>
+                    <span class="text-[#111811] dark:text-white font-medium leading-normal">Profil Dyrektora</span>
+                </div>
 
-                        <a href="{% url 'home_page' %}" role="button"
-                           style="color: #75736B; text-decoration:none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                 height="32"
-                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                 viewBox="0 0 16 16">
-                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                            </svg>
+                <div class="flex flex-wrap justify-between gap-4 items-center bg-white dark:bg-[#1a2e1a] p-6 rounded-xl border border-[#dbe6db] dark:border-gray-800 shadow-sm">
+                    <div class="flex flex-col gap-1">
+                        <h1 class="text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em]">
+                            {% if request.user.id == director.user.id %}Twój Profil{% else %}Informacje o Dyrekcji{% endif %}
+                        </h1>
+                        <p class="text-[#618961] dark:text-[#a1cca1] text-base font-normal leading-normal">
+                            {% if request.user.id == director.user.id %}Zarządzaj swoimi danymi oraz przeglądaj statystyki placówki.{% else %}Dane kontaktowe dyrektora zarządzającego Twoją placówką.{% endif %}
+                        </p>
+                    </div>
+                    <div class="flex gap-3">
+                        {# Tylko właściciel profilu może go edytować #}
+                        {% if request.user.id == director.user.id %}
+                            <a href="{% url 'give-permissions' %}" class="flex items-center justify-center gap-2 rounded-lg h-11 px-5 bg-gray-200 dark:bg-gray-700 text-[#111811] dark:text-white text-sm font-bold hover:bg-gray-300 transition-colors">
+                                <span class="material-symbols-outlined">verified_user</span>
+                                Uprawnienia
+                            </a>
+                            <a href="{% url 'director_update' %}" class="flex items-center justify-center gap-2 rounded-lg h-11 px-5 bg-primary text-black text-sm font-bold hover:bg-primary/90 transition-colors shadow-sm">
+                                <span class="material-symbols-outlined">edit</span>
+                                Edytuj Profil
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
 
-                            MENU
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1">
+                        <div class="bg-white dark:bg-[#1a2e1a] p-8 rounded-xl shadow-sm border border-[#dbe6db] dark:border-gray-800 flex flex-col items-center text-center">
+                            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-40 mb-6 ring-4 ring-primary/20 shadow-md"
+                                 style='background-image: url("{% if director.gender == 2 %}{% static 'DYREKTORKA.jpg' %}{% elif director.gender == 1 %}{% static 'DYREKTOR.jpg' %}{% else %}{% static 'gander_null.jpg' %}{% endif %}");'>
+                            </div>
+                            <h2 class="text-2xl font-bold text-[#111811] dark:text-white mb-1 uppercase tracking-tight">
+                                {% if director.first_name %}{{ director.first_name }} {{ director.last_name }}{% else %}Administrator{% endif %}
+                            </h2>
+                            <p class="text-[#618961] dark:text-primary text-lg font-black uppercase tracking-widest text-xs mb-6">Dyrektor Placówki</p>
 
-                        </a>
-
-                    </h2>
-                </li>
-
-            </ul>
-            <!-- Left links -->
-            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <!-- Left links -->
-                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
-                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>PROFIL DYREKTORA</b></li>
-                </ul>
-            </div>
-            <ul class="navbar-nav d-flex flex-row me-1">
-                {% if perms.director.is_director %}
-                    <li class="nav-item mr-3">
-                        <button class="btn" onclick="location.href='{% url 'give-permissions' %}'"
-                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
-                            DAJ UPRAWNIENIA
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="btn" onclick="location.href='{% url 'director_update' %}'"
-                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
-                            EDYTUJ PROFIL
-                        </button>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-        <!-- Container wrapper -->
-    </nav>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}"
-                 style="color: white; text-align: center; font-size: 30px">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    <div class="container" style="margin-top: 85px">
-        <div class="row gutters">
-            <div class="col-6 mt-5" style="margin-left: -25%">
-                <div class="card h-100 border-0">
-                    <div class="card-body">
-                        <figure>
-                            {% if director.gender == 2 %}
-                                <img src="{% static 'DYREKTORKA.jpg' %}" alt=""
-                                     style="height: 80%; display: block; margin-left: auto; margin-right: auto">
-                            {% elif director.gender == 1 %}
-                                <img src="{% static 'DYREKTOR.jpg' %}" alt=""
-                                     style="height: 80%; display: block; margin-left: auto; margin-right: auto">
-                            {% else %}
-                                <img src="{% static 'gander_null.jpg' %}" alt=""
-                                     style="height: 80%; display: block; margin-left: auto; margin-right: auto">
+                            {% if request.user.id == director.user.id %}
+                                <a href="{% url 'password_change' %}" class="w-full py-3 px-4 rounded-lg border-2 border-[#dbe6db] dark:border-gray-700 text-[#111811] dark:text-white font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined">lock_reset</span>
+                                    Zmień Hasło
+                                </a>
                             {% endif %}
-                            <figcaption style="text-align: center; margin-top: 20px; font-size: 50px">
-                                {% if director.first_name and director.last_name %}
-                                    <div>
-                                        {{ director.first_name }} {{ director.last_name }}
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 flex flex-col gap-6">
+
+                        {# Statystyki widoczne TYLKO dla dyrektora #}
+                        {% if perms.director.is_director and request.user.id == director.user.id %}
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
+                                    <p class="text-2xl font-black text-primary">{{ groups.count }}</p>
+                                    <p class="text-[10px] font-black uppercase text-[#618961]">Grupy</p>
+                                </div>
+                                <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
+                                    <p class="text-2xl font-black text-primary">{{ kids.count }}</p>
+                                    <p class="text-[10px] font-black uppercase text-[#618961]">Dzieci</p>
+                                </div>
+                                <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
+                                    <p class="text-2xl font-black text-primary">{{ director.employee_set.count }}</p>
+                                    <p class="text-[10px] font-black uppercase text-[#618961]">Kadra</p>
+                                </div>
+                                <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
+                                    <p class="text-2xl font-black text-primary">{{ director.parenta_set.count }}</p>
+                                    <p class="text-[10px] font-black uppercase text-[#618961]">Rodzice</p>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="bg-white dark:bg-[#1a2e1a] p-6 rounded-xl shadow-sm border border-[#dbe6db] dark:border-gray-800">
+                            <h3 class="text-lg font-black uppercase tracking-widest pb-4 border-b border-[#dbe6db] dark:border-gray-800 mb-6 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">contact_mail</span>
+                                Dane Kontaktowe
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-[10px] font-black text-[#618961] uppercase tracking-widest">Adres E-mail</span>
+                                    <p class="text-lg font-medium text-[#111811] dark:text-white">{{ director.user.email }}</p>
+                                </div>
+                                {% if director.phone %}
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-[10px] font-black text-[#618961] uppercase tracking-widest">Numer Telefonu</span>
+                                        <p class="text-lg font-medium text-[#111811] dark:text-white">{{ director.phone }}</p>
                                     </div>
                                 {% endif %}
-                                {% if perms.director.is_director %}
-                                    <button type="button" class="btn me-3"
-                                            style="color: white; background-color: #8D847B; width: 50%; height: 70px; font-size: 30px; margin-top: 2%"
-                                            onclick="location.href='{% url 'password_change' %}'">
-                                        <b>ZMIEŃ HASŁO</b>
-                                    </button>
+
+                                {# Status widoczny tylko dla dyrektora #}
+                                {% if request.user.id == director.user.id %}
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-[10px] font-black text-[#618961] uppercase tracking-widest">Status Konta</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="size-3 rounded-full bg-primary animate-pulse"></span>
+                                            <p class="text-lg font-medium text-[#111811] dark:text-white">Aktywne (Administracyjne)</p>
+                                        </div>
+                                    </div>
                                 {% endif %}
-                            </figcaption>
-                        </figure>
-                    </div>
-                </div>
-            </div>
-            <div class="col-9">
-                <div class="card h-100" style="background-color: #BAB1AB; border-color: #BAB1AB">
-                    <div class="card-body text-white">
-                        <div class="col mt-4">
-                            <div class="form-group">
-                                <h3>
-                                    <label class="mb-2" for="birth">E-MAIL:</label>
-                                    <input class="form-control" style="font-size: 20px" name="birth"
-                                           type="text"
-                                           id="birth"
-                                           value="{{ director.user.email }}" readonly>
-                                </h3>
                             </div>
                         </div>
 
-
-                        <div class="row">
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="group">LICZBA GRUP:</label>
-
-                                        <input class="form-control" style="font-size: 20px" name="gender"
-                                               type="text"
-                                               id="gender"
-                                               value="{{ groups.count }}" readonly>
-
-                                    </h3>
-                                </div>
-                            </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="start">LICZBA DZIECI:</label>
-
-                                        <input class="form-control" style="font-size: 20px" name="gender"
-                                               type="text"
-                                               id="gender"
-                                               value="{{ kids.count }}" readonly>
-
-                                    </h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="group">ZASOBY KADROWE:</label>
-
-                                        <input class="form-control" style="font-size: 20px" name="gender"
-                                               type="text"
-                                               id="gender"
-                                               value="{{ director.employee_set.count }}" readonly>
-
-                                    </h3>
-                                </div>
-                            </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="group">LICZBA RODZICÓW:</label>
-
-                                        <input class="form-control" style="font-size: 20px" name="gender"
-                                               type="text"
-                                               id="gender"
-                                               value="{{ director.parenta_set.count }}" readonly>
-
-                                    </h3>
-                                </div>
+                        {# Blok informacyjny zależny od typu użytkownika #}
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border border-blue-100 dark:border-blue-800 flex items-start gap-4">
+                            <span class="material-symbols-outlined text-blue-600 mt-1">help_center</span>
+                            <div class="text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
+                                {% if request.user.id == director.user.id %}
+                                    <p class="font-bold mb-1 uppercase tracking-tight">Twój panel zarządzania</p>
+                                    Dane widoczne powyżej są wykorzystywane do autoryzacji oraz generowania faktur i dokumentów placówki.
+                                {% else %}
+                                    <p class="font-bold mb-1 uppercase tracking-tight">Kontakt z dyrekcją</p>
+                                    Jeśli masz pytania dotyczące płatności, faktur lub spraw organizacyjnych, prosimy o kontakt pod powyższym adresem e-mail.
+                                {% endif %}
                             </div>
                         </div>
                     </div>
-
                 </div>
-
-
             </div>
-        </div>
+        </main>
     </div>
 {% endblock %}

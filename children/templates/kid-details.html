@@ -1,282 +1,219 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
 {% load static %}
+
 {% block content %}
-    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
-        <!-- Container wrapper -->
-        <div class="container-fluid">
-            <!-- Left links -->
-            <ul class="navbar-nav flex-row">
 
-                <li class="nav-item me-2 me-lg-0">
-                    <h2>
-                        <a href="{% url 'home_page' %}" role="button"
-                           style="color: #75736B; text-decoration:none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                 height="32"
-                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                 viewBox="0 0 16 16">
-                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                            </svg>
+    <div class="max-w-7xl mx-auto p-4 lg:p-8">
 
-                            MENU
-
-                        </a>
-                    </h2>
-                </li>
-
-            </ul>
-            <!-- Left links -->
-            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <!-- Left links -->
-                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
-                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>DANE DZIECKA</b></li>
-                </ul>
-            </div>
-            {% if perms.director.is_director %}
-                <ul class="navbar-nav d-flex flex-row me-1">
-                    <li class="nav-item">
-                        <button class="btn" onclick="location.href='{% url 'change_kid_info' pk=kid.id %}'"
-                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
-                            EDYTUJ PROFIL
-                        </button>
-                    </li>
-                </ul>
+        <!-- Breadcrumbs -->
+        <div class="flex flex-wrap items-center gap-2 text-sm mb-8">
+            {% if perms.director.is_director or perms.teacher.is_teacher %}
+            <a href="{% url 'list_kids' %}" class="text-primary hover:underline font-medium">Dzieci</a>
             {% endif %}
+            <span class="text-gray-500">/</span>
+            <span class="text-gray-900 dark:text-white font-medium">{{ kid }}</span>
         </div>
-        <!-- Container wrapper -->
-    </nav>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}"
-                 style="color: white; text-align: center; font-size: 30px">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
-    <form method="post" action="#">
-        {% csrf_token %}
-        <div class="container" style="margin-top: 85px">
-            <div class="row gutters">
-                <div class="col-5" style='margin-left: -15%'>
-                    <div class="card h-100" style="background-color: #BAB1AB; border-color: #BAB1AB">
-                        <div class="card-body text-white">
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="birth">DATA URODZENIA:</label>
-                                        <input class="form-control" style="font-size: 20px" name="birth"
-                                               type="text"
-                                               id="birth"
-                                               value="{{ kid.date_of_birth }}" readonly>
-                                    </h3>
-                                </div>
-                            </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="gender">PŁEĆ:</label>
-                                        <input class="form-control" style="font-size: 20px" name="gender"
-                                               type="text"
-                                               id="gender"
-                                               value="{{ kid.get_gender_display }}" readonly>
-                                    </h3>
-                                </div>
-                            </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="group">GRUPA:</label>
-                                        {% if kid.group %}
-                                            <input class="form-control" style="font-size: 20px" name="group"
-                                                   type="text"
-                                                   id="group"
-                                                   value="{{ kid.group.name }}" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px" name="group"
-                                                   type="text"
-                                                   id="group"
-                                                   value="Brak, edytuj profil by dodać" readonly>
-                                        {% endif %}
-                                    </h3>
-                                </div>
-                            </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="start">POCZĄTEK UMOWY:</label>
-                                        <input class="form-control" style="font-size: 20px" name="start"
-                                               type="text"
-                                               id="start"
-                                               value="{{ kid.start }}" readonly>
-                                    </h3>
-                                </div>
-                            </div>
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="end">KONIEC UMOWY:</label>
-                                        {% if kid.end %}
-                                            <input class="form-control" style="font-size: 20px" name="end"
-                                                   type="text"
-                                                   id="end"
-                                                   value="{{ kid.end }}" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px" name="end"
-                                                   type="text"
-                                                   id="end"
-                                                   value="Na czas nieokreślony" readonly>
-                                        {% endif %}
-                                    </h3>
-                                </div>
-                            </div>
-
-                        </div>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-8 rounded-2xl p-6 shadow-lg border-l-8 border-primary bg-gradient-to-r from-primary/10 to-transparent flex items-center gap-4">
+                    <span class="material-symbols-outlined text-4xl text-primary">check_circle</span>
+                    <div>
+                        <p class="text-xl font-bold text-primary">{{ message }}</p>
                     </div>
                 </div>
-                <div class="col-5">
-                    <div class="card h-100 border-0">
-                        <div class="card-body">
-                            <figure>
-                                {% if kid.gender == 2 %}
-                                    <img src="{% static 'girl.jpg' %}" alt=""
-                                         style="height: 80%; display: block; margin-right: auto; margin-left: auto">
+            {% endfor %}
+        {% endif %}
+        <!-- Nagłówek profilu -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-10">
+            <div class="flex items-center gap-6">
+                <!-- Zdjęcie dziecka -->
+                <div class="w-28 h-28 md:w-36 md:h-36 rounded-full bg-cover bg-center border-4 border-white shadow-xl"
+                     style="background-image: url('{% if kid.get_gender_display == "Chłopiec" %}{% static 'boy.jpg' %}{% else %}{% static 'girl.jpg' %}{% endif %}')">
+                </div>
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white">{{ kid }}</h1>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mt-1">
+                        {% if kid.group %}
+                            Grupa: <span class="font-semibold text-primary">{{ kid.group.name }}</span>
+                        {% else %}
+                            <span class="text-orange-600">Brak grupy</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Przyciski akcji -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                {% if perms.director.is_director %}
+                    <a href="{% url 'change_kid_info' pk=kid.id %}"
+                       class="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 shadow-md transition">
+                        <span class="material-symbols-outlined">edit</span>
+                        Edytuj profil
+                    </a>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- Główna siatka -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Lewa kolumna – główne informacje -->
+            <div class="lg:col-span-2 space-y-8">
+
+                <!-- Dane osobowe -->
+                <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white p-6 border-b border-gray-200 dark:border-gray-700">
+                        Dane osobowe
+                    </h2>
+                    <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Data urodzenia</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ kid.date_of_birth|date:"d.m.Y" }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Wiek</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {{ kid.years_old }} lat
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Płeć</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ kid.get_gender_display }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Rozpoczęcie umowy</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ kid.start|date:"d.m.Y" }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Zakończenie umowy</p>
+                            <p class="text-lg font-semibold {% if not kid.end %}text-green-600{% else %}text-gray-900 dark:text-white{% endif %}">
+                                {% if kid.end %}
+                                    {{ kid.end|date:"d.m.Y" }}
                                 {% else %}
-                                    <img src="{% static 'boy.jpg' %}" alt=""
-                                         style="height: 80%; display: block; margin-right: auto; margin-left: auto">
+                                    Na czas nieokreślony
                                 {% endif %}
-                                <figcaption
-                                        style="text-align: center; margin-top: 20px; font-size: 50px">{{ kid }}</figcaption>
-                            </figure>
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Grupa</p>
+                            <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                                {% if kid.group %}
+                                    {{ kid.group.name }}
+                                {% else %}
+                                    <span class="text-orange-600">Nie przypisano</span>
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
                 </div>
 
-
-                <div class="col-5" style="margin-right: -60%">
-                    <div class="card h-100" style="background-color: #BAB1AB; border-color: #BAB1AB">
-                        <div class="card-body text-white">
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="payment">PLAN PŁATNICZY:</label>
-                                        {% if kid.payment_plan %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="payment"
-                                                   type="text" id="payment"
-                                                   value="{{ kid.payment_plan }}" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px"
-                                                   name="payment"
-                                                   type="text" id="payment"
-                                                   value="Brak, edytuj profil by dodać" readonly>
-                                        {% endif %}
-                                    </h3>
-                                </div>
-                            </div>
-                            {% if perms.director.is_director or perms.parent.is_parent %}
-                                <div class="col mt-4">
-                                    <div class="form-group">
-                                        <h3>
-                                            <label class="mb-2" for="per_month">STAŁY KOSZT MIESIĘCZNY:</label>
-                                            {% if kid.payment_plan %}
-                                                <input class="form-control" style="font-size: 20px"
-                                                       name="per_month"
-                                                       type="text" id="per_month"
-                                                       value="{{ kid.payment_plan.price }} zł" readonly>
-                                            {% else %}
-                                                <input class="form-control" style="font-size: 20px"
-                                                       name="per_month"
-                                                       type="text" id="per_month"
-                                                       value="0 zł" readonly>
-                                            {% endif %}
-                                        </h3>
-                                    </div>
-                                </div>
-                                <div class="col mt-4">
-                                    <div class="form-group">
-                                        <h3>
-                                            <label class="mb-2" for="to_pay">DO ZAPŁATY W TYM MIESIĄCU:</label>
-                                            {% if kid.amount %}
-                                                <input class="form-control" style="font-size: 20px"
-                                                       name="to_pay"
-                                                       type="text" id="to_pay"
-                                                       value="{{ kid.amount }} zł" readonly>
-                                            {% elif kid.payment_plan %}
-                                                <input class="form-control" style="font-size: 20px"
-                                                       name="to_pay"
-                                                       type="text" id="to_pay"
-                                                       value="{{ kid.payment_plan.price }} zł" readonly>
-                                            {% else %}
-                                                <input class="form-control" style="font-size: 20px"
-                                                       name="to_pay"
-                                                       type="text" id="to_pay"
-                                                       value="0 zł" readonly>
-                                            {% endif %}
-                                        </h3>
-                                    </div>
-                                </div>
-                            {% endif %}
-                            <div class="col mt-4">
-                                <div class="form-group">
-                                    <h3>
-                                        <label class="mb-2" for="meal">PLAN ŻYWIENIOWY:</label>
-                                        {% if kid.kid_meals %}
-                                            <input class="form-control" style="font-size: 20px" name="meal"
-                                                   type="text" id="meal"
-                                                   value="{{ kid.kid_meals }}" readonly>
-                                        {% else %}
-                                            <input class="form-control" style="font-size: 20px" name="meal"
-                                                   type="text" id="meal"
-                                                   value="Brak, edytuj profil by dodać" readonly>
-                                        {% endif %}
-                                    </h3>
-                                </div>
-                            </div>
-                            {% if perms.director.is_director or perms.parent.is_parent %}
-                                <div class="col mt-4">
-                                    <div class="form-group">
-                                        <h3>
-                                            <label class="mb-2" for="per_day">DZIENNA OPŁATA ŻYWIENIOWA:</label>
-                                            {% if kid.kid_meals %}
-                                                <input class="form-control" style="font-size: 20px"
-                                                       name="per_day"
-                                                       type="text" id="per_day"
-                                                       value="{{ kid.kid_meals.per_day }} zł" readonly>
-                                            {% else %}
-                                                <input class="form-control" style="font-size: 20px"
-                                                       name="per_day"
-                                                       type="text" id="per_day"
-                                                       value="0 zł" readonly>
-                                            {% endif %}
-                                        </h3>
-                                    </div>
-                                </div>
-                            {% endif %}
-
-                        </div>
+                <!-- Rodzice / Opiekunowie -->
+                <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Rodzice / Opiekunowie</h2>
+                        {% if perms.director.is_director %}
+                            <a href="{% url 'kid_parent' pk=kid.id %}" class="text-primary font-bold text-sm hover:underline">
+                                Zarządzaj rodzicami
+                            </a>
+                        {% endif %}
                     </div>
-
-
+                    <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for parent in kid.parenta_set.all %}
+                            <div class="p-6 flex items-center gap-5 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                                <div class="w-14 h-14 rounded-full bg-gray-300 dark:bg-gray-700 bg-cover bg-center"
+                                     style="background-image: url('{% if parent.gender == 1 %}{% static 'parent_male.jpg' %}{% else %}{% static 'parent_female.jpg' %}{% endif %}')">
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 dark:text-white">
+                                        {{ parent.user.email }}
+                                    </p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                                        {{ parent.user.first_name }} {{ parent.user.last_name }}
+                                        {% if parent.phone %} • {{ parent.phone }}{% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="p-6 text-center text-gray-500 dark:text-gray-400">
+                                Brak przypisanych rodziców
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
 
             </div>
+
+            <!-- Prawa kolumna – płatności i żywienie -->
+            <div class="space-y-8">
+
+                <!-- Plan płatności -->
+                <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Plan płatności</h2>
+                    </div>
+                    <div class="p-6 space-y-5">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Aktualny plan</p>
+                            <p class="text-lg font-bold text-gray-900 dark:text-white">
+                                {% if kid.payment_plan %}
+                                    {{ kid.payment_plan.name }}
+                                {% else %}
+                                    <span class="text-orange-600">Brak planu</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% if kid.payment_plan %}
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Miesięczna opłata</p>
+                                <p class="text-2xl font-black text-primary">{{ kid.payment_plan.price }} zł</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Do zapłaty w tym miesiącu</p>
+                                <p class="text-2xl font-black text-green-600">
+                                    {% if kid.amount %}{{ kid.amount }} zł{% else %}{{ kid.payment_plan.price }} zł{% endif %}
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Plan żywieniowy -->
+                <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-orange-600">restaurant</span>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Żywienie</h2>
+                    </div>
+                    <div class="p-6 space-y-5">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Plan żywieniowy</p>
+                            <p class="text-lg font-bold text-gray-900 dark:text-white">
+                                {% if kid.kid_meals %}
+                                    {{ kid.kid_meals.name }}
+                                {% else %}
+                                    <span class="text-orange-600">Brak planu</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% if kid.kid_meals %}
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Opłata dzienna</p>
+                                <p class="text-2xl font-black text-orange-600">{{ kid.kid_meals.per_day }} zł</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-    </form>
-    {% if kid.parenta_set.all %}
-        <button class="btn"
-                type="button" style="position: absolute; right: 0%; bottom: 40%"
-                onclick="location.href='{% url 'kid_parent' pk=kid.id %}'">
-            <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" fill="currentColor"
-                 style="color: black"
-                 class="bi bi-caret-right-fill" viewBox="0 0 16 16">
-                <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-            </svg>
-        </button>
-    {% endif %}
 
+        <!-- Strzałka do rodziców (jeśli są) -->
+        {% if kid.parenta_set.all %}
+            <a href="{% url 'kid_parent' pk=kid.id %}"
+               class="fixed right-8 bottom-8 w-16 h-16 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-primary/90 transition transform hover:scale-110">
+                <span class="material-symbols-outlined text-3xl">arrow_forward</span>
+            </a>
+        {% endif %}
 
+    </div>
 
 {% endblock %}

@@ -1,141 +1,304 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
+
 {% block content %}
-    <style>
-        body {
-            background-color: #E9DAD7;
-        }
-    </style>
-    <img src="{% static  'add_form_picture.jpg' %}" alt="" style="position: absolute; bottom: 0; left: -5%; height: 90%">
-    <form method="post" action="#">
-        {% csrf_token %}
-        <section class="h-100">
 
-            <div class="container  h-100" style="width: 40%; float: right; margin-right: 35px">
-                <div class="row d-flex h-100">
-                    <div class="col">
-                        <div class="card card-registration my-4">
-                            <div class="row g-0">
+    <div class="mx-auto max-w-5xl">
 
-                                <div class="col" style="color: #75736B">
-                                    <div class="card-body p-md-5 ">
-                                        {% if form.errors %}
-                                            <div class="alert alert-danger">
-                                                {{ form.errors }}
-                                            </div>
-                                        {% endif %}
-                                        <div class="row">
+        <!-- Nagłówek -->
+        <div class="mb-10 flex flex-wrap items-center justify-between gap-6">
+            <h1 class="text-4xl font-black tracking-tight text-gray-900 dark:text-white">
+                Dodaj nowe dziecko
+            </h1>
+            <a href="{% url 'list_kids' %}" class="flex items-center gap-2 text-primary hover:underline font-medium">
+                <span class="material-symbols-outlined text-xl">arrow_back</span>
+                Powrót do listy
+            </a>
+        </div>
 
-                                            <div class="col mb-2">
-                                                <div class="d-flex justify-content-start noPadding">
-                                                    <h2>
-                                                        <a href="{% url 'list_kids' %}"
-                                                           style="text-decoration: none; color: #75736B;">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                                                 height="32"
-                                                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                                                 viewBox="0 0 16 16">
-                                                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                                                            </svg>
-                                                            POWRÓT</a>
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div class="col mb-2">
-                                                <h2 class="text-uppercase d-flex justify-content-end"
-                                                    style="color: #75736B">Dodaj
-                                                    Dziecko</h2>
-                                            </div>
-
-
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
-                                                <div class="form-outline">
-                                                    {{ form.principal }}
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                        <div class="row">
-
-                                            <div class="form-group col-lg-6">
-                                                {{ form.first_name|as_crispy_field }}
-
-                                            </div>
-
-                                            <div class="form-group col-lg-6">
-                                                {{ form.last_name|as_crispy_field }}
-                                            </div>
-
-                                        </div>
-
-
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
-                                                {{ form.payment_plan|as_crispy_field }}
-
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                {{ form.gender|as_crispy_field }}
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
-                                                {{ form.kid_meals|as_crispy_field }}
-                                            </div>
-                                            <div class="col-md-6 mb-2">
-                                                <div class="form-outline">
-                                                    {% if form.group %}
-                                                        {{ form.group|as_crispy_field }}
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-2">
-                                                {{ form.date_of_birth|as_crispy_field }}
-
-                                            </div>
-                                        </div>
-                                        <div class="form-outline mb-2">
-                                            {{ form.start|as_crispy_field }}
-                                            <div>
-                                                <label class="form-check-label mb-0 me-2" for="mySwitch">Umowa na czas
-                                                    nieokteślony:</label>
-
-                                                <div class="form-check form-switch">
-
-                                                    <input class="form-check-input" type="checkbox" id="mySwitch"
-                                                           onclick="myFunction()"
-                                                           name="indefinite" value="yes">
-
-                                                </div>
-                                            </div>
-                                            <div id="end">
-                                                {{ form.end|as_crispy_field }}
-                                            </div>
-
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="d-flex justify-content-end pt-3">
-                                                <button type="submit" class="btn"
-                                                        style="background-color: #75736B; color: white; width: 35%">
-                                                    DODAJ
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <!-- OGÓLNE BŁĘDY FORMULARZA -->
+        {% if form.non_field_errors %}
+            <div class="mb-8 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-5">
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-red-600 mt-0.5">error</span>
+                    <div>
+                        <p class="font-semibold text-red-800 dark:text-red-300">Wystąpiły błędy:</p>
+                        <ul class="mt-2 list-disc list-inside text-red-700 dark:text-red-200">
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
             </div>
-        </section>
-    </form>
-    <script src="{% static 'checkbox.js' %}"></script>
+        {% endif %}
+
+        <form method="post" class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-8 shadow-lg">
+            {% csrf_token %}
+
+            <!-- Informacje o dziecku -->
+            <section class="mb-10">
+                <h2 class="mb-6 text-2xl font-bold text-gray-900 dark:text-white">Informacje o dziecku</h2>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+                    <!-- Imię -->
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold">Imię <span class="text-red-600">*</span></label>
+                        <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" required
+                               class="h-12 w-full rounded-lg border {% if form.first_name.errors %}border-red-500 dark:border-red-400{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-white dark:bg-gray-800 px-4 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        {% if form.first_name.errors %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">error</span>
+                                {{ form.first_name.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Nazwisko -->
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold">Nazwisko <span class="text-red-600">*</span></label>
+                        <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" required
+                               class="h-12 w-full rounded-lg border {% if form.last_name.errors %}border-red-500 dark:border-red-400{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-white dark:bg-gray-800 px-4 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        {% if form.last_name.errors %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">error</span>
+                                {{ form.last_name.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Data urodzenia -->
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold">Data urodzenia <span class="text-red-600">*</span></label>
+                        <div class="relative">
+                            <input type="date" name="date_of_birth" value="{{ form.date_of_birth.value|date:'Y-m-d' }}" required
+                                   class="h-12 w-full rounded-lg border {% if form.date_of_birth.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-white dark:bg-gray-800 px-4 pr-12 focus:border-primary focus:outline-none">
+
+                        </div>
+                        {% if form.date_of_birth.errors %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">error</span>
+                                {{ form.date_of_birth.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Płeć -->
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold">Płeć</label>
+                        <select name="gender" class="h-12 w-full rounded-lg border {% if form.gender.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-white dark:bg-gray-800 px-4 focus:border-primary">
+                            <option value="">--- Wybierz ---</option>
+                            <option value="1" {% if form.gender.value == "Chłopiec" %}selected{% endif %}>Chłopiec</option>
+                            <option value="2" {% if form.gender.value == "Dziewczynka" %}selected{% endif %}>Dziewczynka</option>
+                        </select>
+                        {% if form.gender.errors %}
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">error</span>
+                                {{ form.gender.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Rodzic – Select2 -->
+            <section class="mb-10">
+                <h2 class="mb-6 text-2xl font-bold text-gray-900 dark:text-white">Rodzic / Opiekun <span class="text-red-600">*</span></h2>
+                <div class="max-w-2xl flex items-end gap-4">
+                    <div class="flex-1">
+                        <label class="mb-2 block text-sm font-semibold">Wybierz rodzica</label>
+                        <div class="relative">
+                            <select name="principal" id="principal-select" required class="js-select2 w-full">
+                                <option value="">--- Wybierz rodzica ---</option>
+                                {% for parent in form.fields.principal.queryset %}
+                                    <option value="{{ parent.pk }}">{{ parent.user.username|default:'' }} ({{ parent.user.email }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <button type="button" onclick="openAddParentModal()" class="mb-1 whitespace-nowrap rounded-lg bg-green-600 px-5 py-3 text-white font-medium hover:bg-green-700 shadow-md flex items-center gap-2">
+                        <span class="material-symbols-outlined text-xl">person_add</span>
+                        Dodaj rodzica
+                    </button>
+                </div>
+                {% if form.principal.errors %}
+                    <p class="mt-2 text-sm text-red-600 flex items-center gap-1"><span class="material-symbols-outlined text-xs">error</span> {{ form.principal.errors|join:", " }}</p>
+                {% endif %}
+            </section>
+
+            <!-- Opcjonalne: grupa, plan, posiłki -->
+            <section class="mb-10">
+                <h2 class="mb-6 text-2xl font-bold text-gray-900 dark:text-white">Dodatkowe informacje (opcjonalne)</h2>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold">Grupa</label>
+                        <div class="relative">
+                            <select name="group" class="h-12 w-full rounded-lg border {% if form.group.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-white dark:bg-gray-800 px-4 pr-12">
+                                <option value="">--- Brak grupy ---</option>
+                                {% for group in form.fields.group.queryset %}
+                                    <option value="{{ group.pk }}" {% if form.group.value == group.pk %}selected{% endif %}>{{ group.name }}</option>
+                                {% endfor %}
+                            </select>
+
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold">Plan płatności</label>
+                        <select name="payment_plan" class="h-12 w-full rounded-lg border {% if form.payment_plan.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-white dark:bg-gray-800 px-4">
+                            <option value="">--- Brak ---</option>
+                            {% for plan in form.fields.payment_plan.queryset %}
+                                <option value="{{ plan.pk }}" {% if form.payment_plan.value == plan.pk %}selected{% endif %}>{{ plan.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold">Posiłki</label>
+                        <select name="kid_meals" class="h-12 w-full rounded-lg border {% if form.kid_meals.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-white dark:bg-gray-800 px-4">
+                            <option value="">--- Brak ---</option>
+                            {% for meal in form.fields.kid_meals.queryset %}
+                                <option value="{{ meal.pk }}" {% if form.kid_meals.value == meal.pk %}selected{% endif %}>{{ meal.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Okres pobytu -->
+            <section class="mb-10">
+                <h2 class="mb-6 text-2xl font-bold text-gray-900 dark:text-white">Okres pobytu</h2>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+                    <div>
+                        <label class="mb-2 block text-sm font-semibold">Data rozpoczęcia <span class="text-red-600">*</span></label>
+                        <div class="relative">
+                            <input type="date" name="start" value="{{ form.start.value|date:'Y-m-d' }}" required
+                                   class="h-12 w-full rounded-lg border {% if form.start.errors %}border-red-500{% else %}border-gray-300 dark:border-gray-600{% endif %} bg-white dark:bg-gray-800 px-4 pr-12">
+
+                        </div>
+                        {% if form.start.errors %}
+                            <p class="mt-1 text-sm text-red-600 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs">error</span>
+                                {{ form.start.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <div id="end-date-container">
+                        <label class="mb-2 block text-sm font-semibold">Data zakończenia <span class="text-gray-500">(opcjonalnie)</span></label>
+                        <div class="relative">
+                            <input type="date" name="end" value="{{ form.end.value|date:'Y-m-d' }}"
+                                   class="h-12 w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 pr-12">
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex items-center gap-3">
+                    <input type="checkbox" id="indefinite" name="indefinite" class="h-5 w-5 rounded text-primary"
+                           onchange="toggleEndDate()" {% if form.indefinite.value %}checked{% endif %}>
+                    <label for="indefinite" class="text-base font-medium cursor-pointer">Umowa na czas nieokreślony</label>
+                </div>
+            </section>
+
+            <!-- Przyciski -->
+            <div class="flex flex-col gap-4 sm:flex-row sm:justify-end border-t border-gray-200 dark:border-gray-700 pt-8">
+                <a href="{% url 'list_kids' %}" class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-8 py-3 text-center font-medium hover:bg-gray-100 dark:hover:bg-gray-700">
+                    Anuluj
+                </a>
+                <button type="submit" class="rounded-lg bg-primary px-8 py-3 font-medium text-white hover:bg-primary/90 shadow-md">
+                    Dodaj dziecko
+                </button>
+            </div>
+        </form>
+    </div>
+    <script>
+        function openAddParentModal() {
+            document.getElementById('add-parent-modal').classList.remove('hidden');
+            document.getElementById('new-parent-email').focus();
+        }
+
+        function closeAddParentModal() {
+            document.getElementById('add-parent-modal').classList.add('hidden');
+            document.getElementById('new-parent-email').value = '';
+        }
+
+        function createParentAndSelect() {
+            const email = document.getElementById('new-parent-email').value.trim();
+            if (!email || !email.includes('@')) {
+                alert('Wpisz poprawny adres e-mail!');
+                return;
+            }
+
+            const spinner = document.getElementById('create-parent-spinner');
+            const text = document.getElementById('create-parent-text');
+            spinner.classList.remove('hidden');
+            text.classList.add('hidden');
+
+            fetch("{% url 'create_parent_ajax' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({ email: email })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Dodaj nowego rodzica do selecta
+                        const select = document.getElementById('principal-select');
+                        const option = new Option(data.full_name + " (" + email + ")", data.parent_id, true, true);
+                        select.add(option);
+                        $('.js-select2').trigger('change'); // odśwież Select2
+
+                        closeAddParentModal();
+                        alert("Rodzic dodany i wybrany!");
+                    } else {
+                        alert("Błąd: " + data.error);
+                    }
+                })
+                .finally(() => {
+                    spinner.classList.add('hidden');
+                    text.classList.remove('hidden');
+                });
+        }
+    </script>
+
+    <!-- Select2 init -->
+    <script>
+        $(document).ready(function() {
+            $('.js-select2').select2({
+                placeholder: "Szukaj rodzica...",
+                allowClear: true
+            });
+        });
+    </script>
+    <script>
+
+        $(document).ready(function() {
+            $('.js-select2').select2({
+                placeholder: "Szukaj rodzica po imieniu lub emailu...",
+                allowClear: true
+            });
+        });
+
+        function toggleEndDate() {
+            const container = document.getElementById('end-date-container');
+            const input = container.querySelector('input');
+            if (document.getElementById('indefinite').checked) {
+                container.style.display = 'none';
+                input.value = '';
+                input.removeAttribute('required');
+            } else {
+                container.style.display = 'block';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', toggleEndDate);
+    </script>
+
 {% endblock %}

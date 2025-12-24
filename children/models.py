@@ -24,6 +24,9 @@ class Kid(models.Model):
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     is_active = models.BooleanField(default=True)
 
+    def years_old(self):
+        return timezone.now().year - self.date_of_birth.year
+
     def __str__(self):
         """
         String representation

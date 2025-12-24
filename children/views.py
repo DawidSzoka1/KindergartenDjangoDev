@@ -4,8 +4,9 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.contrib import messages
 from teacher.models import Employee
+from groups.models import Groups
 from django.contrib.messages.views import SuccessMessageMixin
-from .forms import KidAddForm
+from .forms import KidAddForm, KidUpdateForm
 from .models import Kid
 from django.utils import timezone
 from parent.models import ParentA
@@ -39,17 +40,26 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMix
         """ Passes the request object to the form class.
          This is necessary to only display members that belong to a given user"""
 
-        kwargs = super(AddKidView, self).get_form_kwargs()
-        kwargs.update({'current_user': self.request.user})
+        kwargs = super().get_form_kwargs()
+        kwargs['current_user'] = self.request.user
         return kwargs
 
     def get_form(self, form_class=None):
-        form = super(AddKidView, self).get_form(form_class)
+        form = super().get_form(form_class)
+        form.fields['group'].required = False
+        form.fields['payment_plan'].required = False
+        form.fields['kid_meals'].required = False
         form.fields['end'].required = False
         return form
 
     def form_valid(self, form):
-        form.instance.save()
+        if self.request.POST.get('indefinite'):
+            form.instance.end = None
+
+        kid = form.save(commit=False)  # pobieramy instancję
+        kid.save()  # zapisujemy w bazie
+
+        messages.success(self.request, self.success_message)
         return super().form_valid(form)
 
     def test_func(self):
@@ -79,24 +89,32 @@ class KidsListView(LoginRequiredMixin, View):
     def get(self, request):
         if request.user.get_user_permissions() == {'director.is_director'}:
             kids = get_object_or_404(Director, user=request.user.id).kid_set.filter(is_active=True).order_by('-id')
+            groups_count = Groups.objects.filter(principal=request.user.id, is_active=True).count()
         elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
             groups = get_object_or_404(Employee, user=request.user.id).group
-            if groups.is_active == True:
+            groups_count = groups.filter(is_active=True).count()
+            if groups.is_active:
                 kids = groups.kid_set.filter(is_active=True).order_by('-id')
             else:
                 kids = None
-
-        elif request.user.get_user_permissions() == {'parent.is_parent'}:
-            kids = get_object_or_404(ParentA, user=request.user.id).kids.filter(is_active=True).order_by('-id')
         else:
             raise PermissionDenied
 
         paginator = Paginator(kids, 10)
+        kids_count = kids.count()
+        avg = 0
+        for kid in kids:
+            print(kid.date_of_birth)
+            avg += kid.years_old()
+        avg /= kids_count
         page = request.GET.get('page')
         page_obj = paginator.get_page(page)
         month = int(timezone.now().month)
         year = int(timezone.now().year)
-        return render(request, 'kids-list.html', {'page_obj': page_obj, 'month': month, 'year': year})
+
+        return render(request, 'kids-list.html',
+                      {'page_obj': page_obj, 'month': month, 'year': year, 'total_kids': kids_count,
+                       'groups_count': groups_count, 'avg_age': avg})
 
     def post(self, request):
         search = request.POST.get('search')
@@ -105,18 +123,27 @@ class KidsListView(LoginRequiredMixin, View):
                 kids = get_object_or_404(Director, user=request.user.id).kid_set.filter(
                     first_name__icontains=search).filter(
                     is_active=True).order_by('-id')
+                groups_count = Groups.objects.filter(principal=request.user.id, is_active=True).count()
             elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
                 group = get_object_or_404(Employee, user=request.user.id).group
                 kids = group.kid_set.filter(first_name__icontains=search).filter(is_active=True).order_by('-id')
+                groups_count = groups.filter(is_active=True).count()
             else:
                 raise PermissionDenied
-
+            kids_count = kids.count()
+            avg = 0
+            for kid in kids:
+                print(kid.date_of_birth)
+                avg += kid.years_old()
+            avg /= kids_count if kids_count > 0 else 1
             paginator = Paginator(kids, 10)
             page = request.GET.get('page')
             page_obj = paginator.get_page(page)
             month = int(timezone.now().month)
             year = int(timezone.now().year)
-            return render(request, 'kids-list.html', {'page_obj': page_obj, 'month': month, 'year': year})
+            return render(request, 'kids-list.html',
+                          {'page_obj': page_obj, 'month': month, 'year': year, 'total_kids': kids_count,
+                           'groups_count': groups_count, 'avg_age': avg})
         return redirect('list_kids')
 
 
@@ -144,43 +171,81 @@ class DetailsKidView(LoginRequiredMixin, View):
         raise PermissionDenied
 
 
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.views.generic import UpdateView
+from django.urls import reverse_lazy
+from .forms import KidUpdateForm
+
 class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     permission_required = "director.is_director"
     model = Kid
     template_name = 'kid-update-info.html'
-    form_class = KidAddForm
-    success_message = "Poprawnie zmieniono informacje"
+    form_class = KidUpdateForm
+    success_message = "Profil dziecka został zaktualizowany!"
 
     def get_success_url(self):
         return reverse_lazy('kid_details', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self, **kwargs):
-        """ Passes the request object to the form class.
-         This is necessary to only display members that belong to a given user"""
-
+        """Przekazuje current_user do formularza"""
         kwargs = super(ChangeKidInfoView, self).get_form_kwargs()
         kwargs.update({'current_user': self.request.user})
         return kwargs
 
-    def form_valid(self, form):
-        form.instance.save()
-        return super().form_valid(form)
-
     def get_form(self, form_class=None):
         form = super(ChangeKidInfoView, self).get_form(form_class)
         form.fields['end'].required = False
+
+        # Usuwamy pole parents z walidacji formularza, bo obsługujemy je ręcznie w form_valid
+        if 'parents' in form.fields:
+            del form.fields['parents']
         return form
+
+    # --- TO JEST METODA, KTÓREJ BRAKOWAŁO ---
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pobieramy wszystkich rodziców przypisanych do tego dyrektora,
+        # żeby wypełnić <select> w HTML
+        context['all_parents'] = ParentA.objects.filter(principal__user=self.request.user)
+        return context
+    # -----------------------------------------
+
+    def form_valid(self, form):
+        kid = form.save(commit=False)
+
+        # Umowa na czas nieokreślony
+        if self.request.POST.get('indefinite'):
+            kid.end = None
+
+        kid.save()
+
+        # Obsługa rodziców (wielu, z inputa hidden)
+        parents_input = self.request.POST.get('parents', '')
+
+        if parents_input:
+            # Rozbijamy string "1,2,5" na listę liczb
+            parent_ids = [int(pid) for pid in parents_input.split(',') if pid.strip().isdigit()]
+
+            # Pobieramy rodziców z bazy (tylko należących do tego dyrektora)
+            parents = ParentA.objects.filter(
+                id__in=parent_ids,
+                principal__user=self.request.user
+            )
+            kid.parenta_set.set(parents)
+        else:
+            # Jeśli lista pusta, usuwamy powiązania
+            kid.parenta_set.clear()
+
+        kid.save()
+        return super().form_valid(form)
 
     def test_func(self):
         kid = self.get_object()
         try:
-            if self.request.user == kid.principal.user:
-                if kid.is_active == True:
-                    return True
+            return self.request.user == kid.principal.user and kid.is_active
         except Exception:
             return False
-        return False
-
 
 class KidDeleteView(PermissionRequiredMixin, View):
     permission_required = "director.is_director"

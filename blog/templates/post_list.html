@@ -1,214 +1,120 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
+
 {% block content %}
-    <section class="">
-        <div class="container-fluid">
-            <div class="row">
+    <div class="flex flex-col lg:flex-row gap-8">
 
-                <div class="col vh-100" style="background-color: white; ">
+        <aside class="w-full lg:w-1/4 lg:max-w-xs flex-shrink-0">
+            <div class="bg-white dark:bg-[#0f1d0f] p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 sticky top-8">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">filter_list</span> Filtruj Wydarzenia
+                </h3>
 
-                    {% if perms.director.is_director or perms.teacher.is_teacher %}
-
-                        <form method="POST" action="{% url 'post_list_view' %}">
-                            {% csrf_token %}
-                            {{ form.director }}
-                            {{ form.author }}
-                            {{ form.is_active.as_hidden }}
-                            <div class="col mt-5 mb-3">
-
-                                <div class="dropdown">
-                                    <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                                       href="#"
-                                       id="navbarDropdownMenuAvatar"
-                                       role="button"
-                                       data-bs-toggle="dropdown"
-                                       aria-expanded="false"
-                                       style="font-size: 20px;  text-decoration:none; color: #75736B; ">
-                                        GRUPY
-                                    </a>
-                                    <ul
-                                            class="dropdown-menu dropdown-menu-start"
-                                            aria-labelledby="navbarDropdownMenuAvatar"
-                                    >
-
-                                        {{ form.group|as_crispy_field }}
-
-
-                                    </ul>
-                                </div>
-
-
-                                {{ form.content|as_crispy_field }}
-                                <button type="submit" class="btn" style="color: white; background-color: #75736B;">Post
-                                </button>
+                <form method="GET" action="{% url 'post_list_view' %}">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">Dla Grup</label>
+                            <div class="space-y-3">
+                                {% for group in groups_list %}
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" name="filter_group" value="{{ group.id }}"
+                                               {% if group.id in selected_groups %}checked{% endif %}
+                                               class="size-5 rounded border-gray-300 text-primary focus:ring-primary/50">
+                                        <span class="text-sm text-gray-600 dark:text-gray-300 group-hover:text-primary transition-colors">{{ group.name }}</span>
+                                    </label>
+                                {% endfor %}
                             </div>
-                        </form>
-                    {% endif %}
-                    <img style="position: absolute; margin-left: -20%; bottom: 0"
-                         src="{% static 'trawa z kwiatkami.jpg' %}"
-                         alt="zdjecie"
-                    >
-
-                </div>
-                <div class="col-lg-8 vh-100 ml-3 justify-content-center"
-                     style="background-color: #E6DCD3; color: #8D847B;">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }}"
-                                 style="color: white; text-align: center; font-size: 30px;">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                    <div class="justify-content-center">
-                        <form class="d-flex" method="POST" action="{% url 'post_search' %}"
-                              style="border: 7px solid #BAB1AB;border-radius: 25px; width: auto; margin-left: auto; margin-top: 20px">
-                            {% csrf_token %}
-                            <input class="form-control" type="search" placeholder="Wpisz słowo klucz "
-                                   aria-label="Wpisz imie dziecka" name="search">
-                            <span><button class="btn " type="submit"
-                                          style="margin-left: -8px; background-color: #BAB1AB; color: white">SZUKAJ</button></span>
-                        </form>
+                        </div>
                     </div>
-                    {% for post in page_obj %}
-                        <div class="card mt-4">
-                            <div class="row mt-2 mb-2">
-                                <div class="col-sm-2 mb-3 mb-sm-0">
 
-                                    {% if post.author.director %}
-                                        {% if post.author.director.gender == 2 %}
+                    <div class="flex gap-3 mt-8">
+                        <button type="submit" class="flex-1 py-3 bg-primary text-white font-bold rounded-xl shadow-md hover:bg-primary/90 transition-all text-sm">
+                            Zastosuj
+                        </button>
+                        <a href="{% url 'post_list_view' %}" class="flex-1 py-3 bg-gray-100 dark:bg-gray-800 text-center text-gray-500 font-bold rounded-xl text-sm hover:bg-gray-200">
+                            Reset
+                        </a>
+                    </div>
+                </form>
 
-                                            <img src="{% static 'DYREKTORKA.jpg' %}" alt=""
-                                                 style="height: 150px; display: block; margin-left: auto; margin-right: auto">
-                                        {% elif post.author.director.gender == 1 %}
-                                            <img src="{% static 'DYREKTOR.jpg' %}" alt=""
-                                                 style="height: 150px; display: block; margin-left: auto; margin-right: auto">
-                                        {% else %}
-                                            <img src="{% static 'gander_null.jpg' %}" alt=""
-                                                 style="height: 150px; display: block; margin-left: auto; margin-right: auto">
+                {% if perms.director.is_director or perms.teacher.is_teacher %}
+                    <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
+                        <a href="{% url 'post_add' %}" class="w-full flex items-center justify-center gap-2 py-4 bg-purple-50 text-primary font-black rounded-2xl border-2 border-dashed border-primary/30 hover:bg-primary hover:text-white transition-all">
+                            <span class="material-symbols-outlined">add_circle</span> DODAJ NOWE
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </aside>
 
-                                        {% endif %}
-                                    {% elif post.author.employee %}
-                                        {% if post.author.employee.gender == 2 %}
-                                            <img class="img"
-                                                 style="height: 150px; display: block; margin-left: auto; margin-right: auto"
-                                                 src="{% static 'employee_female.jpg' %}"
-                                                 alt="">
-                                        {% elif post.author.employee.gender == 1 %}
-                                            <img class="img"
-                                                 style="height: 150px; display: block; margin-left: auto; margin-right: auto"
-                                                 src="{% static 'employee_male.jpg' %}"
-                                                 alt="">
-                                        {% else %}
-                                            <img class="img"
-                                                 style="height: 150px; display: block; margin-left: auto; margin-right: auto"
-                                                 src="{% static 'gander_null.jpg' %}"
-                                                 alt="">
-                                        {% endif %}
-                                    {% endif %}
+        <div class="flex-1">
+            <div class="flex flex-col gap-6">
+                {% for post in page_obj %}
+                    <div class="bg-white dark:bg-[#0f1d0f] p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 flex items-center justify-between flex-wrap md:flex-nowrap gap-6 hover:shadow-md transition-shadow">
 
-                                </div>
+                        <div class="flex flex-col items-center justify-center bg-primary/10 dark:bg-primary/20 rounded-2xl w-20 h-20 text-primary shrink-0">
+                            <span class="text-xs font-black uppercase">{{ post.event_date|date:"M" }}</span>
+                            <span class="text-3xl font-black">{{ post.event_date|date:"d" }}</span>
+                        </div>
 
-                                <div class="col">
+                        <div class="flex-1 min-w-[200px]">
+                            <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md
+                            {% if post.category == 'holiday' %}bg-red-100 text-red-600
+                            {% elif post.category == 'trip' %}bg-green-100 text-green-600
+                            {% else %}bg-purple-100 text-primary{% endif %}">
+                            {{ post.get_category_display }}
+                        </span>
+                                <span class="text-xs text-gray-400 font-medium">• {{ post.date_posted|timesince }} temu</span>
+                            </div>
+                            <h4 class="font-black text-gray-900 dark:text-white text-xl">{{ post.title }}</h4>
+                            <p class="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mt-1">{{ post.content }}</p>
+                        </div>
 
-                                    <div class="card-body" style="color: #75736B">
-                                        <div class="row">
-                                            <div class="col-9">
-                                                <small class="card-title" style="color: #75736B">
-                                                    {{ post.author }}, {{ post.date_posted }},
-                                                    {% for group in post.group.all %}
-                                                        {{ group }},
-                                                    {% endfor %}
-                                                </small>
-                                            </div>
-                                            <div class="col">
-                                                {% if post.author == user %}
-                                                    <div class="dropdown">
-                                                        <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                                                           href="#"
-                                                           id="navbarDropdownMenuAvatar"
-                                                           role="button"
-                                                           data-bs-toggle="dropdown"
-                                                           aria-expanded="false"
-                                                           style="font-size: 20px;  text-decoration:none; color: #75736B; ">
-                                                            Opcje
-                                                        </a>
-                                                        <ul
-                                                                class="dropdown-menu dropdown-menu-start"
-                                                                aria-labelledby="navbarDropdownMenuAvatar"
-                                                        >
-                                                            <li>
-                                                                <a href="{% url 'post_update' pk=post.id %}"
-                                                                   class="dropdown-item">Zmiana wydarzenia
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <form method="POST"
-                                                                      action="{% url 'post_delete' pk=post.id %}">
-                                                                    {% csrf_token %}
-                                                                    <button class="dropdown-item"
-                                                                            type="submit"
-                                                                            name="delete"
-                                                                            value="Usuń"
-                                                                            onclick="return confirm('Jestes pewny ze chcesz usunac wydarzenie');"
-                                                                    >Usuń wydarzenie
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-
-                                        </div>
-
-                                        <h2 class="card-text mt-2">
-                                            {{ post }}
-
-
-                                        </h2>
+                        <div class="flex items-center gap-4">
+                            <div class="flex -space-x-3 overflow-hidden">
+                                {% for group in post.group.all %}
+                                    <div class="inline-block h-10 w-10 rounded-full ring-4 ring-white dark:ring-[#0f1d0f] bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary"
+                                         title="{{ group.name }}">
+                                        {{ group.name|slice:":2"|upper }}
                                     </div>
-
-
-                                </div>
+                                {% endfor %}
                             </div>
                         </div>
-                    {% endfor %}
-                    {% if page_obj.has_other_pages %}
-                        <div class="pagination justify-content-center">
-                            {% if page_obj.has_previous %}
 
-                                <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
-                                   style=" font-size: 50px; color:#75736B">< </a>
-                            {% else %}
-                                <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
-                                   style=" font-size: 50px; color:#75736B">< </a>
-                            {% endif %}
+                        {% if post.author == user %}
+                            <div class="flex items-center gap-2 pl-4 border-l border-gray-100 dark:border-gray-800">
+                                <a href="{% url 'post_update' pk=post.id %}" class="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-primary transition-colors">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </a>
+                                <form method="POST" action="{% url 'post_delete' pk=post.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" onclick="return confirm('Usunąć wydarzenie?')" class="p-2 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
+                                        <span class="material-symbols-outlined">delete</span>
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <div class="p-20 text-center bg-white dark:bg-[#0f1d0f] rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-800">
+                        <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">event_busy</span>
+                        <p class="text-gray-500 font-bold">Brak nadchodzących wydarzeń dla Twoich grup.</p>
+                    </div>
+                {% endfor %}
 
-                            {% for num in page_obj.paginator.page_range %}
-                                {% if page_obj.number == num %}
-                                    <a class="btn mb-4" href="?page={{ num }}"
-                                       style=" font-size: 50px; color:#75736B">{{ num }}</a>
-                                {% endif %}
-
-                            {% endfor %}
-
-                            {% if page_obj.has_next %}
-                                <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
-                                   style=" text-decoration: none; font-size: 50px; color:#75736B"> ></a>
-                            {% else %}
-
-                                <a class="btn mb-4" href="?page=1"
-                                   style=" font-size: 50px; color:#75736B"> > </a>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                </div>
+                {% if page_obj.has_other_pages %}
+                    <div class="mt-8 flex justify-center gap-3">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 rounded-xl bg-white border border-gray-200 text-primary font-bold">Wstecz</a>
+                        {% endif %}
+                        <span class="px-4 py-2 rounded-xl bg-primary text-white font-black">{{ page_obj.number }}</span>
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 rounded-xl bg-white border border-gray-200 text-primary font-bold">Dalej</a>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
         </div>
-
-    </section>
-
-
+    </div>
 {% endblock %}

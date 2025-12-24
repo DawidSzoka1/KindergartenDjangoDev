@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light dark:bg-background-dark">
+        <main class="flex-1 p-4 md:p-8 flex justify-center">
+            <div class="w-full max-w-4xl">
+
+                <div class="bg-white dark:bg-[#0f1d0f] rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                    <div class="bg-primary p-6 text-white flex justify-between items-center">
+                        <h1 class="text-2xl font-black uppercase tracking-tighter">Nowe Wydarzenie</h1>
+                    </div>
+
+                    <form method="POST" class="p-8 flex flex-col gap-6">
+                        {% csrf_token %}
+                        {{ form.author.as_hidden }}
+                        {{ form.director.as_hidden }}
+                        {{ form.is_active.as_hidden }}
+
+                        {% if form.non_field_errors %}
+                            <div class="p-4 mb-4 rounded-xl bg-red-50 text-red-600 border border-red-200">
+                                {% for error in form.non_field_errors %}
+                                    <p class="font-bold">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="custom-crispy-styling">
+                            {{ form.title|as_crispy_field }}
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="custom-crispy-styling">
+                                {{ form.event_date|as_crispy_field }}
+                            </div>
+                            <div class="custom-crispy-styling">
+                                {{ form.category|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="custom-crispy-styling">
+                            {{ form.content|as_crispy_field }}
+                        </div>
+
+                        <div class="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-2xl border border-gray-200 dark:border-gray-800">
+                            <label class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4 block">Wybierz grupy</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                {% for group in form.group.field.queryset %}
+                                    <label class="flex items-center gap-3 p-3 bg-white dark:bg-[#0f1d0f] rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-primary transition-all">
+                                        <input type="checkbox" name="group" value="{{ group.id }}" class="size-5 rounded border-gray-300 text-primary focus:ring-primary/50">
+                                        <span class="text-sm font-bold text-gray-700 dark:text-gray-300">{{ group.name }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-4 mt-6 pt-6 border-t border-gray-100 dark:border-gray-800">
+                            <a href="{% url 'post_list_view' %}" class="px-6 py-3 font-bold text-gray-400 hover:text-gray-600 transition-colors">Anuluj</a>
+                            <button type="submit" class="px-10 py-4 bg-primary text-white font-black rounded-2xl shadow-lg hover:scale-[1.02] transition-transform uppercase tracking-tighter">
+                                Opublikuj
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        .invalid-feedback {
+            display: block !important;
+            color: #ef4444 !important;
+            font-size: 0.8rem !important;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+        .is-invalid {
+            border-color: #ef4444 !important;
+        }
+        .custom-crispy-styling label { font-weight: 700; color: #6b7280; text-transform: uppercase; font-size: 0.75rem; margin-bottom: 0.5rem; display: block; }
+        .custom-crispy-styling input, .custom-crispy-styling textarea, .custom-crispy-styling select {
+            width: 100%; border-radius: 0.75rem; border: 1px solid #d1d5db; padding: 0.75rem; background-color: white;
+        }
+    </style>
+{% endblock %}

@@ -1,124 +1,134 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block content %}
-    <link rel="stylesheet" href="{% static 'input_foucs.css' %}">
-    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
-        <!-- Container wrapper -->
-        <div class="container-fluid">
-            <!-- Left links -->
-            <ul class="navbar-nav flex-row">
+    <main class="flex-1 p-6 sm:p-8 lg:p-10">
+        <div class="max-w-7xl mx-auto">
 
-                <li class="nav-item me-2 me-lg-0">
-                    <h2>
-                        <a href="{% url 'home_page' %}" role="button"
-                           style="color: #75736B; text-decoration:none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                 height="32"
-                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                 viewBox="0 0 16 16">
-                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                            </svg>
+            <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+                <h1 class="text-3xl font-bold tracking-tight text-text-primary-light dark:text-text-primary-dark">GRUPY</h1>
 
-                            MENU
-
-                        </a>
-                    </h2>
-                </li>
-
-            </ul>
-            <!-- Left links -->
-            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <!-- Left links -->
-                <ul class="navbar-nav mb-2 mb-lg-0" style="margin-left: 5%">
-                    <li class="nav-item" style="font-size: 35px; color:#75736B;"><b>GRUPY</b></li>
-                </ul>
+                {% if perms.director.is_director %}
+                    <a href="{% url 'add_group' %}" class="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+                        <span class="material-symbols-outlined">add</span>
+                        <span class="truncate">DODAJ GRUPĘ</span>
+                    </a>
+                {% endif %}
             </div>
-            {% if perms.director.is_director %}
-                <ul class="navbar-nav d-flex flex-row me-1">
-                    <li class="nav-item">
-                        <button class="btn" onclick="location.href='{% url 'add_group' %}'"
-                                style="font-size: 25px; color: white; background-color: #75736B; text-decoration:none;">
-                            DODAJ GRUPĘ
-                        </button>
-                    </li>
-                </ul>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-lg text-center font-medium"
+                         style="background-color: #4A90E2; color: white;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
             {% endif %}
-        </div>
-        <!-- Container wrapper -->
-    </nav>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}"
-                 style="color: white; text-align: center; font-size: 30px">
-                {{ message }}
+
+            <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                <div class="flex-grow">
+                    <form method="GET" action="{% url 'list_groups' %}"> <label class="flex flex-col min-w-40 h-12 w-full">
+                        <div class="flex w-full flex-1 items-stretch rounded-lg h-full bg-card-light dark:bg-card-dark border border-border-light dark:border-border-dark">
+                            <div class="text-text-secondary-light dark:text-text-secondary-dark flex items-center justify-center pl-4">
+                                <button type="submit" class="p-0 border-none bg-transparent">
+                                    <span class="material-symbols-outlined">search</span>
+                                </button>
+                            </div>
+                            <input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg text-text-primary-light dark:text-text-primary-dark focus:outline-0 focus:ring-2 focus:ring-primary/50 border-none bg-transparent h-full placeholder:text-text-secondary-light dark:placeholder:text-text-secondary-dark px-2 text-base font-normal"
+                                   placeholder="Szukaj po nazwie grupy..."
+                                   name="q"
+                                   value="{{ search_query|default:'' }}"
+                            />
+                        </div>
+                    </label>
+                    </form>
+                </div>
             </div>
-        {% endfor %}
-    {% endif %}
 
-    <div class="container" style="margin-top: 85px;">
-        <div class="row row-cols-1 row-cols-md-3  g-4">
-            {% for group in page_obj %}
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
-
-                <div class="col-2 mt-4">
-                    <div class="card"
-                         style="background-color: #BAB1AB; border-color: #BAB1AB; height: 600px; width: 400px;">
-                        <div class="card-body text-white">
-                            <div class="card-image mt-5">
-                                <article class="photo" style="text-align: center">
-                                    <img src="{{ group.photo }}" alt="zdjecie"
-                                         style="text-align: center; height: 300px;">
-                                </article>
+                {% for group in page_obj %}
+                    <div class="flex flex-col bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark p-6 transition-shadow hover:shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-bold text-text-primary-light dark:text-text-primary-dark">{{ group.name }}</h2>
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 bg-secondary rounded-full"></span>
+                                <span class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark">Aktywna</span>
                             </div>
-                            <div class="col-4 mt-5">
-                                <div class="text-align-center">
-                                    <article style="text-align: center; bottom: 0">
-                                        <h3>
-                                            <button type="button" class="btn"
-                                                    style="position: absolute;font-size: 20px; color:
-                                                    white; background-color: #75736B; text-decoration:none; width: 250px; height: 80px;
-                                                     bottom: 5%; left: auto; right: auto"
-                                                    onclick="location.href='{% url 'group_details' pk=group.id %}'"
-                                            >{{ group.name }}</button>
-                                        </h3>
-                                    </article>
-                                </div>
-                            </div>
-
                         </div>
 
+                        <div class="flex justify-center mb-6">
+                            <img src="{{ group.photo }}" alt="Zdjęcie grupy"
+                                 class="rounded-lg object-cover"
+                                 style="max-height: 200px; width: 100%; border: 1px solid #E0E6EB;">
+                        </div>
+
+                        <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">
+                            Prowadzący: {% if group.teacher %}{{ group.teacher.get_full_name }}{% else %}Brak{% endif %}
+                        </p>
+
+                        <div class="flex items-center justify-start gap-6 text-sm mb-6">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">groups</span>
+                                <span class="font-medium">{{ group.current_students_count }} / {{ group.capacity }} Dzieci</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-accent">school</span>
+                                <span class="font-medium">1 Nauczyciel</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto flex gap-2">
+                            <a class="flex-1 text-center min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-10 tracking-[0.015em] hover:bg-primary/90 transition-colors"
+                               href="{% url 'group_details' pk=group.id %}">
+                                Zobacz Szczegóły
+                            </a>
+                        </div>
                     </div>
+                {% empty %}
+                    <div class="md:col-span-2 xl:col-span-3 flex flex-col items-center justify-center text-center p-12 bg-card-light dark:bg-card-dark rounded-xl border-2 border-dashed border-border-light dark:border-border-dark mt-6">
+                        <div class="w-24 h-24 mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary text-5xl">group_add</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Brak grup</h3>
+                        <p class="text-text-secondary-light dark:text-text-secondary-dark mb-4 max-w-sm">Jeszcze nie utworzyłeś żadnych grup. Kliknij poniżej, aby dodać pierwszą salę.</p>
+                        <a href="{% url 'add_group' %}" class="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+                            <span class="material-symbols-outlined">add</span>
+                            <span class="truncate">Utwórz pierwszą grupę</span>
+                        </a>
+                    </div>
+                {% endfor %}
 
-                </div>
+            </div>
 
-            {% endfor %}
+            <div class="flex justify-between items-center mt-10 p-4">
+
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}"
+                       class="flex items-center gap-1 text-primary hover:text-primary/80 font-medium">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                        Poprzednia
+                    </a>
+                {% else %}
+                    <span></span>
+                {% endif %}
+
+                <span class="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                Strona {{ page_obj.number }} z {{ page_obj.paginator.num_pages }}
+            </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}"
+                       class="flex items-center gap-1 text-primary hover:text-primary/80 font-medium">
+                        Następna
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </a>
+                {% else %}
+                    <span></span>
+                {% endif %}
+
+            </div>
+
         </div>
-    </div>
-
-
-
-    <div style="display: flex;">
-        {% if page_obj.has_previous %}
-
-            <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
-               style="position: absolute;font-size: 100px; color:#75736B; left: 0; bottom: 30%">
-                <svg xmlns="http://www.w3.org/2000/svg" width="200"
-                     height="200"
-                     fill="currentColor" class="bi bi-caret-left-fill"
-                     viewBox="0 0 16 16">
-                    <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                </svg>
-            </a>
-        {% endif %}
-        {% if page_obj.has_next %}
-            <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
-               style="position: absolute;font-size: 100px; color:#75736B; right: 0; bottom: 30%">
-                <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="currentColor"
-                     class="bi bi-caret-right-fill" viewBox="0 0 16 16">
-                    <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-                </svg>
-            </a>
-        {% endif %}
-    </div>
+    </main>
 {% endblock %}
