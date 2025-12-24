@@ -23,52 +23,58 @@ class Calendar(HTMLCalendar):
         self.kid = kid
         super(Calendar, self).__init__()
 
-    # formats a day as a td
-    # filter events by day
     def formatday(self, day, events):
-        events_per_day = events.filter(start_time__day=day)
-        d = ''
-        for event in events_per_day:
-            d += f'<li> {event.title} </li>'
+        if day == 0:
+            return '<div class="h-12 w-full"></div>' # Puste miejsce
 
-        presences = PresenceModel.objects.filter(kid=self.kid)
+        # Logika sprawdzania czy to weekend
+        is_weekend = calendar.weekday(self.year, self.month, day) in [5, 6]
 
-        if day != 0:
-            if calendar.weekday(year=self.year, month=self.month, day=day) == 5 or calendar.weekday(year=self.year,
-                                                                                                    month=self.month,
-                                                                                                    day=day) == 6:
-                return f"<td id='freeday' style='color: #E6DCD3'><span class='date'>{day}</span></td>"
-            for presence in presences:
+        # Pobieranie obecności dla tego dnia
+        presence = PresenceModel.objects.filter(kid=self.kid, day__year=self.year, day__month=self.month, day__day=day).first()
 
-                if day == presence.day.day and self.month == presence.day.month and self.year == presence.day.year:
-                    if presence.presenceType == 1:
-                        return f"<td id='days' style='background-color: #FF5F57'><span class='date'>{day}</span></td>"
-                    elif presence.presenceType == 2:
-                        return f"<td id='days' style='background-color: #A5FE90'><span class='date'>{day}</span></td>"
-                    elif presence.presenceType == 3:
-                        return f"<td id='days' style='background-color: #B4F3F5'><span class='date table-info'>{day}</span></td>"
-            return f"<td id='days'><span class='date'>{day}</span></td>"
-        return f'<td></td>'
+        # Sprawdzanie czy to dzisiaj
+        is_today = (timezone.now().year == self.year and timezone.now().month == self.month and timezone.now().day == day)
 
-    # formats a week as a tr
+        # Klasy bazowe
+        css_classes = "h-12 w-full text-sm font-medium rounded-xl transition-all flex items-center justify-center relative "
+
+        if is_today:
+            css_classes += "bg-primary text-white shadow-lg shadow-primary/30 z-10 "
+        elif is_weekend:
+            css_classes += "text-gray-300 dark:text-gray-700 cursor-not-allowed "
+        else:
+            css_classes += "text-gray-700 dark:text-gray-300 hover:bg-primary/10 "
+
+        # Nakładanie statusów kolorystycznych
+        status_dot = ""
+        if presence:
+            if presence.presenceType == 1: # Nieobecność
+                css_classes += "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 "
+                status_dot = '<span class="absolute bottom-1 size-1 bg-red-500 rounded-full"></span>'
+            elif presence.presenceType == 2: # Obecność
+                css_classes += "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 "
+                status_dot = '<span class="absolute bottom-1 size-1 bg-green-500 rounded-full"></span>'
+            elif presence.presenceType == 3: # Planowana
+                css_classes += "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 "
+                status_dot = '<span class="absolute bottom-1 size-1 bg-blue-500 rounded-full"></span>'
+
+        return f'<button type="button" id="days" class="{css_classes}"><span class="day-num">{day}</span>{status_dot}</button>'
+
     def formatweek(self, theweek, events):
         week = ''
         for d, weekday in theweek:
             week += self.formatday(d, events)
-        return f"<tr class='test'> {week} </tr>"
+        return f'<div class="grid grid-cols-7 gap-2">{week}</div>'
 
-    # formats a month as a table
-    # filter events by year and month
     def formatmonth(self, withyear=True):
-        events = FreeDaysModel.objects.filter(principal=self.director).filter(start_time__year=self.year,
-                                                                              start_time__month=self.month)
+        events = FreeDaysModel.objects.filter(principal=self.director, start_time__year=self.year, start_time__month=self.month)
 
-        cal = f'<table border="0" cellpadding="21" cellspacing="21" align="center" class="calendar">\n'
-        cal += f'{self.formatmonthname(self.year, self.month, withyear=withyear)}\n'
-        cal += f'{self.formatweekheader()}\n'
+        body = ""
         for week in self.monthdays2calendar(self.year, self.month):
-            cal += f'{self.formatweek(week, events)}\n'
-        return cal
+            body += self.formatweek(week, events)
+
+        return body
 
 
 class CalendarKid(LoginRequiredMixin, View):
@@ -115,23 +121,32 @@ class CalendarKid(LoginRequiredMixin, View):
             raise PermissionDenied
 
     def post(self, request, pk, month, year):
-        presence = request.POST.get('presence')
-        presence = presence.split(' ')
-        presence_type = presence.pop(-1)
-        month_name = presence[1]
-        month_number = datetime.strptime(month_name, '%B').month
-        presence[1] = f'{month_number}'
-        presence.reverse()
-        presence = '-'.join(presence)
-        presence_type = presenceChoices[int(presence_type)][0]
+        # Pobieramy dane wysłane z nowego formularza
+        presence_type_id = request.POST.get('presence') # np. "1", "2" lub "3"
+        day = request.POST.get('selected_day') # pobrane z pola hidden
+
+        if not day or not presence_type_id:
+            messages.error(request, "Nie wybrano dnia lub statusu.")
+            return redirect('calendar', pk=pk, month=month, year=year)
+
+        # Tworzymy pełną datę na podstawie parametrów URL i wybranego dnia
+        try:
+            date_str = f"{year}-{month}-{day}"
+            presence_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        except ValueError:
+            messages.error(request, "Nieprawidłowa data.")
+            return redirect('calendar', pk=pk, month=month, year=year)
+
         kid = get_object_or_404(Kid, id=int(pk))
-        test = PresenceModel.objects.filter(kid=kid).filter(day=presence).first()
-        if test:
-            test.presenceType = presence_type
-            test.save()
-        else:
-            PresenceModel.objects.create(day=presence, kid=kid, presenceType=presence_type)
-        messages.success(request, f"Zmieniono obecnosc")
+
+        # Aktualizacja lub stworzenie rekordu obecności
+        presence_record, created = PresenceModel.objects.update_or_create(
+            day=presence_date,
+            kid=kid,
+            defaults={'presenceType': int(presence_type_id)}
+        )
+
+        messages.success(request, f"Zmieniono status obecności dla {kid.first_name}.")
         return redirect('calendar', pk=pk, month=month, year=year)
 
 
