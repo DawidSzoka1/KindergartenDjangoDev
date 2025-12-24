@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
-from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import UpdateView
 
 from groups.models import Groups
@@ -35,54 +35,44 @@ class Home(View):
 
 class PostListView(LoginRequiredMixin, View):
     def get(self, request):
-        user = request.user.get_user_permissions()
-        form = None
-        if user == {'director.is_director'}:
-            director = Director.objects.get(user=request.user.id)
-            posts = director.post_set.filter(is_active=True).order_by('-date_posted')
-            groups = director.groups_set.filter(is_active=True)
-            form = PostAddForm(director=Director.objects.get(user=request.user.id),
-                               initial={'author': director.user, 'director': director})
+        user_perm = request.user.get_user_permissions()
 
-        elif user == {'teacher.is_teacher'}:
-            employee = Employee.objects.get(user=request.user.id)
-            posts = employee.principal.first().post_set.filter(is_active=True).order_by('-date_posted')
-            form = PostAddForm(employee=employee,
-                               initial={'author': employee.user, 'director': employee.principal.first()})
-            groups = employee.group
-        elif user == {'parent.is_parent'}:
-            parent = ParentA.objects.get(user=request.user.id)
-            kids = parent.kids.filter(is_active=True)
-            groups = kids.values_list('group__id', flat=True)
-            posts = Post.objects.filter(director=parent.principal.first().id).filter(group__id__in=groups).filter(
-                is_active=True).order_by(
-                '-date_posted')
-        else:
-            raise PermissionDenied
+        # Pobieranie parametrów filtra
+        selected_groups = request.GET.getlist('filter_group')
+        timeframe = request.GET.get('timeframe', 'upcoming')
 
-        paginator = Paginator(posts, 3)
-        page_number = request.GET.get("page")
-        page_obj = paginator.get_page(page_number)
-        return render(request, 'post_list.html', {'page_obj': page_obj, 'groups': groups, 'form': form})
+        # Podstawowy QuerySet
+        posts = Post.objects.filter(is_active=True)
 
-    def post(self, request):
-        user = request.user.get_user_permissions()
-        form = None
-        if user == {'director.is_director'}:
-            user = Director.objects.get(user=request.user.id)
-            form = PostAddForm(request.POST, director=Director.objects.get(user=request.user.id),
-                               initial={'author': user.user, 'director': user})
+        if user_perm == {'director.is_director'}:
+            director = request.user.director
+            posts = posts.filter(director=director)
+            groups = Groups.objects.filter(principal=director, is_active=True)
+        elif user_perm == {'teacher.is_teacher'}:
+            employee = request.user.employee
+            posts = posts.filter(director=employee.principal.first())
+            groups = Groups.objects.filter(principal=employee.principal.first(), is_active=True)
+        else: # Parent
+            parent = request.user.parenta
+            user_groups = parent.kids.filter(is_active=True).values_list('group', flat=True)
+            posts = posts.filter(group__id__in=user_groups)
+            groups = Groups.objects.filter(id__in=user_groups)
 
-        elif user == {'teacher.is_teacher'}:
-            employee = Employee.objects.get(user=request.user.id)
-            form = PostAddForm(request.POST, employee=employee,
-                               initial={'author': employee.user, 'director': employee.principal.first()})
-        if form.is_valid():
-            form.save()
-            messages.success(request, f'Dodano')
-            return redirect('post_list_view')
-        messages.error(request, f'{form.errors}')
-        return redirect('post_list_view')
+        # Aplikowanie filtrów z bocznego paska
+        if selected_groups:
+            posts = posts.filter(group__id__in=selected_groups).distinct()
+
+        # Sortowanie po dacie wydarzenia
+        posts = posts.order_by('event_date', '-date_posted')
+
+        paginator = Paginator(posts, 10)
+        page_obj = paginator.get_page(request.GET.get("page"))
+
+        return render(request, 'post_list.html', {
+            'page_obj': page_obj,
+            'groups_list': groups,
+            'selected_groups': list(map(int, selected_groups))
+        })
 
 
 class PostSearchView(LoginRequiredMixin, View):
@@ -138,12 +128,14 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
     def get_success_url(self):
         return reverse_lazy('post_list_view')
 
-    def get_form_kwargs(self, **kwargs):
-        """ Passes the request object to the form class.
-         This is necessary to only display members that belong to a given user"""
-
-        kwargs = super(PostUpdateView, self).get_form_kwargs()
-        kwargs.update({'current_user': self.request.user})
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        user = self.request.user
+        # Dopasowujemy do nowej logiki formularza
+        if hasattr(user, 'director'):
+            kwargs.update({'director': user.director})
+        elif hasattr(user, 'employee'):
+            kwargs.update({'employee': user.employee})
         return kwargs
 
     def form_valid(self, form):
@@ -173,3 +165,47 @@ class PostDeleteView(LoginRequiredMixin, View):
             messages.success(request, 'Poprawnie usunięto wydarzenie')
             return redirect('post_list_view')
         raise PermissionDenied
+
+
+class PostAddView(LoginRequiredMixin, View):
+    def get(self, request):
+        user = request.user
+        # Wyznaczamy dyrektora placówki dla autora
+        if hasattr(user, 'director'):
+            director_obj = user.director
+            form_kwargs = {'director': director_obj}
+        elif hasattr(user, 'employee'):
+            director_obj = user.employee.principal.first()
+            form_kwargs = {'employee': user.employee}
+        else:
+            raise PermissionDenied
+
+        # Dodajemy dane początkowe dla pól ukrytych
+        form = PostAddForm(
+            initial={
+                'author': user.id,
+                'director': director_obj.id,
+                'is_active': True
+            },
+            **form_kwargs
+        )
+        return render(request, 'post_add.html', {'form': form})
+
+    def post(self, request):
+        user = request.user
+        # Inicjalizacja z POST i odpowiednimi kwargami filtracji grup
+        if hasattr(user, 'director'):
+            form = PostAddForm(request.POST, director=user.director)
+        elif hasattr(user, 'employee'):
+            form = PostAddForm(request.POST, employee=user.employee)
+
+        if form.is_valid():
+            # Formularz ma już author i director z pól ukrytych, więc save() zadziała
+            post = form.save()
+            # save_m2m() jest wywoływane automatycznie przez form.save(),
+            # chyba że użyjesz commit=False
+            messages.success(request, "Wydarzenie zostało pomyślnie opublikowane.")
+            return redirect('post_list_view')
+
+        # Jeśli nie przeszło walidacji, renderuj z błędami
+        return render(request, 'post_add.html', {'form': form})

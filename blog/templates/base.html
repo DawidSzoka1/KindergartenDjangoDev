@@ -227,6 +227,36 @@
         </aside>
 {% endif %}
     <main class="flex-1 bg-background-light dark:bg-background-dark p-8">
+        {% if messages %}
+            <div class="max-w-4xl mx-auto mb-6 space-y-3">
+                {% for message in messages %}
+                    <div class="flex items-center gap-3 p-4 rounded-xl border shadow-sm transition-all animate-in fade-in slide-in-from-top-2
+                        {% if message.tags == 'success' %}
+                            bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-300
+                        {% elif message.tags == 'error' %}
+                            bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300
+                        {% elif message.tags == 'warning' %}
+                            bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-300
+                        {% else %}
+                            bg-purple-50 border-purple-200 text-primary dark:bg-primary/10 dark:border-primary/20 dark:text-primary
+                        {% endif %}">
+
+                        <span class="material-symbols-outlined">
+                            {% if message.tags == 'success' %}check_circle
+                            {% elif message.tags == 'error' %}error
+                            {% elif message.tags == 'warning' %}warning
+                            {% else %}info{% endif %}
+                        </span>
+
+                        <p class="text-sm font-semibold leading-normal">{{ message }}</p>
+
+                        <button onclick="this.parentElement.remove()" class="ml-auto hover:opacity-70 transition-opacity">
+                            <span class="material-symbols-outlined text-sm">close</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         {% block content %}{% endblock %}
     </main>
 </div>

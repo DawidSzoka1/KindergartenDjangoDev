@@ -10,39 +10,64 @@ class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
 
 
 class PostAddForm(forms.ModelForm):
-
-    def __init__(self, *args, current_user=None, **kwargs):
-        self.director = kwargs.pop("director", None)
-        self.employee = kwargs.pop("employee", None)
-        super().__init__(*args, **kwargs)
-        if current_user is not None:
-            if current_user.get_user_permissions() == {'director.is_director'}:
-                self.fields['group'].queryset = current_user.director.groups_set.filter(is_active=True)
-
-            elif current_user.get_user_permissions() == {'teacher.is_teacher'}:
-                self.fields['group'].queryset = current_user.employee.principal.first().groups_set.filter(is_active=True)
-
-        elif self.director is not None:
-            self.fields['group'].queryset = self.director.groups_set.filter(is_active=True)
-        elif self.employee is not None:
-            self.fields['group'].queryset = self.employee.principal.first().groups_set.filter(is_active=True)
-
     class Meta:
         model = Post
-        fields = "__all__"
+        # Wybieramy konkretne pola, aby zachować kontrolę nad kolejnością
+        fields = ['title', 'event_date', 'category', 'content', 'group', 'author', 'director', 'is_active']
 
         widgets = {
-            'author': forms.HiddenInput,
-            'director': forms.HiddenInput,
-            'content': forms.Textarea(attrs={'placeholder': 'Zacznij wpis..'})
+            'author': forms.HiddenInput(),
+            'director': forms.HiddenInput(),
+            'is_active': forms.HiddenInput(),
+            'title': forms.TextInput(attrs={
+                'placeholder': 'np. Wycieczka do zoo',
+                'class': 'form-control'
+            }),
+            'event_date': forms.DateInput(
+                format='%Y-%m-%d',attrs={
+                'type': 'date', # Wywołuje systemowy kalendarz w przeglądarce
+                'class': 'form-control'
+            }),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'content': forms.Textarea(attrs={
+                'placeholder': 'Opisz szczegóły wydarzenia...',
+                'rows': 4,
+                'class': 'form-control'
+            }),
+            # Widget CheckboxSelectMultiple pozwoli nam na renderowanie siatki w HTML
+            'group': forms.CheckboxSelectMultiple(),
         }
 
         labels = {
-            'content': ''
+            'title': 'Tytuł wydarzenia',
+            'event_date': 'Data wydarzenia',
+            'category': 'Typ ogłoszenia',
+            'content': 'Treść wiadomości',
+            'group': 'Grupy docelowe',
         }
 
-    group = CustomModelMultipleChoiceField(
-        queryset=None,
-        widget=forms.CheckboxSelectMultiple,
-        label=''
-    )
+    def __init__(self, *args, **kwargs):
+        # Wyciągamy obiekty dyrektora lub pracownika przekazane z widoku
+        director = kwargs.pop("director", None)
+        employee = kwargs.pop("employee", None)
+
+        super().__init__(*args, **kwargs)
+
+        # Logika filtrowania grup w zależności od tego, kto dodaje post
+        if director:
+            # Dyrektor widzi wszystkie aktywne grupy w swojej placówce
+            self.fields['group'].queryset = Groups.objects.filter(
+                principal=director,
+                is_active=True
+            ).order_by('name')
+
+        elif employee:
+            # Nauczyciel widzi tylko grupy, do których jest przypisany
+            # Używamy employee.group, ponieważ model Employee ma relację do Groups
+            self.fields['group'].queryset = Groups.objects.filter(
+                id=employee.group.id,
+                is_active=True
+            ) if employee.group else Groups.objects.none()
+
+        # Dodatkowa klasa dla etykiet grup, aby ułatwić stylowanie w Tailwind
+        self.fields['group'].widget.attrs.update({'class': 'group-checkbox-input'})
