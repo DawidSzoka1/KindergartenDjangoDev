@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="flex-1 w-full max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
+        <nav aria-label="Breadcrumb">
+            <ol class="flex items-center gap-2 text-sm font-medium">
+                <li><a href="{% url 'list_payments_plans' %}" class="text-gray-500 dark:text-gray-400 hover:text-primary transition-colors">Finanse</a></li>
+                <li class="text-gray-400"><span class="material-symbols-outlined text-sm align-middle">chevron_right</span></li>
+                <li><span class="text-gray-900 dark:text-white font-bold">Szczegóły Planu</span></li>
+            </ol>
+        </nav>
+
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-3">
+                    <h1 class="text-3xl font-black tracking-tight text-gray-900 dark:text-white uppercase">{{ plan.name }}</h1>
+                    <span class="inline-flex items-center rounded-full bg-primary/20 dark:bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-green-700 dark:text-green-300 ring-1 ring-green-600/20 uppercase">
+                    {% if not plan.is_archived %}Aktywny{% else %}Archiwalny{% endif %}
+                </span>
+                </div>
+                <p class="text-gray-500 text-sm">Plan ID: #PP-{{ plan.id }} • Zarządzany przez: {{ plan.principal }}</p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <form method="POST" action="{% url 'payment_plan_delete' plan.id %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Czy na pewno usunąć plan?')" class="group flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-red-50 transition-colors">
+                        <span class="material-symbols-outlined text-[20px] group-hover:text-red-600">delete</span>
+                        <span>Usuń</span>
+                    </button>
+                </form>
+                <a href="{% url 'payment_plan_update' plan.id %}" class="flex items-center justify-center gap-2 rounded-lg bg-primary hover:bg-primary/90 px-4 py-2.5 text-sm font-bold text-black transition-colors shadow-sm">
+                    <span class="material-symbols-outlined text-[20px]">edit</span>
+                    <span>Edytuj Plan</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 flex flex-col gap-6">
+                <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a2e1a] overflow-hidden shadow-sm">
+                    <div class="border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between bg-gray-50/50 dark:bg-white/5">
+                        <h2 class="font-bold text-lg text-gray-900 dark:text-white uppercase tracking-widest text-xs">Konfiguracja Finansowa</h2>
+                        <span class="material-symbols-outlined text-primary">payments</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2">
+                        <div class="p-6 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-800">
+                            <p class="text-gray-500 text-xs font-black uppercase mb-1">Czesne ({{ plan.get_frequency_display }})</p>
+                            <p class="text-3xl font-black text-primary tracking-tight">{{ plan.price }} zł</p>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-500 text-xs font-black uppercase mb-1">Przewidywany Przychód Miesięczny</p>
+                            <p class="text-3xl font-black text-gray-900 dark:text-white tracking-tight">{{ projected_revenue }} zł</p>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 dark:border-gray-800 grid grid-cols-1 sm:grid-cols-2 gap-px bg-gray-200 dark:bg-gray-800">
+                        <div class="bg-white dark:bg-[#1a2e1a] p-4 text-center">
+                            <p class="text-gray-400 text-[10px] font-black uppercase mb-1">Zniżki</p>
+                            <p class="text-sm font-bold">{{ plan.discount_info|default:"Brak" }}</p>
+                        </div>
+                        <div class="bg-white dark:bg-[#1a2e1a] p-4 text-center">
+                            <p class="text-gray-400 text-[10px] font-black uppercase mb-1">Status</p>
+                            <p class="text-sm font-bold">{% if plan.is_active %}AKTYWNY{% else %}NIEAKTYWNY{% endif %}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a2e1a] p-6 shadow-sm">
+                    <h3 class="font-black text-gray-900 dark:text-white text-xs uppercase tracking-widest mb-3">Opis Planu</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm italic">
+                        "{{ plan.description|default:"Ten plan nie posiada jeszcze opisu." }}"
+                    </p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1 flex flex-col gap-6">
+                <div class="rounded-xl bg-white dark:bg-[#1a2e1a] border border-gray-200 dark:border-gray-800 shadow-sm p-6 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-8 -mt-8"></div>
+                    <h3 class="font-bold text-lg text-gray-900 dark:text-white relative z-10">Status Zapisów</h3>
+                    <div class="mt-6 relative z-10">
+                        <div class="flex justify-between items-end mb-2">
+                            <span class="text-5xl font-black text-primary">{{ kids_count }}</span>
+                            <span class="text-sm font-bold text-gray-400 uppercase tracking-widest">Aktywnych dzieci</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2.5">
+                            <div class="bg-primary h-2.5 rounded-full" style="width: {{ capacity_percent }}%"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-4 mt-2">
+            <div class="border-b border-gray-200 dark:border-gray-800">
+                <nav class="flex space-x-8">
+                    <button class="border-primary text-primary border-b-[3px] py-4 px-1 text-sm font-black flex items-center gap-2 uppercase tracking-widest">
+                        Aktywne Zapisy
+                        <span class="bg-primary/20 text-green-800 py-0.5 px-2 rounded-full text-xs ml-1">{{ kids_count }}</span>
+                    </button>
+                </nav>
+            </div>
+
+            <div class="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a2e1a] overflow-hidden shadow-sm">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+                        <thead class="bg-gray-50 dark:bg-white/5">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Student</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Grupa</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Data Zapisania</th>
+                            <th class="px-6 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Opcje</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                        {% for kid in active_kids %}
+                            <tr class="hover:bg-primary/5 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-3">
+                                        <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center font-black text-primary uppercase text-xs">
+                                            {{ kid.first_name|slice:":1" }}{{ kid.last_name|slice:":1" }}
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-bold text-gray-900 dark:text-white">{{ kid.first_name }} {{ kid.last_name }}</div>
+                                            <div class="text-[10px] text-gray-400 font-bold uppercase">{{ kid.years_old }} lat(a)</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600 dark:text-gray-300">
+                                    {{ kid.group.name|default:"BRAK" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ kid.start|date:"d M, Y" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right">
+                                    <a href="{% url 'kid_details' kid.id %}" class="text-gray-400 hover:text-primary transition-colors">
+                                        <span class="material-symbols-outlined">visibility</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="px-6 py-12 text-center text-gray-400 italic font-medium">Brak aktywnych dzieci przypisanych do tego planu.</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
