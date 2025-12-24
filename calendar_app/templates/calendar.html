@@ -9,39 +9,44 @@
                 <p class="text-gray-500">Przeglądaj historię i planuj nieobecności dziecka.</p>
             </div>
 
-            {% if not perms.parent.is_parent %}
-                <div class="mb-8 bg-white dark:bg-[#0f1d0f] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
-                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 block">Wybrane Dziecko</label>
-                    <div class="flex items-center gap-4">
-                        <div class="size-12 rounded-full bg-primary/20 flex items-center justify-center font-black text-primary uppercase">
-                            {{ kid.first_name|slice:":1" }}{{ kid.last_name|slice:":1" }}
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ kid.first_name }} {{ kid.last_name }}</h3>
-                            <p class="text-sm text-gray-500">{{ kid.group.name }}</p>
-                        </div>
-                        <a href="{% url 'kid_details' kid.id %}" class="ml-auto px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-xl text-xs font-bold hover:bg-primary hover:text-white transition-all uppercase">Profil</a>
+
+            <div class="mb-8 bg-white dark:bg-[#0f1d0f] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                <label class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 block">Wybrane
+                    Dziecko</label>
+                <div class="flex items-center gap-4">
+                    <div class="size-12 rounded-full bg-primary/20 flex items-center justify-center font-black text-primary uppercase">
+                        {{ kid.first_name|slice:":1" }}{{ kid.last_name|slice:":1" }}
                     </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ kid.first_name }} {{ kid.last_name }}</h3>
+                        <p class="text-sm text-gray-500">{{ kid.group.name }}</p>
+                    </div>
+                    <a href="{% url 'kid_details' kid.id %}"
+                       class="ml-auto px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-xl text-xs font-bold hover:bg-primary hover:text-white transition-all uppercase">Profil</a>
                 </div>
-            {% endif %}
+            </div>
+
 
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
                 <div class="lg:col-span-3">
                     <div class="bg-white dark:bg-[#0f1d0f] p-6 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm">
                         <div class="flex items-center justify-between mb-6">
-                            <a href="{% url 'calendar' kid.id month_previous year_previous %}" class="size-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400">
+                            <a href="{% url 'calendar' kid.id month_previous year_previous %}"
+                               class="size-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400">
                                 <span class="material-symbols-outlined">chevron_left</span>
                             </a>
                             <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
                                 {{ month_name }} {{ year }}
                             </h2>
-                            <a href="{% url 'calendar' kid.id month_next year_next %}" class="size-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400">
+                            <a href="{% url 'calendar' kid.id month_next year_next %}"
+                               class="size-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400">
                                 <span class="material-symbols-outlined">chevron_right</span>
                             </a>
                         </div>
 
                         <div class="grid grid-cols-7 gap-2 mb-2 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                            <span>Pn</span><span>Wt</span><span>Śr</span><span>Czw</span><span>Pt</span><span class="text-red-300">So</span><span class="text-red-300">Nd</span>
+                            <span>Pn</span><span>Wt</span><span>Śr</span><span>Czw</span><span>Pt</span><span
+                                class="text-red-300">So</span><span class="text-red-300">Nd</span>
                         </div>
 
                         <div class="flex flex-col gap-2">
@@ -63,36 +68,51 @@
                 </div>
 
                 <div class="lg:col-span-2 flex flex-col gap-6">
-                    <form method="POST" class="bg-white dark:bg-[#0f1d0f] p-8 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col h-full">
+                    <form method="POST"
+                          class="bg-white dark:bg-[#0f1d0f] p-8 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col h-full">
                         {% csrf_token %}
-                        <h3 class="text-lg font-black text-gray-900 dark:text-white mb-6 uppercase tracking-tight">Zarządzaj Dniem</h3>
+                        <h3 class="text-lg font-black text-gray-900 dark:text-white mb-6 uppercase tracking-tight">
+                            Zarządzaj Dniem</h3>
 
                         <div id="wholeDrop" style="display: none">
-                            <p class="text-xs font-bold text-gray-400 uppercase mb-4">Wybrana data: <span id="selected-date-text" class="text-primary"></span></p>
+                            <p class="text-xs font-bold text-gray-400 uppercase mb-4">Ustaw status dla wybranego dnia:: <span
+                                    id="selected-date-text" class="text-primary"></span></p>
 
                             <div class="space-y-3">
-                                <label class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-transparent cursor-pointer hover:border-primary transition-all">
-                                    <input type="radio" name="presence" value="2" checked class="size-5 text-primary focus:ring-primary/20">
-                                    <span class="font-bold text-gray-700 dark:text-gray-200">Obecność</span>
-                                </label>
-                                <label class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-transparent cursor-pointer hover:border-primary transition-all">
-                                    <input type="radio" name="presence" value="1" class="size-5 text-red-500 focus:ring-red-200">
-                                    <span class="font-bold text-gray-700 dark:text-gray-200">Nieobecność</span>
-                                </label>
-                                <label class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-transparent cursor-pointer hover:border-primary transition-all">
-                                    <input type="radio" name="presence" value="3" class="size-5 text-blue-500 focus:ring-blue-200">
-                                    <span class="font-bold text-gray-700 dark:text-gray-200">Planowana</span>
-                                </label>
+                                {% if perms.parent.is_parent %}
+                                    <label class="flex items-center gap-3 p-4 border rounded-xl cursor-pointer hover:bg-primary/5">
+                                        <input type="radio" name="presence" value="3" checked>
+                                        <span class="material-symbols-outlined text-orange-500">event_busy</span>
+                                        <div>
+                                            <p class="font-bold">Planowana nieobecność</p>
+                                            <p class="text-xs text-gray-400">Poinformuj placówkę o nieobecności dziecka</p>
+                                        </div>
+                                    </label>
+                                {% elif perms.teacher.is_teacher or perms.director.is_director %}
+                                    <label class="flex items-center gap-3 p-4 border rounded-xl cursor-pointer">
+                                        <input type="radio" name="presence" value="2">
+                                        <span class="material-symbols-outlined text-green-500">check_circle</span>
+                                        <p class="font-bold">Obecny</p>
+                                    </label>
+                                    <label class="flex items-center gap-3 p-4 border rounded-xl cursor-pointer">
+                                        <input type="radio" name="presence" value="1">
+                                        <span class="material-symbols-outlined text-red-500">cancel</span>
+                                        <p class="font-bold">Nieobecny</p>
+                                    </label>
+                                {% endif %}
                             </div>
 
-                            <button type="submit" class="w-full mt-8 py-4 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform uppercase tracking-tighter">
+                            <button type="submit"
+                                    class="w-full mt-8 py-4 bg-primary text-white font-black rounded-2xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform uppercase tracking-tighter">
                                 Zapisz Status
                             </button>
                         </div>
 
-                        <div id="no-selection-msg" class="flex-1 flex flex-col items-center justify-center text-center py-10">
+                        <div id="no-selection-msg"
+                             class="flex-1 flex flex-col items-center justify-center text-center py-10">
                             <span class="material-symbols-outlined text-4xl text-gray-200 mb-2">touch_app</span>
-                            <p class="text-sm text-gray-400 font-medium">Kliknij wybrany dzień w kalendarzu, aby zmienić status.</p>
+                            <p class="text-sm text-gray-400 font-medium">Kliknij wybrany dzień w kalendarzu, aby zmienić
+                                status.</p>
                         </div>
 
                         <input type="hidden" name="selected_day" id="selected_day_input">

@@ -121,32 +121,33 @@ class CalendarKid(LoginRequiredMixin, View):
             raise PermissionDenied
 
     def post(self, request, pk, month, year):
-        # Pobieramy dane wysłane z nowego formularza
-        presence_type_id = request.POST.get('presence') # np. "1", "2" lub "3"
-        day = request.POST.get('selected_day') # pobrane z pola hidden
+        presence_type_id = request.POST.get('presence')
+        day = request.POST.get('selected_day')
 
-        if not day or not presence_type_id:
-            messages.error(request, "Nie wybrano dnia lub statusu.")
-            return redirect('calendar', pk=pk, month=month, year=year)
+        # Budujemy datę wybraną przez użytkownika
+        selected_date = datetime.strptime(f"{year}-{month}-{day}", '%Y-%m-%d').date()
+        today = timezone.now().date()
 
-        # Tworzymy pełną datę na podstawie parametrów URL i wybranego dnia
-        try:
-            date_str = f"{year}-{month}-{day}"
-            presence_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        except ValueError:
-            messages.error(request, "Nieprawidłowa data.")
+        # BLOKADA: Nie można zmieniać dni wcześniejszych niż dzisiaj
+        if selected_date < today:
+            messages.error(request, "Nie można zmieniać statusu obecności dla dni przeszłych.")
             return redirect('calendar', pk=pk, month=month, year=year)
 
         kid = get_object_or_404(Kid, id=int(pk))
 
-        # Aktualizacja lub stworzenie rekordu obecności
-        presence_record, created = PresenceModel.objects.update_or_create(
-            day=presence_date,
+        # Ograniczenie dla rodzica - tylko planowana nieobecność (typ 3/2 w zależności od modelu)
+        if 'parent.is_parent' in request.user.get_user_permissions():
+            if int(presence_type_id) != 3: # Zakładając, że 3 to planowana nieobecność
+                messages.error(request, "Rodzic może zgłaszać tylko planowane nieobecności.")
+                return redirect('calendar', pk=pk, month=month, year=year)
+
+        PresenceModel.objects.update_or_create(
+            day=selected_date,
             kid=kid,
             defaults={'presenceType': int(presence_type_id)}
         )
 
-        messages.success(request, f"Zmieniono status obecności dla {kid.first_name}.")
+        messages.success(request, f"Zaktualizowano status dla dnia {day}.")
         return redirect('calendar', pk=pk, month=month, year=year)
 
 
