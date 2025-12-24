@@ -98,7 +98,11 @@
                                 <span class="material-symbols-outlined">shield_person</span>
                             </div>
                             <div>
-                                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ principal.first_name }} {{ principal.last_name }}</p>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white">{% if principal.first_name or principal.last_name %}
+                                    {{ principal.first_name }} {{ principal.last_name }}
+                                {% else %}
+                                    {{ principal.user.email }}
+                                {% endif %}</p>
                                 <p class="text-[10px] text-gray-400 uppercase font-black">Dyrektor Placówki</p>
                             </div>
                         </a>
@@ -118,8 +122,12 @@
                                 <span class="material-symbols-outlined">person</span>
                             </div>
                             <div>
-                                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ teacher.first_name }} {{ teacher.last_name }}</p>
-                                <p class="text-[10px] text-gray-400 uppercase font-black">Nauczyciel: {{ teacher.group.name }}</p>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white">{% if teacher.first_name or teacher.last_name %}
+                                    {{ teacher.first_name }} {{ teacher.last_name }}
+                                {% else %}
+                                    {{ teacher.user.email }}
+                                {% endif %}</p>
+                                <p class="text-[10px] text-gray-400 uppercase font-black">Nauczyciel: {{ teacher.group.name|default:"Brak przypisanej grupy" }}</p>
                             </div>
                         </a>
                     {% endfor %}

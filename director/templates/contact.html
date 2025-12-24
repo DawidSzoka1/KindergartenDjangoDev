@@ -69,11 +69,19 @@
                             <div class="p-4 bg-white dark:bg-[#0f1d0f] rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center justify-between group">
                                 <div class="flex items-center gap-4">
                                     <div class="size-12 rounded-full bg-blue-50 dark:bg-gray-800 flex items-center justify-center text-blue-500 font-bold">
+                                        {% if t.first_name %}
                                         {{ t.first_name|slice:":1" }}
+                                            {% else %}
+                                            {{ t.user.email|slice:":1" }}
+                                        {% endif %}
                                     </div>
                                     <div>
-                                        <p class="font-bold text-gray-900 dark:text-white">{{ t.first_name }} {{ t.last_name }}</p>
-                                        <p class="text-xs text-gray-400">Grupa: {{ t.group.name }}</p>
+                                        <p class="font-bold text-gray-900 dark:text-white">{% if t.first_name or t.last_name %}
+                                            {{ t.first_name }} {{ t.last_name }}
+                                        {% else %}
+                                            {{ t.user.email }}
+                                        {% endif %}</p>
+                                        <p class="text-xs text-gray-400">Grupa: {{ t.group.name|default:"Brak przypisanej grupy" }}</p>
                                     </div>
                                 </div>
                                 <div class="flex gap-2">

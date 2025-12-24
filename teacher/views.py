@@ -34,17 +34,18 @@ class EmployeeProfileView(LoginRequiredMixin, View):
                 return render(request, 'employee-profile.html',
                               {'employee': employee})
         elif user.get_user_permissions() == {'parent.is_parent'}:
-            group = employee.group
-            kids = group.kid_set.filter(is_active=True)
-            parent = ParentA.objects.get(user=user.id)
-            allow = False
-            for kid in kids:
-                if kid in parent.kids.filter(is_active=True):
-                    allow = True
-                    break
-            if allow:
-                return render(request, 'employee-profile.html',
-                              {'employee': employee})
+            parent = get_object_or_404(ParentA, user=user)
+            parent_kids_in_teacher_groups = parent.kids.filter(
+                is_active=True,
+                group=employee.group
+            ).select_related('group')
+            if parent_kids_in_teacher_groups.exists():
+                # Wyciągamy unikalne grupy tych dzieci
+                assigned_groups = set(kid.group for kid in parent_kids_in_teacher_groups)
+                return render(request, 'employee-profile.html', {
+                    'employee': employee,
+                    'groups_list': assigned_groups
+                })
         raise PermissionDenied
 
 
