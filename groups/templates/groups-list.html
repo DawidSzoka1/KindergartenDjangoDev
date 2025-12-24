@@ -63,10 +63,6 @@
                                  style="max-height: 200px; width: 100%; border: 1px solid #E0E6EB;">
                         </div>
 
-                        <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">
-                            Prowadzący: {% if group.teacher %}{{ group.teacher.get_full_name }}{% else %}Brak{% endif %}
-                        </p>
-
                         <div class="flex items-center justify-start gap-6 text-sm mb-6">
                             <div class="flex items-center gap-2">
                                 <span class="material-symbols-outlined text-primary">groups</span>
@@ -74,7 +70,7 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="material-symbols-outlined text-accent">school</span>
-                                <span class="font-medium">1 Nauczyciel</span>
+                                <span class="font-medium">{{ teachers_count|default:'0' }} Nauczyciel</span>
                             </div>
                         </div>
 

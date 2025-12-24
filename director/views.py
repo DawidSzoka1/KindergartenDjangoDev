@@ -161,6 +161,15 @@ class ContactView(LoginRequiredMixin, View):
         if 'director.is_director' in user.get_all_permissions():
             director_obj = Director.objects.get(user=user.id)
             contact = ContactModel.objects.filter(director=director_obj).first()
+
+            # Dyrektor widzi wszystkich swoich nauczycieli
+            teachers_list = Employee.objects.filter(principal=director_obj, is_active=True).order_by('last_name')
+            t_paginator = Paginator(teachers_list, 10)
+            context['teachers'] = t_paginator.get_page(request.GET.get('t_page'))
+
+            # Dyrektor widzi innych dyrektorów w tej samej placówce (opcjonalnie)
+            principals_list = Director.objects.filter(id=director_obj.id) # Tu można rozszerzyć o relacje placówki
+            context['principals'] = principals_list
         elif 'teacher.is_teacher' in user.get_all_permissions():
             employee = Employee.objects.get(user=user.id)
             director_obj = employee.principal.all().first()
@@ -196,7 +205,7 @@ class ContactUpdateView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
     template_name = 'contact-update.html'
     form_class = ContactAddForm
     success_url = reverse_lazy('contact')
-    success_message = "Dane kontaktowe zmieniono poprawnie"
+    success_message = "Dane kontaktowe placówki zostały zaktualizowane."
 
     def form_valid(self, form):
         form.instance.save()

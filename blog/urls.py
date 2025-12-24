@@ -6,6 +6,7 @@ urlpatterns = [
     path("wydarzenia/wyszukane/", views.PostSearchView.as_view(), name='post_search'),
     path("wydarzenia/zmień/<int:pk>/", views.PostUpdateView.as_view(), name='post_update'),
     path("wydarzenia/usun/<int:pk>/", views.PostDeleteView.as_view(), name='post_delete'),
+    path("wydarzenia/<int:pk>/", views.PostDetailView.as_view(), name='post_detail'),
     path("wydarzenia/dodaj/", views.PostAddView.as_view(), name='post_add'),
     path("", views.Home.as_view(), name="home_page"),
 ]

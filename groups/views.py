@@ -85,7 +85,8 @@ class GroupsListView(LoginRequiredMixin, View):
 
         # 3. Dodanie adnotacji z licznikiem dzieci
         groups_qs = groups_qs.annotate(
-            child_count=Count('kid', filter=Q(kid__is_active=True))
+            child_count=Count('kid', filter=Q(kid__is_active=True)),
+            teachers_count=Count('employee', filter=Q(employee__is_active=True)),
         ).order_by('-id')
 
         groups = groups_qs  # Zmieniamy nazwę zmiennej dla czytelności

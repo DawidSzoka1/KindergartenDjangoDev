@@ -3,51 +3,56 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-    <div class="flex-1 flex flex-col h-full overflow-y-auto bg-background-light dark:bg-background-dark">
-        <main class="flex-1 p-4 sm:p-6 md:p-8">
+    <div class="flex-1 flex flex-col h-full bg-background-light dark:bg-background-dark">
+        <main class="flex-1 p-4 sm:p-8">
             <div class="max-w-4xl mx-auto">
-
-                <div class="flex flex-wrap gap-2 mb-6 text-sm">
-                    <a class="text-[#618961] dark:text-gray-400 font-medium hover:text-primary transition-colors" href="{% url 'home_page' %}">Dashboard</a>
-                    <span class="text-[#618961] dark:text-gray-400 font-medium">/</span>
-                    <a class="text-[#618961] dark:text-gray-400 font-medium hover:text-primary transition-colors" href="{% url 'contact' %}">Dane Kontaktowe</a>
-                    <span class="text-[#618961] dark:text-gray-400 font-medium">/</span>
-                    <span class="text-[#111811] dark:text-white font-medium">Edycja</span>
+                <div class="flex items-center gap-2 mb-8 text-sm font-bold uppercase tracking-widest text-[#618961]">
+                    <a href="{% url 'home_page' %}" class="hover:text-primary transition-colors">Dashboard</a>
+                    <span>/</span>
+                    <a href="{% url 'contact' %}" class="hover:text-primary transition-colors">Kontakt</a>
+                    <span>/</span>
+                    <span class="text-gray-400">Edycja danych</span>
                 </div>
 
-                <div class="bg-white dark:bg-[#1a2e1a] rounded-xl shadow-sm border border-[#dbe6db] dark:border-gray-800 overflow-hidden">
-                    <div class="bg-primary/10 border-b border-[#dbe6db] dark:border-gray-800 p-6">
-                        <h1 class="text-[#111811] dark:text-white text-2xl font-black leading-tight tracking-tight uppercase">Zmień Dane Kontaktowe</h1>
+                <div class="bg-white dark:bg-[#1a2e1a] rounded-3xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+                    <div class="bg-primary p-8 text-[#111811]">
+                        <h1 class="text-3xl font-black uppercase tracking-tighter">Zarządzaj Danymi Placówki</h1>
+                        <p class="font-bold opacity-80 uppercase text-xs mt-1">Aktualizacja informacji widocznych dla rodziców</p>
                     </div>
 
-                    <form method="post" class="p-8">
+                    <form method="post" class="p-8 md:p-12 space-y-8">
                         {% csrf_token %}
-                        {{ form.director.as_hidden }}
 
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="mb-6 p-4 rounded-lg bg-red-100 text-red-700 text-center font-bold">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 custom-form-grid">
-                            <div class="md:col-span-2">
-                                {{ form.localization|as_crispy_field }}
-                            </div>
-                            <div class="md:col-span-1">
+                        <div class="space-y-6">
+                            <h3 class="text-xs font-black text-primary uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 pb-2">Dane Podstawowe</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 custom-form-grid">
                                 {{ form.email_address|as_crispy_field }}
-                            </div>
-                            <div class="md:col-span-1">
                                 {{ form.phone|as_crispy_field }}
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-end gap-4 mt-10 pt-6 border-t border-gray-100 dark:border-gray-800">
-                            <a href="{% url 'contact' %}" class="px-6 py-3 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors font-medium">Anuluj</a>
-                            <button type="submit" class="px-10 py-3 bg-primary text-[#111811] font-bold rounded-lg shadow-md hover:bg-primary/90 transition-all uppercase tracking-tight">
-                                Zapisz Zmiany
+                        <div class="space-y-6">
+                            <h3 class="text-xs font-black text-primary uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 pb-2">Lokalizacja</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 custom-form-grid">
+                                <div class="md:col-span-3">{{ form.address|as_crispy_field }}</div>
+                                {{ form.zip_code|as_crispy_field }}
+                                <div class="md:col-span-2">{{ form.city|as_crispy_field }}</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <h3 class="text-xs font-black text-primary uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 pb-2">Informacje Dodatkowe</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 custom-form-grid">
+                                {{ form.office_hours|as_crispy_field }}
+                                {{ form.website_url|as_crispy_field }}
+                                <div class="md:col-span-2">{{ form.additional_info|as_crispy_field }}</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-4 pt-8 border-t border-gray-50 dark:border-gray-800">
+                            <a href="{% url 'contact' %}" class="px-8 py-4 text-xs font-black uppercase text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors">Anuluj</a>
+                            <button type="submit" class="px-12 py-4 bg-primary text-[#111811] font-black rounded-2xl shadow-lg shadow-primary/20 hover:scale-105 transition-all uppercase text-xs tracking-widest">
+                                Zapisz Profil Placówki
                             </button>
                         </div>
                     </form>
@@ -57,26 +62,33 @@
     </div>
 
     <style>
-        /* Stylowanie pól Crispy dla Tailwind */
+        /* Spójne stylowanie pól dla całego projektu */
+        .custom-form-grid .asteriskField { display: none; }
         .custom-form-grid label {
-            font-weight: 700;
-            color: #618961;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-            display: block;
+            font-weight: 900 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            font-size: 10px !important;
+            color: #618961 !important;
+            margin-bottom: 8px !important;
         }
-        .custom-form-grid input, .custom-form-grid textarea {
-            width: 100%;
-            border-radius: 0.5rem;
-            border: 1px solid #dbe6db;
-            padding: 0.75rem;
-            background-color: #f6f8f6;
+        .custom-form-grid input, .custom-form-grid textarea, .custom-form-grid select {
+            background-color: #f9faf9 !important;
+            border: 2px solid #f0f4f0 !important;
+            border-radius: 12px !important;
+            padding: 12px 16px !important;
+            font-weight: 600 !important;
+            transition: all 0.2s !important;
         }
         .dark .custom-form-grid input, .dark .custom-form-grid textarea {
-            background-color: #102210;
-            border-color: #2a3e2a;
-            color: white;
+            background-color: #0f1d0f !important;
+            border-color: #223322 !important;
+            color: white !important;
+        }
+        .custom-form-grid input:focus {
+            border-color: #a78bfa !important;
+            background-color: white !important;
+            box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1) !important;
         }
     </style>
 {% endblock %}

@@ -1,104 +1,122 @@
-
+{% load static %}
 <div class="relative flex min-h-screen w-full flex-col group/design-root">
     <div class="flex h-full w-full">
         <main class="flex-1 flex flex-col">
             <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark px-10 py-4 bg-card-light dark:bg-card-dark sticky top-0 z-10">
                 <div class="flex items-center gap-4">
-                    <h2 class="text-text-light dark:text-text-dark text-lg font-bold leading-tight tracking-[-0.015em]">Witaj, Dyrektor {{ user.first_name }}!</h2>
+                    <h2 class="text-text-light dark:text-text-dark text-xl font-black tracking-tighter uppercase">Panel Dyrektora: {{ user.first_name }}</h2>
                 </div>
-                <div class="flex flex-1 justify-end items-center gap-4">
-
-                    <button class="relative flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark hover:bg-primary/10 hover:text-primary dark:hover:text-primary">
-                        <span class="material-symbols-outlined">notifications</span>
-                        <div class="absolute top-2 right-2 size-2.5 bg-accent rounded-full border-2 border-card-light dark:border-card-dark"></div>
-                    </button>
-                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Director Anna's profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBhJekGO0fuw8YvAna4zyavt-KrUTOtw7uTy1BhZNUIPcGEkOhG6NFdJIsJGAHwIvvSaXkQjsOWwj9ikQnd7H6x6slo318xPxB2b7YF4D6lKzmG7X8SuGfk1HyXu9Pw4-eb9ezS4KW2mERZtqfpAIxQO3-dMJz9Q-ymRe2NBri37YkdJT8zRIqOfGt3ipTeLXWH0sPWPFbD6j5iKEM4shKUDcVtyv4l0fPPN4OQt4KtKc0nxnCwlwYbdipelxYJfkI-4-WgXbxNS90");'></div>
+                <div class="flex items-center gap-4">
+                    <div class="flex flex-col items-end">
+                        <p class="text-sm font-bold text-primary">{{ today|date:"l" }}</p>
+                        <p class="text-xs text-text-light/50 dark:text-text-dark/50">{{ today|date:"d F Y" }}</p>
+                    </div>
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" style='background-image: url("{% static 'DYREKTOR.jpg' %}");'></div>
                 </div>
             </header>
+
             <div class="flex-1 p-10 overflow-y-auto">
                 <div class="flex flex-col gap-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-                        <a href="{% url 'add_group' %}" class="flex flex-col items-center justify-center gap-3 p-4 bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark cursor-pointer hover:border-primary hover:shadow-lg transition-all text-center h-32" href="#">
-                            <div class="p-2.5 bg-primary/10 rounded-lg text-primary">
-                                <span class="material-symbols-outlined">group_add</span>
-                            </div>
-                            <h3 class="text-sm font-semibold">Dodaj Grupe</h3>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <a href="{% url 'add_group' %}" class="flex flex-col items-center justify-center gap-2 p-4 bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark hover:border-primary hover:shadow-xl transition-all h-28 group">
+                            <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">group_add</span>
+                            <span class="text-xs font-black uppercase">Grupa</span>
                         </a>
-                        <a href="{% url 'add_teacher' %}" class="flex flex-col items-center justify-center gap-3 p-4 bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark cursor-pointer hover:border-primary hover:shadow-lg transition-all text-center h-32" href="#">
-                            <div class="p-2.5 bg-primary/10 rounded-lg text-primary">
-                                <span class="material-symbols-outlined">school</span>
-                            </div>
-                            <h3 class="text-sm font-semibold">Dodaj Nauczyciela</h3>
+                        <a href="{% url 'add_teacher' %}" class="flex flex-col items-center justify-center gap-2 p-4 bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark hover:border-primary hover:shadow-xl transition-all h-28 group">
+                            <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">school</span>
+                            <span class="text-xs font-black uppercase">Nauczyciel</span>
                         </a>
-                        <a href="{% url 'add_kid' %}" class="flex flex-col items-center justify-center gap-3 p-4 bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark cursor-pointer hover:border-primary hover:shadow-lg transition-all text-center h-32" href="#">
-                            <div class="p-2.5 bg-primary/10 rounded-lg text-primary">
-                                <span class="material-symbols-outlined">escalator_warning</span>
-                            </div>
-                            <h3 class="text-sm font-semibold">Dodaj Rodzica</h3>
+                        <a href="{% url 'invite_standalone_parent' %}" class="flex flex-col items-center justify-center gap-2 p-4 bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark hover:border-primary hover:shadow-xl transition-all h-28 group">
+                            <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">person_add</span>
+                            <span class="text-xs font-black uppercase">Rodzic</span>
                         </a>
-                        <a href="{% url 'add_kid' %}" class="flex flex-col items-center justify-center gap-3 p-4 bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark cursor-pointer hover:border-primary hover:shadow-lg transition-all text-center h-32" href="#">
-                            <div class="p-2.5 bg-primary/10 rounded-lg text-primary">
-                                <span class="material-symbols-outlined">child_care</span>
-                            </div>
-                            <h3 class="text-sm font-semibold">Dodaj Dziecko</h3>
+                        <a href="{% url 'add_kid' %}" class="flex flex-col items-center justify-center gap-2 p-4 bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark hover:border-primary hover:shadow-xl transition-all h-28 group">
+                            <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">child_care</span>
+                            <span class="text-xs font-black uppercase">Dziecko</span>
                         </a>
-                        <a href="{% url 'list_meals' %}" class="flex flex-col items-center justify-center gap-3 p-4 bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark cursor-pointer hover:border-primary hover:shadow-lg transition-all text-center h-32" href="#">
-                            <div class="p-2.5 bg-primary/10 rounded-lg text-primary">
-                                <span class="material-symbols-outlined">restaurant_menu</span>
-                            </div>
-                            <h3 class="text-sm font-semibold">Zarządzaj menu</h3>
+                        <a href="{% url 'post_list_view' %}" class="flex flex-col items-center justify-center gap-2 p-4 bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark hover:border-primary hover:shadow-xl transition-all h-28 group">
+                            <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">campaign</span>
+                            <span class="text-xs font-black uppercase">Ogłoszenie</span>
                         </a>
-                        <a href="{% url 'home_page' %}" class="flex flex-col items-center justify-center gap-3 p-4 bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark cursor-pointer hover:border-primary hover:shadow-lg transition-all text-center h-32" href="#">
-                            <div class="p-2.5 bg-primary/10 rounded-lg text-primary">
-                                <span class="material-symbols-outlined">campaign</span>
-                            </div>
-                            <h3 class="text-sm font-semibold">Dodaj wydarzenie</h3>
+                        <a href="{% url 'contact-update' user.director.id %}" class="flex flex-col items-center justify-center gap-2 p-4 bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark hover:border-primary hover:shadow-xl transition-all h-28 group">
+                            <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">settings</span>
+                            <span class="text-xs font-black uppercase">Ustawienia</span>
                         </a>
                     </div>
-                    <div class="flex flex-col gap-6">
-                        <h2 class="text-text-light dark:text-text-dark text-[22px] font-bold leading-tight tracking-[-0.015em]">Kindergarten Overview</h2>
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-border-light dark:border-border-dark flex flex-col gap-4 col-span-1 lg:col-span-2">
-                                <h3 class="font-bold text-lg">Statystyki</h3>
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <div class="flex items-center gap-4 p-4 bg-background-light dark:bg-background-dark rounded-lg">
-                                        <div class="text-primary"><span class="material-symbols-outlined" style="font-size: 36px;">child_care</span></div>
-                                        <div>
-                                            <p class="text-2xl font-bold">{{ kids_count }}</p>
-                                            <p class="text-sm text-text-light/70 dark:text-text-dark/70">Dzieci</p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 flex flex-col gap-6">
+                            <div class="bg-card-light dark:bg-card-dark p-8 rounded-3xl border border-border-light dark:border-border-dark shadow-sm">
+                                <div class="flex justify-between items-end mb-6">
+                                    <h3 class="font-black uppercase tracking-tighter text-xl">Przegląd Placówki</h3>
+                                    <span class="text-[10px] font-black bg-primary/20 text-primary px-2 py-1 rounded-md uppercase">Live dzisiaj</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                    <div class="p-6 bg-background-light dark:bg-background-dark rounded-2xl border border-gray-100 dark:border-gray-800">
+                                        <p class="text-sm font-bold text-gray-400 uppercase mb-1">Dzieci</p>
+                                        <div class="flex items-end gap-2">
+                                            <p class="text-4xl font-black text-primary">{{ kids_count }}</p>
+                                            <p class="text-xs font-bold text-gray-500 pb-1">/ {{ total_capacity|default:"100" }}</p>
+                                        </div>
+                                        <div class="w-full bg-gray-200 dark:bg-gray-700 h-1.5 rounded-full mt-4">
+                                            <div class="bg-primary h-1.5 rounded-full" style="width: {{ occupancy_rate|default:'75' }}%"></div>
                                         </div>
                                     </div>
-                                    <div class="flex items-center gap-4 p-4 bg-background-light dark:bg-background-dark rounded-lg">
-                                        <div class="text-primary"><span class="material-symbols-outlined" style="font-size: 36px;">school</span></div>
-                                        <div>
-                                            <p class="text-2xl font-bold">{{ teachers_count }}</p>
-                                            <p class="text-sm text-text-light/70 dark:text-text-dark/70">Nauczyciele</p>
-                                        </div>
+                                    <div class="p-6 bg-background-light dark:bg-background-dark rounded-2xl border border-gray-100 dark:border-gray-800">
+                                        <p class="text-sm font-bold text-gray-400 uppercase mb-1">Obecni</p>
+                                        <p class="text-4xl font-black text-blue-500">{{ kids_presence_count|default:"0" }}</p>
+                                        <p class="text-[10px] text-gray-500 font-bold mt-2 uppercase">Status na teraz</p>
                                     </div>
-                                    <div class="flex items-center gap-4 p-4 bg-background-light dark:bg-background-dark rounded-lg">
-                                        <div class="text-primary"><span class="material-symbols-outlined" style="font-size: 36px;">groups</span></div>
-                                        <div>
-                                            <p class="text-2xl font-bold">{{ groups_count }}</p>
-                                            <p class="text-sm text-text-light/70 dark:text-text-dark/70">Grupy</p>
-                                        </div>
+                                    <div class="p-6 bg-background-light dark:bg-background-dark rounded-2xl border border-gray-100 dark:border-gray-800">
+                                        <p class="text-sm font-bold text-gray-400 uppercase mb-1">Kadra</p>
+                                        <p class="text-4xl font-black text-orange-500">{{ teachers_count }}</p>
+                                        <p class="text-[10px] text-gray-500 font-bold mt-2 uppercase">Aktywni nauczyciele</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-border-light dark:border-border-dark flex flex-col gap-4">
-                                <h3 class="font-bold text-lg">Today's Menu</h3>
-                                <div class="flex flex-col gap-3">
-                                    <div class="flex items-start gap-3">
-                                        <div class="w-20 text-sm font-semibold text-text-light/80 dark:text-text-dark/80 shrink-0">Breakfast</div>
-                                        <p class="text-sm flex-1">Oatmeal with fresh berries and honey.</p>
-                                    </div>
-                                    <div class="flex items-start gap-3">
-                                        <div class="w-20 text-sm font-semibold text-text-light/80 dark:text-text-dark/80 shrink-0">Lunch</div>
-                                        <p class="text-sm flex-1">Chicken soup with whole wheat bread.</p>
-                                    </div>
-                                    <div class="flex items-start gap-3">
-                                        <div class="w-20 text-sm font-semibold text-text-light/80 dark:text-text-dark/80 shrink-0">Snack</div>
-                                        <p class="text-sm flex-1">Apple slices and yogurt.</p>
-                                    </div>
+
+                            <div class="bg-card-light dark:bg-card-dark p-8 rounded-3xl border border-border-light dark:border-border-dark shadow-sm">
+                                <h3 class="font-black uppercase tracking-tighter text-xl mb-6">Ostatnia Aktywność</h3>
+                                <div class="space-y-4">
+                                    {% for post in recent_announcements %}
+                                        <div class="flex items-center justify-between p-4 bg-background-light dark:bg-background-dark rounded-2xl">
+                                            <div class="flex items-center gap-4">
+                                                <div class="p-2 bg-primary/10 rounded-lg text-primary">
+                                                    <span class="material-symbols-outlined text-sm">campaign</span>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-bold">{{ post.title }}</p>
+                                                    <p class="text-[10px] text-gray-500">{{ post.date_posted|timesince }} temu</p>
+                                                </div>
+                                            </div>
+                                            <a href="{% url 'post_detail' pk=post.id %}" class="text-xs font-black text-primary uppercase">Zobacz</a>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-sm text-gray-500 text-center py-4 italic">Brak nowych ogłoszeń.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-6">
+                            <div class="bg-card-light dark:bg-card-dark p-8 rounded-3xl border border-border-light dark:border-border-dark shadow-sm h-full">
+                                <h3 class="font-black uppercase tracking-tighter text-xl mb-6">Podsumowanie Grup</h3>
+                                <div class="space-y-6">
+                                    {% for group in groups_summary %}
+                                        <div class="space-y-2">
+                                            <div class="flex justify-between text-xs font-black uppercase">
+                                                <span>{{ group.name }}</span>
+                                                <span class="text-primary">{{ group.kid_count }} os.</span>
+                                            </div>
+                                            <div class="w-full bg-gray-100 dark:bg-gray-800 h-2 rounded-full overflow-hidden">
+                                                <div class="bg-primary h-full" style="width: {{ group.capacity_percent }}%"></div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                    <a href="{% url 'list_groups' %}" class="mt-4 block text-center py-4 bg-gray-50 dark:bg-gray-800 rounded-2xl text-[10px] font-black uppercase hover:bg-primary hover:text-white transition-all">
+                                        Zarządzaj Wszystkimi Grupami
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -108,4 +126,3 @@
         </main>
     </div>
 </div>
-

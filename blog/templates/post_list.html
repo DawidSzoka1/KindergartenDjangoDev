@@ -59,19 +59,23 @@
 
                         <div class="flex-1 min-w-[200px]">
                             <div class="flex items-center gap-2 mb-1">
-                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md
-                            {% if post.category == 'holiday' %}bg-red-100 text-red-600
-                            {% elif post.category == 'trip' %}bg-green-100 text-green-600
-                            {% else %}bg-purple-100 text-primary{% endif %}">
-                            {{ post.get_category_display }}
-                        </span>
+                                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-md
+                                    {% if post.category == 'holiday' %}bg-red-100 text-red-600
+                                    {% elif post.category == 'trip' %}bg-green-100 text-green-600
+                                    {% else %}bg-purple-100 text-primary{% endif %}">
+                                    {{ post.get_category_display }}
+                                </span>
                                 <span class="text-xs text-gray-400 font-medium">• {{ post.date_posted|timesince }} temu</span>
                             </div>
-                            <h4 class="font-black text-gray-900 dark:text-white text-xl">{{ post.title }}</h4>
+
+                            <a href="{% url 'post_detail' post.id %}" class="hover:text-primary transition-colors">
+                                <h4 class="font-black text-gray-900 dark:text-white text-xl">{{ post.title }}</h4>
+                            </a>
+
                             <p class="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mt-1">{{ post.content }}</p>
                         </div>
 
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-6">
                             <div class="flex -space-x-3 overflow-hidden">
                                 {% for group in post.group.all %}
                                     <div class="inline-block h-10 w-10 rounded-full ring-4 ring-white dark:ring-[#0f1d0f] bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary"
@@ -80,21 +84,25 @@
                                     </div>
                                 {% endfor %}
                             </div>
-                        </div>
 
-                        {% if post.author == user %}
-                            <div class="flex items-center gap-2 pl-4 border-l border-gray-100 dark:border-gray-800">
-                                <a href="{% url 'post_update' pk=post.id %}" class="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-primary transition-colors">
-                                    <span class="material-symbols-outlined">edit</span>
-                                </a>
-                                <form method="POST" action="{% url 'post_delete' pk=post.id %}" class="inline">
-                                    {% csrf_token %}
-                                    <button type="submit" onclick="return confirm('Usunąć wydarzenie?')" class="p-2 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
-                                        <span class="material-symbols-outlined">delete</span>
-                                    </button>
-                                </form>
-                            </div>
-                        {% endif %}
+                            <a href="{% url 'post_detail' post.id %}" class="flex items-center justify-center h-10 px-4 rounded-xl bg-gray-50 dark:bg-gray-800 text-primary font-black text-xs uppercase hover:bg-primary hover:text-white transition-all">
+                                Szczegóły
+                            </a>
+
+                            {% if post.author == user %}
+                                <div class="flex items-center gap-2 pl-4 border-l border-gray-100 dark:border-gray-800">
+                                    <a href="{% url 'post_update' pk=post.id %}" class="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-primary transition-colors">
+                                        <span class="material-symbols-outlined">edit</span>
+                                    </a>
+                                    <form method="POST" action="{% url 'post_delete' pk=post.id %}" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit" onclick="return confirm('Usunąć wydarzenie?')" class="p-2 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
+                                            <span class="material-symbols-outlined">delete</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                 {% empty %}
                     <div class="p-20 text-center bg-white dark:bg-[#0f1d0f] rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-800">

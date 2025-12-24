@@ -84,9 +84,28 @@ class FreeDaysModel(models.Model):
 
 class ContactModel(models.Model):
     director = models.OneToOneField(Director, on_delete=models.CASCADE)
-    email_address = models.EmailField(null=True)
+
+    # Podstawowe dane kontaktowe
+    email_address = models.EmailField(null=True, verbose_name="E-mail placówki")
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$',
                                  message="Numer telefonu w formacie: '+99 999 999 999'")
-    phone = models.CharField(null=True, unique=True, max_length=17, validators=[phone_regex])
-    localization = models.TextField(max_length=128, null=True)
+    phone = models.CharField(null=True, unique=True, max_length=17, validators=[phone_regex], verbose_name="Telefon")
 
+    # Rozbite pole lokalizacji (lepsze dla szablonów niż jeden TextField)
+    address = models.CharField(max_length=255, null=True, verbose_name="Ulica i numer")
+    zip_code = models.CharField(max_length=10, null=True, verbose_name="Kod pocztowy")
+    city = models.CharField(max_length=100, null=True, verbose_name="Miasto")
+
+    # Dodatkowe przydatne informacje
+    office_hours = models.CharField(max_length=100, default="08:00 - 16:00", verbose_name="Godziny otwarcia biura")
+    website_url = models.URLField(null=True, blank=True, verbose_name="Strona WWW")
+
+    # Pole tekstowe na dodatkowe informacje (np. dojazd)
+    additional_info = models.TextField(max_length=500, null=True, blank=True, verbose_name="Dodatkowe informacje")
+
+    def __str__(self):
+        return f"Kontakt: {self.director.user.first_name} - {self.city}"
+
+    class Meta:
+        verbose_name = "Dane kontaktowe"
+        verbose_name_plural = "Dane kontaktowe"

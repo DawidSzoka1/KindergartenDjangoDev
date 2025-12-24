@@ -4,12 +4,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin, PermissionRequiredMixin
-from django.views.generic import UpdateView
+from django.views.generic import UpdateView, DetailView
 from django.utils import timezone
 from children.models import PresenceModel
 from groups.models import Groups
 from parent.models import ParentA
 from teacher.models import Employee
+from django.db.models import Count, Q, F
 from .forms import PostAddForm
 from datetime import timedelta
 from .models import Post
@@ -23,6 +24,8 @@ class Home(View):
     def get(self, request):
         now = timezone.now()
         last_week = now - timedelta(days=7)
+        user = request.user
+        user_perms = user.get_user_permissions()
         if request.user.get_user_permissions() == {'parent.is_parent'}:
             parent = get_object_or_404(ParentA, user=request.user.id)
 
@@ -69,11 +72,54 @@ class Home(View):
         elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
             teacher = get_object_or_404(Employee, user=request.user.id)
             return render(request, 'home.html', {'teacher': teacher})
-        elif request.user.get_user_permissions() == {'director.is_director'}:
-            kids = Kid.objects.filter(principal=request.user.id, is_active=True).count()
-            groups = Groups.objects.filter(principal=request.user.id, is_active=True).count()
-            teachers = Employee.objects.filter(principal=request.user.id, is_active=True).count()
-            return render(request, 'home.html', {'teachers_count': teachers, 'groups_count': groups, 'kids_count': kids})
+        elif 'director.is_director' in user_perms:
+            director = get_object_or_404(Director, user=user.id)
+
+            # Podstawowe liczniki
+            kids_count = director.kid_set.filter(is_active=True).count()
+            groups_count = director.groups_set.filter(is_active=True).count()
+            teachers_count = director.employee_set.filter(is_active=True).count()
+
+            # Statystyki obecności na dzisiaj
+            kids_presence_count = PresenceModel.objects.filter(
+                kid__principal=director,
+                day=now.date(),
+                presenceType=2  # Zakładamy 2 = Obecny
+            ).count()
+
+            # Ostatnia aktywność (ogłoszenia dyrektora i jego grup)
+            recent_announcements = Post.objects.filter(
+                is_active=True
+            ).order_by('-date_posted')[:4]
+
+            # Podsumowanie grup (zajętość)
+            groups_summary = director.groups_set.filter(is_active=True).annotate(
+                kid_count=Count('kid', filter=Q(kid__is_active=True))
+            )
+
+            # Obliczanie procentowej zajętości dla każdej grupy w Pythonie
+            for group in groups_summary:
+                if group.capacity and group.capacity > 0:
+                    group.capacity_percent = (group.kid_count / group.capacity) * 100
+                else:
+                    group.capacity_percent = 0
+
+            # Ogólna zajętość placówki
+            total_capacity = sum(g.capacity for g in groups_summary if g.capacity)
+            occupancy_rate = (kids_count / total_capacity * 100) if total_capacity > 0 else 0
+
+            context = {
+                'kids_count': kids_count,
+                'groups_count': groups_count,
+                'teachers_count': teachers_count,
+                'kids_presence_count': kids_presence_count,
+                'recent_announcements': recent_announcements,
+                'groups_summary': groups_summary,
+                'total_capacity': total_capacity,
+                'occupancy_rate': occupancy_rate,
+                'today': now,
+            }
+            return render(request, 'home.html', context)
         return render(request, 'home.html')
 
 
@@ -241,7 +287,7 @@ class PostAddView(LoginRequiredMixin, View):
         if hasattr(user, 'director'):
             form = PostAddForm(request.POST, director=user.director)
         elif hasattr(user, 'employee'):
-            form = PostAddForm(request.POST, employee=user.employee)
+            form = PostAddForm(request.POST, employee=user.employee, director=user.employee.principal.first())
 
         if form.is_valid():
             # Formularz ma już author i director z pól ukrytych, więc save() zadziała
@@ -253,3 +299,32 @@ class PostAddView(LoginRequiredMixin, View):
 
         # Jeśli nie przeszło walidacji, renderuj z błędami
         return render(request, 'post_add.html', {'form': form})
+
+
+class PostDetailView(LoginRequiredMixin, DetailView):
+    model = Post
+    template_name = 'post_detail.html'
+    context_object_name = 'post'
+
+    def get_queryset(self):
+        user = self.request.user
+
+        # Dyrektor i Nauczyciel widzą wszystkie posty
+        if hasattr(user, 'director'):
+            return Post.objects.filter(director=user.director)
+        if hasattr(user, 'employee'):
+            director = user.employee.principal.first()
+            return Post.objects.filter(director=director)
+        # Rodzic widzi posty bez grupy (ogólne) LUB posty swoich dzieci
+        if hasattr(user, 'parenta'):
+            try:
+                parent = ParentA.objects.get(user=user)
+                director = parent.principal.first()
+                child_groups = parent.kids.filter(is_active=True).values_list('group_id', flat=True)
+                return Post.objects.filter(
+                    (Q(group__isnull=True) | Q(group__id__in=child_groups)) & Q(director=director)
+                ).distinct()
+            except ParentA.DoesNotExist:
+                return Post.objects.filter(group__isnull=True)
+
+        return Post.objects.none()
