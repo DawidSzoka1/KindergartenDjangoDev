@@ -7,7 +7,9 @@
 
         <!-- Breadcrumbs -->
         <div class="flex flex-wrap items-center gap-2 text-sm mb-8">
+            {% if perms.director.is_director or perms.teacher.is_teacher %}
             <a href="{% url 'list_kids' %}" class="text-primary hover:underline font-medium">Dzieci</a>
+            {% endif %}
             <span class="text-gray-500">/</span>
             <span class="text-gray-900 dark:text-white font-medium">{{ kid }}</span>
         </div>

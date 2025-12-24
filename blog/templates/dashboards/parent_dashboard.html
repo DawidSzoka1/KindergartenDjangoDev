@@ -1,150 +1,144 @@
-<div class="p-8 overflow-y-auto">
-    <div class="max-w-7xl mx-auto">
+<div class="max-w-7xl mx-auto px-6 py-10 space-y-10">
 
-        <!-- Nagłówek powitalny -->
-        <header class="flex flex-wrap justify-between items-center gap-4 mb-8">
-            <div class="flex flex-col">
-                <h1 class="text-[#111811] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
-                    Good Morning, Maria!
-                </h1>
-                <p class="text-[#618961] dark:text-gray-400 text-base font-normal leading-normal">
-                    Here is a summary of Leo's day.
-                </p>
+    <header class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-2">
+            <h1 class="text-4xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Cześć, {{ user.first_name }}! 👋</h1>
+            <p class="text-gray-500 mt-2 font-medium">Masz dziś pod opieką {{ kids.paginator.count }} dzieci. Sprawdź co u nich słychać.</p>
+        </div>
+        <div class="flex gap-4 items-center justify-end">
+            <div class="bg-white dark:bg-[#0f1d0f] p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm text-center min-w-[100px]">
+                <p class="text-xs text-gray-400 font-bold uppercase">Wydarzenia</p>
+                <p class="text-2xl font-black text-primary">{{ upcoming_events_count|default:"0" }}</p>
             </div>
+            <div class="bg-white dark:bg-[#0f1d0f] p-4 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm text-center min-w-[100px]">
+                <p class="text-xs text-gray-400 font-bold uppercase">Grupy</p>
+                <p class="text-2xl font-black text-blue-500">{{ kids.paginator.count }}</p>
+            </div>
+        </div>
+    </header>
 
-            <button class="relative p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-                <span class="material-symbols-outlined text-[#111811] dark:text-white">notifications</span>
-                <span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500"></span>
-            </button>
-        </header>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-            <!-- Lewa kolumna -->
-            <div class="lg:col-span-2 flex flex-col gap-8">
-
-                <!-- Today's Summary -->
-                <section>
-                    <h2 class="text-[#111811] dark:text-white text-[22px] font-bold mb-4">Today's Summary</h2>
-
-                    <div class="rounded-xl shadow-md bg-white dark:bg-gray-800 overflow-hidden flex flex-col">
-                        <div class="w-full h-48 bg-cover"
-                             style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDTU85qd8-3a0UHmrpXoMR9ShgC4GH8JTZ5Ztyzvls4JKP-O1wtBvkfrFRMdsy-KxxXnLa34aVycM7LrdUYgaDxyCmyXwJOlc-O4kNRBrtzBDC3s-poLZs81JWUfhiVLsTPtNnfMTiequszZO_0ReirxiRg4aVymlk7LuXaQ0lArJYVDlk7_XhEGnh1E7DgbqHQS_E2BD61BopowgVsZRI8b6nmWE6A-ZXXaZgnGZ0unjN4JuxPUEEVuk26EyGgP8TOm5wjWViL-wg");'>
-                        </div>
-
-                        <div class="p-6 flex flex-col gap-3">
-                            <p class="text-sm text-[#618961] dark:text-gray-400">Checked-in at 8:45 AM</p>
-                            <p class="text-lg font-bold text-[#111811] dark:text-white">Leo is having a great day!</p>
-
-                            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-                                <div class="flex flex-col gap-1">
-                                    <p class="text-base text-[#618961] dark:text-gray-400">
-                                        He enjoyed his morning snack and is now playing with blocks.
-                                    </p>
-                                    <p class="text-base text-[#618961] dark:text-gray-400">
-                                        Teacher: Ms. Honey
-                                    </p>
+        <div class="lg:col-span-2 space-y-8">
+            <section>
+                <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase mb-4">Twoje Dzieci</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for kid in kids %}
+                        <div class="bg-white dark:bg-[#0f1d0f] rounded-3xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-md transition-all group">
+                            <div class="p-6">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="size-14 rounded-2xl bg-primary/10 flex items-center justify-center font-black text-primary text-xl">
+                                        {{ kid.first_name|slice:":1" }}
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ kid.first_name }} {{ kid.last_name }}</h3>
+                                        <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Grupa: {{ kid.group.name }}</p>
+                                    </div>
                                 </div>
-
-                                <button class="rounded-lg bg-primary text-[#111811] dark:text-black h-10 px-4 text-sm font-bold">
-                                    Message Teacher
-                                </button>
+                                <div class="flex gap-2">
+                                    <a href="{% url 'kid_details' kid.id %}" class="flex-1 text-center py-3 rounded-xl bg-gray-50 dark:bg-gray-800 text-xs font-black uppercase hover:bg-primary hover:text-white transition-all">Szczegóły</a>
+                                    <a href="{% url 'calendar' kid.id month_current year_current %}" class="flex-1 text-center py-3 rounded-xl bg-primary text-white text-xs font-black uppercase shadow-lg shadow-primary/20">Obecność</a>
+                                </div>
                             </div>
                         </div>
+                    {% endfor %}
+                </div>
+
+                {% if kids.has_other_pages %}
+                    <div class="mt-4 flex justify-center gap-2">
+                        {% if kids.has_previous %}<a href="?kids_page={{ kids.previous_page_number }}" class="px-3 py-1 bg-white dark:bg-[#0f1d0f] border border-gray-200 dark:border-gray-800 rounded-lg text-xs font-bold uppercase text-gray-400 hover:text-primary">Poprzednia</a>{% endif %}
+                        <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Strona {{ kids.number }} z {{ kids.paginator.num_pages }}</span>
+                        {% if kids.has_next %}<a href="?kids_page={{ kids.next_page_number }}" class="px-3 py-1 bg-white dark:bg-[#0f1d0f] border border-gray-200 dark:border-gray-800 rounded-lg text-xs font-bold uppercase text-gray-400 hover:text-primary">Następna</a>{% endif %}
                     </div>
-                </section>
+                {% endif %}
+            </section>
 
-                <!-- Latest photos -->
-                <section>
-                    <h2 class="text-[#111811] dark:text-white text-[22px] font-bold mb-4">Latest Photos</h2>
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase">Najnowsze ogłoszenia</h2>
+                    <a href="{% url 'post_list_view' %}" class="px-4 py-2 bg-primary/10 text-primary text-xs font-black rounded-xl uppercase hover:bg-primary hover:text-white transition-all flex items-center gap-2">
+                        Wszystkie Wydarzenia
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </a>
+                </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-                        <!-- 4 zdjęcia (skrócone dla czytelności – zostawiłem oryginalne linki) -->
-
-                        <div class="aspect-square bg-cover rounded-xl"
-                             style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAmKO3JKr1Mx2PSHpOaf2kTIZqjpxF2Eobip2VNIuYcoPAWor_a8RY_d7iqpUGxCnHbZasw65OoOersktcFW3wsohj3vGss6blBg39CiMvUpcjO0_ARMp_lJyyu0qGKO27Z9XXZmik9H7ZpIs9n5PR76faQ7nDRwiuiqvn1k4_aRQT7oLUr5jOQ3_YLW4x1p-qoefq0fECLysEamEknZHE42BS0Re1JRf2oM8ObFfvtP_eMTEq_RY9WUavYg39Q-6NOHxO1dPSKtDE");'>
-                        </div>
-
-                        <div class="aspect-square bg-cover rounded-xl"
-                             style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDrTNbD2CuRCo3mz9P9hwNhQPupM-PgFxUHQ5iftGUM322_6l8B-l-U76D3SDMWJyFe7qwLANBI00v5Yz_jKLFue_xCYAzO5OCPUDIQiUF_2_i-hiHP2TGkXUbzTzMR1yO4L-ZV5QqU1UOejurWnap7myyae4MpiMlCopCB-uuLPIOLz1iCTuoeQPV-SoLV32rBWAw_m_us1F4rF6v2K-cCoKLpznDkafv5kibuL_L558J6AacS5MGKTGWoyzV-EaOXLUERCIgU9S8");'>
-                        </div>
-
-                        <div class="aspect-square bg-cover rounded-xl"
-                             style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAEa92AjKoIKDZCWmIUOKCHZE1SCrpqevX-tmaz-0wLOwVDdiTDVvGm0uagQS9CNmL2uVoZkWApI6OncSPdINGL61nX6gai8n8u6k1VXEorO3c2Ef16uhUNUN6BjlsjChNy_0cEuMXYQYPxMEYP5C8q7ZNUildNTUqf856FdTfg5pHKaDdbTdrA-M5WvLcDqfZn7uJCC5qyrFERKa3UXJU74w5NH8qPdhiEMYPl9eujxCwlMkN9gGxfhRrsrXCDQhpyccL-Ybg68fI");'>
-                        </div>
-
-                        <div class="aspect-square bg-cover rounded-xl"
-                             style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCLa0_8ubGTRydZhX6vRqxTtUD2W6mwNI-fMXaFWQ39I6oC0OatiwFP61kyTrDa-V5oOoEEekUXjJAihM3wTA0BUfugbjHShktn5J45fF8et7UesmiOIEQ_oItGzceVcoZ8Fpw9XQwbZHRt9TSJYF4w2QIgWC_VAZzxFwmxwzqV8ygJRAkJcTMMD7VYcfblutQf9iF0_t4ZAYLpcPcGIdAM137YioC2pC3XhRwL7dZlJFXIc99rLbPSCZySQyv26D7eAnnHYKcnDvs");'>
-                        </div>
-
-                    </div>
-                </section>
-            </div>
-
-            <!-- Prawa kolumna -->
-            <div class="flex flex-col gap-8">
-
-                <!-- Announcements -->
-                <section>
-                    <h2 class="text-[#111811] dark:text-white text-[22px] font-bold mb-4">Announcements</h2>
-
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col gap-4">
-
-                        <div class="pb-4 border-b border-gray-200 dark:border-gray-700">
-                            <p class="text-sm font-bold text-[#111811] dark:text-white mb-1">Parent-Teacher Conferences</p>
-                            <p class="text-sm text-[#618961] dark:text-gray-400">
-                                Sign-ups are now available for next month's conferences. Please check your email.
-                            </p>
-                        </div>
-
-                        <div>
-                            <p class="text-sm font-bold text-[#111811] dark:text-white mb-1">School Closure Reminder</p>
-                            <p class="text-sm text-[#618961] dark:text-gray-400">
-                                School will be closed this Friday for a professional development day.
-                            </p>
-                        </div>
-
-                    </div>
-                </section>
-
-                <!-- Events -->
-                <section>
-                    <h2 class="text-[#111811] dark:text-white text-[22px] font-bold mb-4">Upcoming Events</h2>
-
-                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col gap-4">
-
-                        <div class="flex items-center gap-4">
-                            <div class="flex flex-col justify-center items-center bg-primary/20 rounded-lg p-2 w-16 h-16">
-                                <span class="text-sm font-bold">OCT</span>
-                                <span class="text-2xl font-black">25</span>
+                <div class="bg-white dark:bg-[#0f1d0f] rounded-3xl border border-gray-200 dark:border-gray-800 p-6 space-y-4">
+                    {% for post in announcements %}
+                        <div class="flex items-start gap-4 p-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                            <div class="p-3 rounded-xl bg-orange-100 text-orange-600">
+                                <span class="material-symbols-outlined text-2xl">campaign</span>
                             </div>
                             <div>
-                                <p class="font-bold text-[#111811] dark:text-white">Picture Day</p>
-                                <p class="text-sm text-[#618961] dark:text-gray-400">Don't forget to dress up!</p>
+                                <p class="font-bold text-gray-900 dark:text-white">{{ post.title }}</p>
+                                <p class="text-sm text-gray-500 line-clamp-2">{{ post.content }}</p>
                             </div>
                         </div>
+                    {% empty %}
+                        <p class="text-gray-400 italic text-center py-4 text-sm">Brak nowych ogłoszeń.</p>
+                    {% endfor %}
+                </div>
 
-                        <div class="flex items-center gap-4">
-                            <div class="flex flex-col justify-center items-center bg-primary/20 rounded-lg p-2 w-16 h-16">
-                                <span class="text-sm font-bold">NOV</span>
-                                <span class="text-2xl font-black">12</span>
-                            </div>
-                            <div>
-                                <p class="font-bold text-[#111811] dark:text-white">Field Trip to the Farm</p>
-                                <p class="text-sm text-[#618961] dark:text-gray-400">Permission slips due Nov 5th.</p>
-                            </div>
-                        </div>
-
-                        <a href="#" class="text-center text-sm font-bold text-primary hover:underline mt-2">
-                            View Full Calendar
-                        </a>
+                {% if announcements.has_other_pages %}
+                    <div class="mt-4 flex justify-center gap-2">
+                        {% if announcements.has_previous %}<a href="?ann_page={{ announcements.previous_page_number }}" class="px-3 py-1 bg-white dark:bg-[#0f1d0f] border border-gray-200 dark:border-gray-800 rounded-lg text-xs font-bold uppercase text-gray-400 hover:text-primary">Poprzednia</a>{% endif %}
+                        <span class="px-3 py-1 text-xs font-bold text-gray-400 uppercase">Strona {{ announcements.number }} z {{ announcements.paginator.num_pages }}</span>
+                        {% if announcements.has_next %}<a href="?ann_page={{ announcements.next_page_number }}" class="px-3 py-1 bg-white dark:bg-[#0f1d0f] border border-gray-200 dark:border-gray-800 rounded-lg text-xs font-bold uppercase text-gray-400 hover:text-primary">Następna</a>{% endif %}
                     </div>
-                </section>
-
-            </div>
-
+                {% endif %}
+            </section>
         </div>
 
+        <div class="space-y-8">
+            <section>
+                <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase mb-4">Moja Kadra</h2>
+                <div class="space-y-4">
+                    {% for principal in principals %}
+                        <a href="{% url 'director_profile' pk=principal.id %}" class="flex items-center gap-4 p-4 bg-white dark:bg-[#0f1d0f] rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-primary transition-all group">
+                            <div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                                <span class="material-symbols-outlined">shield_person</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ principal.first_name }} {{ principal.last_name }}</p>
+                                <p class="text-[10px] text-gray-400 uppercase font-black">Dyrektor Placówki</p>
+                            </div>
+                        </a>
+                    {% endfor %}
+
+                    {% if principals.has_other_pages %}
+                        <div class="flex justify-center gap-2 py-2">
+                            {% if principals.has_previous %}<a href="?p_page={{ principals.previous_page_number }}" class="material-symbols-outlined text-primary text-sm">chevron_left</a>{% endif %}
+                            <span class="text-[10px] font-black uppercase text-gray-400">Dyrekcja</span>
+                            {% if principals.has_next %}<a href="?p_page={{ principals.next_page_number }}" class="material-symbols-outlined text-primary text-sm">chevron_right</a>{% endif %}
+                        </div>
+                    {% endif %}
+
+                    {% for teacher in teachers %}
+                        <a href="{% url 'teacher-profile' pk=teacher.id %}" class="flex items-center gap-4 p-4 bg-white dark:bg-[#0f1d0f] rounded-2xl border border-gray-100 dark:border-gray-800 hover:border-primary transition-all group">
+                            <div class="size-12 rounded-full bg-blue-50 dark:bg-gray-800 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                                <span class="material-symbols-outlined">person</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ teacher.first_name }} {{ teacher.last_name }}</p>
+                                <p class="text-[10px] text-gray-400 uppercase font-black">Nauczyciel: {{ teacher.group.name }}</p>
+                            </div>
+                        </a>
+                    {% endfor %}
+
+                    {% if teachers.has_other_pages %}
+                        <div class="flex justify-center gap-2 py-2">
+                            {% if teachers.has_previous %}<a href="?t_page={{ teachers.previous_page_number }}" class="material-symbols-outlined text-primary text-sm">chevron_left</a>{% endif %}
+                            <span class="text-[10px] font-black uppercase text-gray-400">Nauczyciele</span>
+                            {% if teachers.has_next %}<a href="?t_page={{ teachers.next_page_number }}" class="material-symbols-outlined text-primary text-sm">chevron_right</a>{% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <section class="bg-primary rounded-3xl p-8 text-white shadow-xl shadow-primary/20">
+                <h3 class="font-black uppercase text-sm mb-4">Potrzebujesz pomocy?</h3>
+                <p class="text-xs opacity-80 mb-6">Skontaktuj się z administracją placówki w godzinach 8:00 - 16:00.</p>
+                <a href="tel:+48123456789" class="block text-center py-3 bg-white text-primary rounded-xl font-bold text-sm uppercase hover:scale-105 transition-all">Zadzwoń teraz</a>
+            </section>
+        </div>
     </div>
 </div>

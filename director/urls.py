@@ -4,7 +4,7 @@ from django.conf import settings
 from . import views
 
 urlpatterns = [
-    path("director/profile/", views.DirectorProfileView.as_view(), name="director_profile"),
+    path("director/profile/<int:pk>/", views.DirectorProfileView.as_view(), name="director_profile"),
     path("director/update/", views.DirectorUpdateView.as_view(), name="director_update"),
     path("contact/", views.ContactView.as_view(), name="contact"),
     path("contact/update/<int:pk>/", views.ContactUpdateView.as_view(), name="contact-update"),

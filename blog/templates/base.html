@@ -187,10 +187,26 @@
                     {% endif %}
 
                     <!-- Obecność -->
-                    {% if perms.teacher.is_teacher %}
-                        <a href="#"
-                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary">
-                            <span class="material-symbols-outlined">checklist</span> Obecność
+                    {% if perms.parent.is_parent %}
+                        <a href="{% url 'presence_calendar' %}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">event_available</span>
+                            <p class="text-sm font-medium leading-normal">Obecności</p>
+                        </a>
+
+                        <a href="{% url 'post_list_view' %}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">campaign</span>
+                            <p class="text-sm font-medium leading-normal">Wydarzenia</p>
+                        </a>
+
+
+                        <div class="my-2 border-t border-gray-100 dark:border-gray-800"></div>
+
+                        <a href="{% url 'contact' %}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">contact_support</span>
+                            <p class="text-sm font-medium leading-normal">Kontakt</p>
                         </a>
                     {% endif %}
 
@@ -210,7 +226,7 @@
                     {% elif perms.parent.is_parent %}
                         <a href="{% url 'parent_profile' user.parenta.id %}"
                     {% elif perms.director.is_director %}
-                        <a href="{% url 'director_profile' %}"
+                        <a href="{% url 'director_profile' pk=user.director.id %}"
                     {% else %}
                         <a href="#"
                     {% endif %}

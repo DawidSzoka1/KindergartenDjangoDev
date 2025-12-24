@@ -97,10 +97,6 @@ class KidsListView(LoginRequiredMixin, View):
                 kids = groups.kid_set.filter(is_active=True).order_by('-id')
             else:
                 kids = None
-
-        elif request.user.get_user_permissions() == {'parent.is_parent'}:
-            kids = get_object_or_404(ParentA, user=request.user.id).kids.filter(is_active=True).order_by('-id')
-            groups_count = get_object_or_404(ParentA, user=request.user.id).kids.group.filter(is_active=True).count()
         else:
             raise PermissionDenied
 

@@ -7,18 +7,23 @@
             <div class="flex flex-col gap-6">
 
                 <div class="flex flex-wrap gap-2 text-sm">
-                    <a class="text-primary hover:underline font-medium leading-normal" href="{% url 'home_page' %}">Home</a>
+                    <a class="text-primary hover:underline font-medium leading-normal" href="{% url 'home_page' %}">Dashboard</a>
                     <span class="text-[#618961] dark:text-[#8cb88c] font-medium leading-normal">/</span>
                     <span class="text-[#111811] dark:text-white font-medium leading-normal">Profil Dyrektora</span>
                 </div>
 
                 <div class="flex flex-wrap justify-between gap-4 items-center bg-white dark:bg-[#1a2e1a] p-6 rounded-xl border border-[#dbe6db] dark:border-gray-800 shadow-sm">
                     <div class="flex flex-col gap-1">
-                        <h1 class="text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em]">Profil Dyrektora</h1>
-                        <p class="text-[#618961] dark:text-[#a1cca1] text-base font-normal leading-normal">Zarządzaj swoimi danymi oraz przeglądaj statystyki placówki.</p>
+                        <h1 class="text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em]">
+                            {% if request.user.id == director.user.id %}Twój Profil{% else %}Informacje o Dyrekcji{% endif %}
+                        </h1>
+                        <p class="text-[#618961] dark:text-[#a1cca1] text-base font-normal leading-normal">
+                            {% if request.user.id == director.user.id %}Zarządzaj swoimi danymi oraz przeglądaj statystyki placówki.{% else %}Dane kontaktowe dyrektora zarządzającego Twoją placówką.{% endif %}
+                        </p>
                     </div>
                     <div class="flex gap-3">
-                        {% if perms.director.is_director %}
+                        {# Tylko właściciel profilu może go edytować #}
+                        {% if request.user.id == director.user.id %}
                             <a href="{% url 'give-permissions' %}" class="flex items-center justify-center gap-2 rounded-lg h-11 px-5 bg-gray-200 dark:bg-gray-700 text-[#111811] dark:text-white text-sm font-bold hover:bg-gray-300 transition-colors">
                                 <span class="material-symbols-outlined">verified_user</span>
                                 Uprawnienia
@@ -31,26 +36,18 @@
                     </div>
                 </div>
 
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="p-4 rounded-xl bg-primary text-black font-bold text-center shadow-sm">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div class="lg:col-span-1">
                         <div class="bg-white dark:bg-[#1a2e1a] p-8 rounded-xl shadow-sm border border-[#dbe6db] dark:border-gray-800 flex flex-col items-center text-center">
                             <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-40 mb-6 ring-4 ring-primary/20 shadow-md"
                                  style='background-image: url("{% if director.gender == 2 %}{% static 'DYREKTORKA.jpg' %}{% elif director.gender == 1 %}{% static 'DYREKTOR.jpg' %}{% else %}{% static 'gander_null.jpg' %}{% endif %}");'>
                             </div>
-                            <h2 class="text-2xl font-bold text-[#111811] dark:text-white mb-1">
+                            <h2 class="text-2xl font-bold text-[#111811] dark:text-white mb-1 uppercase tracking-tight">
                                 {% if director.first_name %}{{ director.first_name }} {{ director.last_name }}{% else %}Administrator{% endif %}
                             </h2>
-                            <p class="text-[#618961] dark:text-primary text-lg font-medium mb-6">Dyrektor Placówki</p>
+                            <p class="text-[#618961] dark:text-primary text-lg font-black uppercase tracking-widest text-xs mb-6">Dyrektor Placówki</p>
 
-                            {% if perms.director.is_director %}
+                            {% if request.user.id == director.user.id %}
                                 <a href="{% url 'password_change' %}" class="w-full py-3 px-4 rounded-lg border-2 border-[#dbe6db] dark:border-gray-700 text-[#111811] dark:text-white font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
                                     <span class="material-symbols-outlined">lock_reset</span>
                                     Zmień Hasło
@@ -60,50 +57,71 @@
                     </div>
 
                     <div class="lg:col-span-2 flex flex-col gap-6">
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                            <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
-                                <p class="text-2xl font-black text-primary">{{ groups.count }}</p>
-                                <p class="text-xs font-bold uppercase text-[#618961]">Grupy</p>
+
+                        {# Statystyki widoczne TYLKO dla dyrektora #}
+                        {% if perms.director.is_director and request.user.id == director.user.id %}
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
+                                    <p class="text-2xl font-black text-primary">{{ groups.count }}</p>
+                                    <p class="text-[10px] font-black uppercase text-[#618961]">Grupy</p>
+                                </div>
+                                <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
+                                    <p class="text-2xl font-black text-primary">{{ kids.count }}</p>
+                                    <p class="text-[10px] font-black uppercase text-[#618961]">Dzieci</p>
+                                </div>
+                                <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
+                                    <p class="text-2xl font-black text-primary">{{ director.employee_set.count }}</p>
+                                    <p class="text-[10px] font-black uppercase text-[#618961]">Kadra</p>
+                                </div>
+                                <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
+                                    <p class="text-2xl font-black text-primary">{{ director.parenta_set.count }}</p>
+                                    <p class="text-[10px] font-black uppercase text-[#618961]">Rodzice</p>
+                                </div>
                             </div>
-                            <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
-                                <p class="text-2xl font-black text-primary">{{ kids.count }}</p>
-                                <p class="text-xs font-bold uppercase text-[#618961]">Dzieci</p>
-                            </div>
-                            <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
-                                <p class="text-2xl font-black text-primary">{{ director.employee_set.count }}</p>
-                                <p class="text-xs font-bold uppercase text-[#618961]">Kadra</p>
-                            </div>
-                            <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
-                                <p class="text-2xl font-black text-primary">{{ director.parenta_set.count }}</p>
-                                <p class="text-xs font-bold uppercase text-[#618961]">Rodzice</p>
-                            </div>
-                        </div>
+                        {% endif %}
 
                         <div class="bg-white dark:bg-[#1a2e1a] p-6 rounded-xl shadow-sm border border-[#dbe6db] dark:border-gray-800">
-                            <h3 class="text-xl font-bold pb-4 border-b border-[#dbe6db] dark:border-gray-800 mb-6 flex items-center gap-2">
-                                <span class="material-symbols-outlined text-primary">person</span>
-                                Informacje o Koncie
+                            <h3 class="text-lg font-black uppercase tracking-widest pb-4 border-b border-[#dbe6db] dark:border-gray-800 mb-6 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">contact_mail</span>
+                                Dane Kontaktowe
                             </h3>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                 <div class="flex flex-col gap-1">
-                                    <span class="text-sm font-bold text-[#618961] uppercase tracking-wider">Adres E-mail</span>
+                                    <span class="text-[10px] font-black text-[#618961] uppercase tracking-widest">Adres E-mail</span>
                                     <p class="text-lg font-medium text-[#111811] dark:text-white">{{ director.user.email }}</p>
                                 </div>
-                                <div class="flex flex-col gap-1">
-                                    <span class="text-sm font-bold text-[#618961] uppercase tracking-wider">Status Konta</span>
-                                    <div class="flex items-center gap-2">
-                                        <span class="size-3 rounded-full bg-primary animate-pulse"></span>
-                                        <p class="text-lg font-medium text-[#111811] dark:text-white">Aktywne (Dyrektor)</p>
+                                {% if director.phone %}
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-[10px] font-black text-[#618961] uppercase tracking-widest">Numer Telefonu</span>
+                                        <p class="text-lg font-medium text-[#111811] dark:text-white">{{ director.phone }}</p>
                                     </div>
-                                </div>
+                                {% endif %}
+
+                                {# Status widoczny tylko dla dyrektora #}
+                                {% if request.user.id == director.user.id %}
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-[10px] font-black text-[#618961] uppercase tracking-widest">Status Konta</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="size-3 rounded-full bg-primary animate-pulse"></span>
+                                            <p class="text-lg font-medium text-[#111811] dark:text-white">Aktywne (Administracyjne)</p>
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
 
-                        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800 flex items-start gap-4">
-                            <span class="material-symbols-outlined text-blue-600 mt-1">info</span>
-                            <p class="text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
-                                To jest Twój panel profilu. Statystyki powyżej są generowane automatycznie na podstawie aktywnych zasobów w Twojej placówce. Dane e-mail służą do logowania i komunikacji systemowej.
-                            </p>
+                        {# Blok informacyjny zależny od typu użytkownika #}
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border border-blue-100 dark:border-blue-800 flex items-start gap-4">
+                            <span class="material-symbols-outlined text-blue-600 mt-1">help_center</span>
+                            <div class="text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
+                                {% if request.user.id == director.user.id %}
+                                    <p class="font-bold mb-1 uppercase tracking-tight">Twój panel zarządzania</p>
+                                    Dane widoczne powyżej są wykorzystywane do autoryzacji oraz generowania faktur i dokumentów placówki.
+                                {% else %}
+                                    <p class="font-bold mb-1 uppercase tracking-tight">Kontakt z dyrekcją</p>
+                                    Jeśli masz pytania dotyczące płatności, faktur lub spraw organizacyjnych, prosimy o kontakt pod powyższym adresem e-mail.
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>

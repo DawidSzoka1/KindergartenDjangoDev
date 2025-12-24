@@ -1,223 +1,163 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block content %}
-    <link rel="stylesheet" href="{% static 'input_foucs.css' %}">
-    <nav class="navbar second-navbar navbar-expand-sm" style="background-color: #E6DCD3;">
-        <!-- Container wrapper -->
-        <div class="container-fluid">
-            <!-- Left links -->
-            <ul class="navbar-nav justify-content-start">
+    <main class="flex-1 p-4 lg:p-8 w-full max-w-5xl mx-auto">
+        <nav class="flex items-center gap-2 mb-6 text-sm font-medium">
+            <a href="{% url 'home_page' %}" class="text-[#618961] dark:text-gray-400 hover:text-primary transition-colors">Dashboard</a>
+            <span class="text-gray-400">/</span>
+            <span class="text-[#111811] dark:text-white">Lista Obecności</span>
+        </nav>
 
-                <li class="nav-item me-2 me-lg-0">
-                    <h2>
-                        <a href="{% url 'home_page' %}" role="button"
-                           style="color: #75736B; text-decoration:none;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32"
-                                 height="32"
-                                 fill="currentColor" class="bi bi-caret-left-fill"
-                                 viewBox="0 0 16 16">
-                                <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
-                            </svg>
-
-                            MENU
-
-                        </a>
-                    </h2>
-                </li>
-
-            </ul>
-            <!-- Left links -->
-            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                <!-- Navbar brand -->
-                <!-- Left links -->
-                <ul class="navbar-nav mb-2">
-                    <li class="nav-item" style="font-size: 35px; color:#75736B; margin-left: -25%"><b>LISTA
-                        OBECNOŚCI</b></li>
-                </ul>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-[#111811] dark:text-white tracking-tight uppercase">Zarządzanie Obecnością</h1>
+                <p class="text-[#618961] dark:text-gray-400">Dzisiaj jest {{ today|date:"l, d F Y" }}</p>
             </div>
 
+            {% if perms.director.is_director %}
+                <form method="POST" action="" class="relative w-full md:w-72">
+                    {% csrf_token %}
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="material-symbols-outlined text-gray-400">search</span>
+                    </div>
+                    <input type="text" name="search" placeholder="Szukaj dziecka..."
+                           class="block w-full pl-10 pr-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl focus:ring-primary focus:border-primary text-sm">
+                </form>
+            {% endif %}
         </div>
-        <!-- Container wrapper -->
-    </nav>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}"
-                 style="color: white; text-align: center; font-size: 30px">
-                {{ message }}
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-6 p-4 rounded-xl {% if message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %} font-medium shadow-sm flex items-center gap-3">
+                    <span class="material-symbols-outlined">info</span>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if weekend %}
+            <div class="bg-white dark:bg-gray-900 rounded-2xl p-12 text-center border border-dashed border-gray-300 dark:border-gray-700">
+                <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">event_busy</span>
+                <h2 class="text-2xl font-bold text-gray-500">Weekend / Dzień wolny od zajęć</h2>
             </div>
-        {% endfor %}
-    {% endif %}
-    {% if perms.director.is_director %}
-        <div class="justify-content-center">
-            <form class="d-flex" method="POST" action=""
-                  style="border: 7px solid #BAB1AB;border-radius: 25px; width: 50%; margin-left: 22%; margin-top: 20px">
-                {% csrf_token %}
-                <input class="form-control" type="search" placeholder="Wpisz imie dziecka"
-                       aria-label="Wpisz imie dziecka" name="search">
-                <span><button class="btn " type="submit"
-                              style="margin-left: -8px; background-color: #BAB1AB; color: white">SZUKAJ</button></span>
-            </form>
-        </div>
-    {% endif %}
-    {% if weekend %}
-        <h1 style="text-align: center; margin-top: 20px">Dzień wolny od zajęć</h1>
-    {% else %}
-        <form action="" method="POST">
-            {% csrf_token %}
-            {% for kid, presence in dict.items %}
-
-
-                <div class="container-fluid mb-1 mt-5"
-                     style="background-color: white">
-                    <div class="row align-item-end" style="padding-top: 10px;">
-                        <div class="col mb-3 mr-2"
-                             style="justify-content: end">
-                            {% if kid.gender == 2 %}
-                                <img class="img"
-                                     style="height: 150px;"
-                                     src="{% static 'girl.jpg' %}"
-                                     alt="">
-                            {% else %}
-                                <img class="img"
-                                     style="height: 150px; margin-left: 3%; margin-right: 2%"
-                                     src="{% static 'boy.jpg' %}"
-                                     alt="">
-                            {% endif %}
-                        </div>
-                        <div class="col-7 md-5 mt-5 ml-5">
-
-                            <a href="{% url 'kid_details' pk=kid.id %}"
-                               style="font-size: 20px; text-decoration:none; color: #75736B ">{{ kid.first_name.title }} {{ kid.last_name.title }}</a>
-
-                        </div>
-                        <div class="col-3 mt-5  ml-5" style="color: #75736B;">
-                            <form method="POST" action="">
-                                {% csrf_token %}
-
-                                {% if perms.teacher.is_teacher or perms.director.is_director %}
-                                    {% if presence.presenceType == 2 %}
-
-                                        <label>
-                                            <input type="submit" value="{{ kid.id }} 1" name="data"
-                                                   style="background-image: url('{% static 'check2-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0"
-                                                   onclick="return confirm('Jestes pewny ze chcesz cofnąć obecność dziecka {{ kid }}');"
-                                            >
-
-                                        </label>
-                                    {% elif presence.presenceType == 3 %}
-                                        <b style="color: #BAF3F5 ; border: solid 1px #BAF3F5; font-size: 20px">ZAPLANOWANA
-                                            NIEOBECNOŚĆ</b>
+        {% else %}
+            <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800">
+                <div class="divide-y divide-gray-100 dark:divide-gray-800">
+                    {% for kid, presence in dict.items %}
+                        <div class="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all">
+                            <div class="flex items-center gap-4">
+                                <div class="relative">
+                                    {% if kid.gender == 2 %}
+                                        <img class="h-14 w-14 rounded-full object-cover border-2 border-primary/20" src="{% static 'girl.jpg' %}" alt="{{ kid.first_name }}">
                                     {% else %}
-
-                                        <label>
-                                            <input type="submit" value="{{ kid.id }} 2" name="data"
-                                                   style="background-image: url('{% static 'x-square.svg' %}'); background-color: white; border: none; width: 50px; height: 50px; font-size: 0">
-
-                                        </label>
-
+                                        <img class="h-14 w-14 rounded-full object-cover border-2 border-primary/20" src="{% static 'boy.jpg' %}" alt="{{ kid.first_name }}">
                                     {% endif %}
-                                {% elif perms.parent.is_parent %}
-                                    {% if tomorrow == 5 or tomorrow == 6 %}
-                                        Kolejny dzień jest dniem wolnym od zajęć
-                                    {% else %}
-                                        <label>
-                                            <input type="submit" value="{{ kid.id }} 3" name="data"
-                                                   style="background-image: url('{% static 'nieobecnosc-2.jpg' %}'); border: none; width: 293px; height: 85px; font-size: 0">
+                                    <div class="absolute -bottom-1 -right-1 size-4 rounded-full border-2 border-white dark:border-gray-900
+                                {% if presence.presenceType == 2 %}bg-green-500{% elif presence.presenceType == 3 %}bg-blue-500{% else %}bg-red-500{% endif %}">
+                                    </div>
+                                </div>
+                                <div>
+                                    <a href="{% url 'kid_details' pk=kid.id %}" class="text-lg font-bold text-[#111811] dark:text-white hover:text-primary transition-colors">
+                                        {{ kid.first_name.title }} {{ kid.last_name.title }}
+                                    </a>
+                                    <p class="text-sm text-[#618961] dark:text-gray-400">Grupa: {{ kid.group.name|default:"Brak grupy" }}</p>
+                                </div>
+                            </div>
 
-                                        </label>
+                            <div class="flex items-center gap-3">
+                                <form method="POST" action="" class="flex items-center">
+                                    {% csrf_token %}
+                                    {% if perms.teacher.is_teacher or perms.director.is_director %}
+                                        {% if presence.presenceType == 2 %}
+                                            <button type="submit" name="data" value="{{ kid.id }} 1"
+                                                    onclick="return confirm('Cofnąć obecność dla: {{ kid }}?');"
+                                                    class="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-xl font-bold text-sm hover:bg-green-600 transition-all">
+                                                <span class="material-symbols-outlined !text-lg">check_circle</span>
+                                                OBECNY
+                                            </button>
+                                        {% elif presence.presenceType == 3 %}
+                                            <div class="px-4 py-2 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded-xl font-bold text-sm flex items-center gap-2">
+                                                <span class="material-symbols-outlined !text-lg">event_busy</span>
+                                                ZAPLANOWANA
+                                            </div>
+                                        {% else %}
+                                            <button type="submit" name="data" value="{{ kid.id }} 2"
+                                                    class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-xl font-bold text-sm hover:bg-primary/20 hover:text-primary transition-all">
+                                                <span class="material-symbols-outlined !text-lg">radio_button_unchecked</span>
+                                                OZNACZ OBECNOŚĆ
+                                            </button>
+                                        {% endif %}
+                                    {% elif perms.parent.is_parent %}
+                                        {% if tomorrow == 5 or tomorrow == 6 %}
+                                            <span class="text-xs text-gray-400 italic">Jutro wolne</span>
+                                        {% else %}
+                                            <button type="submit" name="data" value="{{ kid.id }} 3"
+                                                    class="flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-xl font-bold text-sm hover:bg-orange-200 transition-all">
+                                                <span class="material-symbols-outlined !text-lg">history_toggle_off</span>
+                                                ZGŁOŚ NIEOBECNOŚĆ
+                                            </button>
+                                        {% endif %}
                                     {% endif %}
-                                {% endif %}
-                            </form>
+                                </form>
 
-                        </div>
+                                <div class="relative group">
+                                    <button class="p-2 text-gray-400 hover:text-primary rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+                                        <span class="material-symbols-outlined">more_vert</span>
+                                    </button>
 
-                        <div class="col mt-5">
-
-                            <div class="drodown">
-                                <a class="dropdown-toggle d-flex align-items-center hidden-arrow"
-                                   href="#"
-                                   id="navbarDropdownMenuAvatar"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false"
-                                   style="font-size: 20px;  text-decoration:none; color: #75736B; ">
-                                    Opcje
-                                </a>
-                                <ul
-                                        class="dropdown-menu dropdown-menu-end"
-                                        aria-labelledby="navbarDropdownMenuAvatar"
-                                >
-                                    <li>
-                                        <a href="{% url 'kid_details' pk=kid.id %}"
-                                           class="dropdown-item">Konto
-                                            dziecka
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a href="{% url 'calendar' kid.id month year %}"
-                                           class="dropdown-item">Kalendarz
-                                        </a>
-                                    </li>
-                                    {% if perms.director.is_director %}
-                                        <li>
-                                            <a href="{% url 'change_kid_info' pk=kid.id %}"
-                                               class="dropdown-item">Zmien
-                                                informacje</a>
-                                        </li>
-                                        <li>
-                                            <form method="POST"
-                                                  action="{% url 'kid_delete' pk=kid.id %}">
-                                                {% csrf_token %}
-                                                <button class="dropdown-item"
-                                                        type="submit"
-                                                        name="delete"
-                                                        value="Usuń"
-                                                        onclick="return confirm('Jestes pewny ze chcesz usunac dziecko {{ kid }}');"
-                                                >Usuń dziecko
-                                                </button>
-                                            </form>
-                                        </li>
-                                    {% endif %}
-                                </ul>
+                                    <div class="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-[100]">
+                                        <div class="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl shadow-2xl overflow-hidden">
+                                            <a href="{% url 'kid_details' pk=kid.id %}" class="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-colors">
+                                                <span class="material-symbols-outlined !text-lg">account_circle</span> Profil
+                                            </a>
+                                            <a href="{% url 'calendar' kid.id month year %}" class="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-colors">
+                                                <span class="material-symbols-outlined !text-lg">calendar_month</span> Kalendarz
+                                            </a>
+                                            {% if perms.director.is_director %}
+                                                <div class="border-t border-gray-100 dark:border-gray-800"></div>
+                                                <a href="{% url 'change_kid_info' pk=kid.id %}" class="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-colors">
+                                                    <span class="material-symbols-outlined !text-lg">edit</span> Edytuj
+                                                </a>
+                                                <form method="POST" action="{% url 'kid_delete' pk=kid.id %}" onsubmit="return confirm('Usunąć dziecko {{ kid }}?');">
+                                                    {% csrf_token %}
+                                                    <button type="submit" name="delete" class="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+                                                        <span class="material-symbols-outlined !text-lg">delete</span> Usuń
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
-                <hr>
 
-            {% endfor %}
-        </form>
+                {% if page_obj.has_other_pages %}
+                    <div class="p-4 bg-gray-50 dark:bg-gray-800/30 border-t border-gray-100 dark:border-gray-800 flex justify-center gap-2">
+                        {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}" class="size-10 flex items-center justify-center rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-500 hover:border-primary hover:text-primary transition-all">
+                                <span class="material-symbols-outlined">chevron_left</span>
+                            </a>
+                        {% endif %}
 
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="size-10 flex items-center justify-center rounded-xl bg-primary text-black font-bold">{{ num }}</span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?page={{ num }}" class="size-10 flex items-center justify-center rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-500 hover:border-primary hover:text-primary transition-all">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
 
-        {% if page_obj.has_other_pages %}
-            <div style="position: absolute; bottom: auto; left:45%">
-                {% if page_obj.has_previous %}
-
-                    <a class="btn mb-4" href="?page={{ page_obj.previous_page_number }}"
-                       style=" font-size: 50px; color:#75736B">< </a>
-                {% else %}
-                    <a class="btn mb-4" href="?page={{ page_obj.paginator.num_pages }}"
-                       style=" font-size: 50px; color:#75736B">< </a>
-                {% endif %}
-
-                {% for num in page_obj.paginator.page_range %}
-                    {% if page_obj.number == num %}
-                        <a class="btn mb-4" href="?page={{ num }}"
-                           style=" font-size: 50px; color:#75736B">{{ num }}</a>
-                    {% endif %}
-
-                {% endfor %}
-
-                {% if page_obj.has_next %}
-                    <a class="btn mb-4" href="?page={{ page_obj.next_page_number }}"
-                       style=" text-decoration: none; font-size: 50px; color:#75736B"> ></a>
-                {% else %}
-
-                    <a class="btn mb-4" href="?page=1"
-                       style=" font-size: 50px; color:#75736B"> > </a>
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}" class="size-10 flex items-center justify-center rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-500 hover:border-primary hover:text-primary transition-all">
+                                <span class="material-symbols-outlined">chevron_right</span>
+                            </a>
+                        {% endif %}
+                    </div>
                 {% endif %}
             </div>
         {% endif %}
-    {% endif %}
+    </main>
 {% endblock %}

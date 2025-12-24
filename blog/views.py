@@ -5,11 +5,13 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import UpdateView
-
+from django.utils import timezone
+from children.models import PresenceModel
 from groups.models import Groups
 from parent.models import ParentA
 from teacher.models import Employee
 from .forms import PostAddForm
+from datetime import timedelta
 from .models import Post
 from director.models import Director
 from django.contrib import messages
@@ -19,9 +21,51 @@ from children.models import Kid
 
 class Home(View):
     def get(self, request):
+        now = timezone.now()
+        last_week = now - timedelta(days=7)
         if request.user.get_user_permissions() == {'parent.is_parent'}:
-            kids = get_object_or_404(ParentA, user=request.user.id).kids.filter(is_active=True)
-            return render(request, 'home.html', {'kids': kids})
+            parent = get_object_or_404(ParentA, user=request.user.id)
+
+            # 1. Dzieci z paginacją (4 na stronę)
+            kids_list = parent.kids.filter(is_active=True).select_related('group').order_by('last_name')
+            kids_page = Paginator(kids_list, 4).get_page(request.GET.get('kids_page'))
+
+            group_ids = kids_list.values_list('group__id', flat=True)
+
+            # 2. Najnowsze ogłoszenia (dowolny typ, z ostatniego tygodnia)
+            announcements_list = Post.objects.filter(
+                group__id__in=group_ids,
+                is_active=True,
+                date_posted__gte=last_week
+            ).distinct().order_by('-date_posted')
+            ann_page = Paginator(announcements_list, 3).get_page(request.GET.get('ann_page'))
+
+            # 3. Nadchodzące wydarzenia (przyszłe daty)
+            upcoming_events = Post.objects.filter(
+                group__id__in=group_ids,
+                is_active=True,
+                event_date__gte=now.date()
+            ).distinct().order_by('event_date')[:2]
+
+            # 4. Kadra Nauczycielska z paginacją (np. 3 na stronę w bocznym pasku)
+            teachers_list = Employee.objects.filter(group__id__in=group_ids, is_active=True).distinct().order_by('last_name')
+            teachers_page = Paginator(teachers_list, 3).get_page(request.GET.get('t_page'))
+
+            # 5. Dyrektorzy z paginacją
+            principals_list = parent.principal.all().order_by('last_name')
+            principals_page = Paginator(principals_list, 2).get_page(request.GET.get('p_page'))
+
+            context = {
+                'kids': kids_page,
+                'announcements': ann_page,
+                'upcoming_events': upcoming_events,
+                'upcoming_events_count': upcoming_events.count(),
+                'teachers': teachers_page,
+                'principals': principals_page,
+                'month_current': now.month,
+                'year_current': now.year,
+            }
+            return render(request, 'home.html', context)
         elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
             teacher = get_object_or_404(Employee, user=request.user.id)
             return render(request, 'home.html', {'teacher': teacher})
