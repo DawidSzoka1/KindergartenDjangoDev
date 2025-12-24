@@ -180,12 +180,28 @@
                     {% endif %}
                     <!-- Moja grupa — tylko nauczyciel -->
                     {% if perms.teacher.is_teacher %}
-                        <a href="#"
-                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary">
-                            <span class="material-symbols-outlined">groups</span> Moja grupa
-                        </a>
-                    {% endif %}
 
+
+                        <a href="{% url 'presence_calendar' %}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/10 text-gray-600 dark:text-gray-400 hover:text-primary transition-all group">
+                            <span class="material-symbols-outlined">task_alt</span>
+                            <span class="text-sm font-bold uppercase tracking-tight">Obecność Grupy</span>
+                        </a>
+
+                        {% if user.employee.group %}
+                            <a href="{% url 'group_details' pk=user.employee.group.id %}"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/10 text-gray-600 dark:text-gray-400 hover:text-primary transition-all group">
+                                <span class="material-symbols-outlined">groups</span>
+                                <span class="text-sm font-bold uppercase tracking-tight">Moja Grupa</span>
+                            </a>
+                        {% else %}
+                            <div class="flex items-center gap-3 px-3 py-2.5 text-gray-400 cursor-not-allowed" title="Brak przypisanej grupy">
+                                <span class="material-symbols-outlined">groups_off</span>
+                                <span class="text-sm font-bold uppercase tracking-tight italic">Brak Grupy</span>
+                            </div>
+                        {% endif %}
+
+                    {% endif %}
                     <!-- Obecność -->
                     {% if perms.parent.is_parent %}
                         <a href="{% url 'presence_calendar' %}"

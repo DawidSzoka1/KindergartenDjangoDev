@@ -1,189 +1,99 @@
+
 <div class="p-8 overflow-y-auto">
     <div class="max-w-7xl mx-auto">
 
-        <!-- Header -->
         <header class="flex flex-wrap items-center justify-between gap-4 mb-8">
             <div class="flex flex-col gap-1">
-                <h1 class="text-3xl font-bold tracking-tight">Welcome, Maria!</h1>
-                <p class="text-text-muted-light dark:text-text-muted-dark text-base">Tuesday, 26 October</p>
+                <h1 class="text-3xl font-black tracking-tighter uppercase">Witaj, {{ teacher.first_name }}! 👋</h1>
+                <p class="text-gray-500 font-bold uppercase text-xs tracking-widest">{{ today|date:"l, d F Y" }}</p>
             </div>
 
             <div class="flex items-center gap-4">
-                <button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 px-4">
-                    <p class="text-sm font-medium">Sunbeam Group</p>
-                    <span class="material-symbols-outlined text-base">expand_more</span>
-                </button>
-
-                <div class="flex gap-2">
-                    <button class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700/50">
-                        <span class="material-symbols-outlined">notifications</span>
-                    </button>
-                    <button class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700/50">
-                        <span class="material-symbols-outlined">help</span>
-                    </button>
+                <div class="px-4 py-2 rounded-xl bg-primary/10 border border-primary/20">
+                    <p class="text-sm font-black text-primary uppercase">Grupa: {{ group.name }}</p>
                 </div>
             </div>
         </header>
 
-        <!-- Dashboard Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-            <!-- Left Column -->
             <div class="lg:col-span-2 flex flex-col gap-8">
-
-                <!-- Attendance Card -->
-                <section class="bg-card-light dark:bg-card-dark rounded-xl shadow-sm">
-                    <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-                        <h2 class="text-xl font-bold">Daily Attendance</h2>
-                        <span class="text-sm font-semibold text-text-muted-light dark:text-text-muted-dark">12/15 Present</span>
+                <section class="bg-white dark:bg-[#0f1d0f] rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800">
+                    <div class="flex items-center justify-between p-6 border-b border-gray-50 dark:border-gray-800">
+                        <h2 class="text-xl font-black uppercase tracking-tight">Dzisiejsza Obecność</h2>
+                        <span class="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-black text-primary uppercase">
+                            {{ stats.present }} / {{ stats.total }} Obecnych
+                        </span>
                     </div>
 
                     <div class="p-6 space-y-4">
+                        {% for kid in kids %}
+                            <div class="flex items-center justify-between p-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all border border-transparent hover:border-gray-100 dark:hover:border-gray-800">
+                                <div class="flex items-center gap-4">
+                                    <div class="size-10 rounded-full bg-primary/10 flex items-center justify-center font-black text-primary text-xs uppercase">
+                                        {{ kid.first_name|slice:":1" }}
+                                    </div>
+                                    <p class="font-bold text-gray-900 dark:text-white">{{ kid.first_name }} {{ kid.last_name }}</p>
+                                </div>
 
-                        <!-- Student example row -->
-                        <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                            <div class="flex items-center gap-4">
-                                <img class="w-10 h-10 rounded-full object-cover"
-                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5BAAhiThA5OBBA0gKzWdsQNA5jFl802EzeI_DCXV-HQqCA7PuMsSQQLFw21gAAh08Ix7BW2BwPnZrIVG2jSAzeuRkGGUE8BIyT-Z4R3VstCnxHwSssHKOhAKcfcbLyDD5WrA5eLXDgdIc2RuL1yWqYUN6IgaI9zkZ7DOOPCN-sxw_zcK2fHD9nijo039MOWhuDv5YAwEGrD8n8itdoiTI7E9WuYvKLF-hi8h3t54L5wtiXa8UlJXZY0ljnUX4JelB9puqyi9F0PU"/>
-                                <p class="font-medium">Olivia Chen</p>
+                                <div class="flex items-center gap-2">
+                                    {# Bezpośredni dostęp do atrybutu dodanego w widoku #}
+                                    <span class="px-3 py-1 text-[10px] rounded-full font-black uppercase tracking-widest
+            {% if kid.today_status == 2 %} bg-green-100 text-green-700
+            {% elif kid.today_status == 1 %} bg-red-100 text-red-700
+            {% else %} bg-gray-100 text-gray-400 {% endif %}">
+
+            {% if kid.today_status == 2 %}
+                Obecny
+            {% elif kid.today_status == 1 %}
+                Nieobecny
+            {% else %}
+                Brak wpisu
+            {% endif %}
+        </span>
+                                </div>
                             </div>
-
-                            <div class="flex items-center gap-2">
-                                <button class="px-3 py-1 text-sm rounded-full bg-success text-green-800 font-medium">Present</button>
-                                <button class="px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-danger hover:text-red-800 dark:hover:text-red-200">Absent</button>
-                                <button class="px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-warning hover:text-orange-800 dark:hover:text-orange-200">Late</button>
-                            </div>
-                        </div>
-
-                        <!-- kolejne rzędy uczniów – zostawiam Twoje oryginalne dane -->
-
-                        <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                            <div class="flex items-center gap-4">
-                                <img class="w-10 h-10 rounded-full object-cover"
-                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCydijzBITtrHU3KMGRh6P_JQlGviiik9R9QNQLcOfFebUhzXXjVh7Q9rwZMZvBtDUZ-Y7xqxhiPD2aOVOm-5EykouqSsY2CgurTjdyPc07ua5I8lWEFmlN9elaGnFin_V1PHm-t97XAeDxYBJjKtpNVobmbMa6wMRbn397JD8sYcLgXKuWY6EN9hXKDQ3aTFoX-StY0f6AWgT4O9SWRHcVANK16x3A91Y7dNN1paH_MwzfmKUni8S7tAWHs-XRajVWNPlaTJKdoVk"/>
-                                <p class="font-medium">Liam Smith</p>
-                            </div>
-
-                            <div class="flex items-center gap-2">
-                                <button class="px-3 py-1 text-sm rounded-full bg-danger text-red-800 font-medium">Absent</button>
-                                <button class="px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-success hover:text-green-800 dark:hover:text-green-200">Present</button>
-                                <button class="px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-warning hover:text-orange-800 dark:hover:text-orange-200">Late</button>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                            <div class="flex items-center gap-4">
-                                <img class="w-10 h-10 rounded-full object-cover"
-                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwdImmu82ykBUj1ZLXkkCUfg_HPnjrhNY6ir0_NKl1Y9sSNbnJrZ-JoYAAErfXxztIh3-k_gdBZffI7d5G1ZZ2EQW88S5Rznj3PDGCGZb6hmCxCu5V2mqs64zPd5lVO1mudiSUOPv97RGfVu65hY1R65hSLe64Wxm-aoBJ4qy0WE3yWTf2qIbIOCYCyNPp1yptv-mQxZpuu2vNlUaAgEwAXEduZbSw7IZw37BqivKvtIWt_RmeuUUyp6OU7FDhG4xZfd39yQeP2B8"/>
-                                <p class="font-medium">Noah Johnson</p>
-                            </div>
-
-                            <div class="flex items-center gap-2">
-                                <button class="px-3 py-1 text-sm rounded-full bg-warning text-orange-800 font-medium">Late</button>
-                                <button class="px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-success hover:text-green-800 dark:hover:text-green-200">Present</button>
-                                <button class="px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-danger hover:text-red-800 dark:hover:text-red-200">Absent</button>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                            <div class="flex items-center gap-4">
-                                <img class="w-10 h-10 rounded-full object-cover"
-                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1Vbth1kUvfDlkxVwCgKoYTjaGPQdEidNnMw0wEqa0FELjVL3BRX2xrfxgYFWK2b51jJwjBNsjW34mJx-M9txOre6O2_HWQUIpZW-Y8M8GR_KvrCM-3x3e0jjuhCAoXwhXfDtbcujNg2c3SILtHmhNiE3IitRSznJB37pcm4IwxO15FTxyCbsKrTP3NnPl__hq1ykvuRjliC0VYBoB_KGXJ4DewAMlcGNOGVxaqN6Jn0GnAw6ux4Hee3ti85N1G-nfjEOAIckmi9M"/>
-                                <p class="font-medium">Emma Williams</p>
-                            </div>
-
-                            <div class="flex items-center gap-2">
-                                <button class="px-3 py-1 text-sm rounded-full bg-success text-green-800 font-medium">Present</button>
-                                <button class="px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-danger hover:text-red-800 dark:hover:text-red-200">Absent</button>
-                                <button class="px-3 py-1 text-sm rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-warning hover:text-orange-800 dark:hover:text-orange-200">Late</button>
-                            </div>
-                        </div>
-
+                        {% endfor %}
                     </div>
                 </section>
             </div>
 
-            <!-- Right Column -->
             <div class="lg:col-span-1 flex flex-col gap-8">
-
-                <!-- Group Overview -->
-                <section class="bg-card-light dark:bg-card-dark rounded-xl p-6 shadow-sm">
-                    <h2 class="text-xl font-bold mb-4">Group Overview</h2>
-
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span class="text-text-muted-light dark:text-text-muted-dark">Total Children</span>
-                            <span class="font-semibold">15</span>
+                <section class="bg-white dark:bg-[#0f1d0f] rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-gray-800">
+                    <h2 class="text-xl font-black uppercase tracking-tight mb-6">Status Grupy</h2>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-gray-400 uppercase">Dzieci Razem</span>
+                            <span class="font-black text-lg">{{ stats.total }}</span>
                         </div>
-
-                        <div class="flex justify-between">
-                            <span class="text-text-muted-light dark:text-text-muted-dark">Boy/Girl Ratio</span>
-                            <span class="font-semibold">7 / 8</span>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-gray-400 uppercase">Chłopcy / Dziewczynki</span>
+                            <span class="font-black text-lg">{{ stats.boys }} / {{ stats.girls }}</span>
                         </div>
-
-                        <div class="flex justify-between">
-                            <span class="text-text-muted-light dark:text-text-muted-dark">Average Age</span>
-                            <span class="font-semibold">4.2 yrs</span>
-                        </div>
-                    </div>
-
-                    <button class="mt-6 w-full py-2 px-4 rounded-lg bg-primary/20 dark:bg-primary/30 text-primary font-semibold hover:bg-primary/30 dark:hover:bg-primary/40">
-                        View Full Roster
-                    </button>
-                </section>
-
-                <!-- Quick Actions -->
-                <section class="bg-card-light dark:bg-card-dark rounded-xl p-6 shadow-sm">
-                    <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
-
-                    <div class="flex flex-col gap-3">
-                        <button class="w-full text-left flex items-center gap-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-600/50">
-                            <span class="material-symbols-outlined text-primary">send</span>
-                            <span>Send Message to All Parents</span>
-                        </button>
-
-                        <button class="w-full text-left flex items-center gap-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-600/50">
-                            <span class="material-symbols-outlined text-primary">edit_note</span>
-                            <span>Add Activity Log</span>
-                        </button>
-
-                        <button class="w-full text-left flex items-center gap-3 p-3 rounded-lg bg-gray-100 dark:bg-gray-700/50 hover:bg-gray-200 dark:hover:bg-gray-600/50">
-                            <span class="material-symbols-outlined text-primary">event_note</span>
-                            <span>View Today&apos;s Schedule</span>
-                        </button>
+                        <a href="{% url 'presence_calendar' %}" class="block w-full mt-6 py-3 px-4 rounded-2xl bg-primary text-white text-center font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20 hover:scale-105 transition-all">
+                            Pełna Lista Obecności
+                        </a>
                     </div>
                 </section>
 
-                <!-- Upcoming Events -->
-                <section class="bg-card-light dark:bg-card-dark rounded-xl p-6 shadow-sm">
-                    <h2 class="text-xl font-bold mb-4">Upcoming Events</h2>
-
-                    <div class="space-y-3">
-                        <div class="flex items-start gap-3">
-                            <div class="p-2 bg-primary/20 dark:bg-primary/30 rounded-lg mt-1">
-                                <span class="material-symbols-outlined text-primary text-xl">celebration</span>
+                <section class="bg-white dark:bg-[#0f1d0f] rounded-3xl p-8 shadow-sm border border-gray-100 dark:border-gray-800">
+                    <h2 class="text-xl font-black uppercase tracking-tight mb-6">Nadchodzące</h2>
+                    <div class="space-y-6">
+                        {% for event in upcoming_events %}
+                            <div class="flex items-start gap-4 group">
+                                <div class="p-3 bg-primary/10 rounded-2xl text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                                    <span class="material-symbols-outlined">event</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-900 dark:text-white">{{ event.title }}</p>
+                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">{{ event.event_date|date:"d.m.Y" }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="font-semibold">Art Day</p>
-                                <p class="text-sm text-text-muted-light dark:text-text-muted-dark">Today, 10:00 AM</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-3">
-                            <div class="p-2 bg-primary/20 dark:bg-primary/30 rounded-lg mt-1">
-                                <span class="material-symbols-outlined text-primary text-xl">supervisor_account</span>
-                            </div>
-                            <div>
-                                <p class="font-semibold">Parent-Teacher Meeting</p>
-                                <p class="text-sm text-text-muted-light dark:text-text-muted-dark">Friday, 3:00 PM</p>
-                            </div>
-                        </div>
+                        {% empty %}
+                            <p class="text-sm text-gray-400 italic">Brak planowanych wydarzeń.</p>
+                        {% endfor %}
                     </div>
                 </section>
-
             </div>
-
         </div>
-
     </div>
 </div>

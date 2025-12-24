@@ -69,9 +69,39 @@ class Home(View):
                 'year_current': now.year,
             }
             return render(request, 'home.html', context)
-        elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
-            teacher = get_object_or_404(Employee, user=request.user.id)
-            return render(request, 'home.html', {'teacher': teacher})
+        # --- LOGIKA DLA NAUCZYCIELA ---
+        elif 'teacher.is_teacher' in user_perms:
+            teacher = get_object_or_404(Employee, user=user.id)
+            group = teacher.group
+
+            # Pobieramy dzieci i dzisiejsze obecności
+            kids_in_group = Kid.objects.filter(group=group, is_active=True).order_by('last_name')
+            today_presences = PresenceModel.objects.filter(day=now.date(), kid__group=group)
+
+            # Tworzymy mapę dla szybkiego wyszukiwania
+            presence_map = {p.kid_id: p.presenceType for p in today_presences}
+
+            # PRZYPISANIE STATUSU DO KAŻDEGO DZIECKA (Rozwiązanie bez filtra)
+            for kid in kids_in_group:
+                # Pobieramy status ze słownika, jeśli nie ma - None
+                kid.today_status = presence_map.get(kid.id)
+
+            # Statystyki (bez zmian)
+            stats = {
+                'total': kids_in_group.count(),
+                'present': today_presences.filter(presenceType=2).count(),
+                'boys': kids_in_group.filter(gender=1).count(),
+                'girls': kids_in_group.filter(gender=2).count(),
+            }
+
+            context = {
+                'teacher': teacher,
+                'group': group,
+                'kids': kids_in_group, # Obiekty mają teraz atrybut .today_status
+                'stats': stats,
+                'today': now,
+            }
+            return render(request, 'home.html', context)
         elif 'director.is_director' in user_perms:
             director = get_object_or_404(Director, user=user.id)
 

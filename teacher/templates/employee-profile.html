@@ -11,10 +11,12 @@
                 <div class="w-full max-w-7xl mx-auto">
 
                     <div class="flex items-center gap-3 mb-4 pt-4">
+                        {% if perms.director.is_director %}
                         <a href="{% url 'list_teachers' %}" class="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors">
                             <span class="material-symbols-outlined text-3xl">arrow_back</span>
                             <span class="text-xl font-medium leading-normal hidden sm:inline">KADRA</span>
                         </a>
+                        {% endif %}
                         <span class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal">/</span>
                         <span class="text-[#111811] dark:text-gray-200 text-sm font-medium leading-normal">
                             {{ employee.first_name|default:employee.user.email }}
@@ -63,7 +65,7 @@
                             </div>
 
                             <div class="flex w-full max-w-[480px] gap-3 @[480px]:w-auto">
-                                {% if perms.director.is_director or perms.teacher.is_teacher %}
+                                {% if perms.director.is_director or perms.teacher.is_teacher and user.email == employee.user.email %}
                                     <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-100 dark:bg-gray-800 text-[#111811] dark:text-gray-200 text-sm font-bold leading-normal tracking-[0.015em] flex-1 @[480px]:flex-auto hover:bg-gray-200 dark:hover:bg-gray-700"
                                             onclick="location.href='{% url 'teacher_update' pk=employee.id %}'">
                                         <span class="truncate">EDYTUJ PROFIL</span>

@@ -16,6 +16,7 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
+from django.db import transaction
 
 class EmployeeProfileView(LoginRequiredMixin, View):
 
@@ -161,7 +162,7 @@ class EmployeeAddView(PermissionRequiredMixin, View):
 
                 # Wyczyść stare rekordy (jeśli istnieją)
                 # Zostawiam ten fragment, ale jest BARDZO ryzykowne:
-                from contact_app.models import ContactModel # Dodaj import
+                from director.models import ContactModel # Dodaj import
                 ContactModel.objects.filter(director__user__email=teacher_email).delete()
                 Director.objects.filter(user__email=teacher_email).delete()
 
