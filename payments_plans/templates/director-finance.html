@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="max-w-7xl mx-auto p-4 lg:p-8">
+
+        <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+            <div>
+                <h1 class="text-3xl font-black uppercase tracking-tighter">Finanse Placówki</h1>
+                <form method="GET" class="flex items-center gap-4 mt-2">
+                    <select name="month" onchange="this.form.submit()" class="bg-transparent border-none font-bold text-primary uppercase text-xs focus:ring-0 cursor-pointer">
+                        {% for m_num, m_name in months_list %}
+                            <option value="{{ m_num }}" {% if selected_month == m_num %}selected{% endif %}>{{ m_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" name="year" value="{{ selected_year }}" onchange="this.form.submit()"
+                           class="w-20 bg-transparent border-none font-bold text-primary text-xs focus:ring-0 cursor-pointer">
+                </form>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="generate_all">
+                <input type="hidden" name="month" value="{{ selected_month }}">
+                <input type="hidden" name="year" value="{{ selected_year }}">
+                <button type="submit" class="flex items-center gap-2 px-6 py-4 bg-[#111811] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-primary hover:text-[#111811] transition-all">
+                    <span class="material-symbols-outlined">sync</span>
+                    Przelicz dane za ten okres
+                </button>
+            </form>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-white dark:bg-[#0f1d0f] p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Przychody (Wpłacone / Oczekiwane)</p>
+                <p class="text-3xl font-black text-green-500">{{ received_income }} <span class="text-sm text-gray-300">/ {{ total_income }} zł</span></p>
+            </div>
+            <div class="bg-white dark:bg-[#0f1d0f] p-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-2">Koszty (Wypłacone / Do wypłaty)</p>
+                <p class="text-3xl font-black text-red-500">{{ salaries_paid }} <span class="text-sm text-gray-300">/ {{ total_salaries }} zł</span></p>
+            </div>
+            <div class="bg-primary p-8 rounded-3xl text-[#111811] shadow-xl shadow-primary/20">
+                <p class="text-[10px] font-black uppercase opacity-70 mb-2">Aktualna gotówka w kasie</p>
+                <p class="text-3xl font-black">{{ balance }} zł</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+
+            <div class="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col">
+                <div class="p-6 border-b border-gray-50 dark:border-gray-800 bg-orange-50/30">
+                    <h2 class="text-sm font-black uppercase text-orange-700">Oczekujące wpłaty (Dzieci)</h2>
+                </div>
+                <div class="flex-1 overflow-x-auto">
+                    <table class="w-full text-left">
+                        <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
+                        {% for debt in debtors %}
+                            <tr class="hover:bg-gray-50/50 transition-colors">
+                                <td class="p-4">
+                                    <a href="{% url 'kid_details' debt.kid.id %}" class="font-bold text-gray-900 dark:text-white hover:text-primary transition-colors">
+                                        {{ debt.kid.first_name }} {{ debt.kid.last_name }}
+                                    </a>
+                                </td>
+                                <td class="p-4 text-right font-black text-orange-600 text-sm">{{ debt.total_amount }} zł</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if debtors.has_other_pages %}
+                    <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex justify-center gap-4">
+                        {% if debtors.has_previous %}<a href="?d_page={{ debtors.previous_page_number }}" class="text-[10px] font-black uppercase text-primary">Poprzednia</a>{% endif %}
+                        <span class="text-[10px] font-black text-gray-400">Strona {{ debtors.number }}</span>
+                        {% if debtors.has_next %}<a href="?d_page={{ debtors.next_page_number }}" class="text-[10px] font-black uppercase text-primary">Następna</a>{% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col">
+                <div class="p-6 border-b border-gray-50 dark:border-gray-800">
+                    <h2 class="text-sm font-black uppercase">Lista Płac Nauczycieli</h2>
+                </div>
+                <div class="flex-1 overflow-x-auto">
+                    <table class="w-full text-left">
+                        <tbody class="divide-y divide-gray-50 dark:divide-gray-800">
+                        {% for salary in salaries_list %}
+                            <tr class="hover:bg-gray-50/50">
+                                <td class="p-4">
+                                    <a href="{% url 'teacher-profile' salary.employee.id %}" class="font-bold text-sm hover:text-primary">{{ salary.employee }}</a>
+                                    <p class="text-[10px] font-black text-primary">{{ salary.base_salary }} zł</p>
+                                </td>
+                                <td class="p-4 text-right">
+                                    {% if salary.is_paid %}
+                                        <span class="material-symbols-outlined text-green-500">check_circle</span>
+                                    {% else %}
+                                        <form method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="pay_salary">
+                                            <input type="hidden" name="salary_id" value="{{ salary.id }}">
+                                            <button class="text-[10px] font-black uppercase bg-red-500 text-white px-4 py-2 rounded-xl hover:scale-105 transition-all">Opłać</button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if salaries_list.has_other_pages %}
+                    <div class="p-4 bg-gray-50/50 border-t border-gray-100 flex justify-center gap-4">
+                        {% if salaries_list.has_previous %}<a href="?s_page={{ salaries_list.previous_page_number }}" class="text-[10px] font-black uppercase text-primary">Poprzednia</a>{% endif %}
+                        <span class="text-[10px] font-black text-gray-400">Strona {{ salaries_list.number }}</span>
+                        {% if salaries_list.has_next %}<a href="?s_page={{ salaries_list.next_page_number }}" class="text-[10px] font-black uppercase text-primary">Następna</a>{% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

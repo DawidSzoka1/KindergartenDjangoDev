@@ -25,3 +25,27 @@ class PaymentPlan(models.Model):
 
     def __str__(self):
         return f'{self.name} - {self.price} zł'
+
+
+
+
+from teacher.models import Employee
+
+class SalaryPayment(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='salary_payments')
+    month = models.IntegerField()
+    year = models.IntegerField()
+    principal = models.ForeignKey(Director, on_delete=models.CASCADE, related_name='salary_payments', null=True)
+    base_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Pensja zasadnicza")
+    bonus = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Premia")
+
+    is_paid = models.BooleanField(default=False, verbose_name="Czy wypłacono?")
+    payment_date = models.DateField(null=True, blank=True, verbose_name="Data przelewu")
+
+    class Meta:
+        unique_together = ('employee', 'month', 'year')
+        verbose_name = "Wypłata"
+        verbose_name_plural = "Wypłaty"
+
+    def __str__(self):
+        return f"Pensja {self.month}/{self.year} - {self.employee}"

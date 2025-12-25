@@ -143,19 +143,23 @@
                             <span class="material-symbols-outlined">groups</span>
                             <p class="text-sm font-medium leading-normal">Grupy</p>
                         </a>
-                        <a  href="{% url 'list_kids' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary" href="#">
+                        <a  href="{% url 'list_kids' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary">
                             <span class="material-symbols-outlined">child_care</span>
                             <p class="text-sm font-medium leading-normal">Dzieci</p>
                         </a>
-                        <a href="{% url 'list_teachers' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary" href="#">
+                        <a href="{% url 'director_finance' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary">
+                            <span class="material-symbols-outlined">account_balance</span>
+                            <span class="text-sm font-medium leading-normal">Finanse i Wypłaty</span>
+                        </a>
+                        <a href="{% url 'list_teachers' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary">
                             <span class="material-symbols-outlined">school</span>
                             <p class="text-sm font-medium leading-normal">Nauczyciele</p>
                         </a>
-                        <a href="{% url 'list_parent' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary" href="#">
+                        <a href="{% url 'list_parent' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary">
                             <span class="material-symbols-outlined">escalator_warning</span>
                             <p class="text-sm font-medium leading-normal">Rodzice</p>
                         </a>
-                        <a href="{% url 'list_meals' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary" href="#">
+                        <a href="{% url 'list_meals' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary">
                             <span class="material-symbols-outlined">restaurant_menu</span>
                             <p class="text-sm font-medium leading-normal">Menu (Jadłospis)</p>
                         </a>
@@ -169,16 +173,12 @@
                             <span class="material-symbols-outlined">image</span>
                             <p class="text-sm font-medium">Zarządzaj Ikonami</p>
                         </a>
-                        <a href="{% url 'contact' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">
-                            <span class="material-symbols-outlined">contact_phone</span>
-                            <p class="text-sm font-medium">Dane Kontaktowe</p>
-                        </a>
                         <a href="{% url 'give-permissions' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">
                             <span class="material-symbols-outlined">verified_user</span>
                             <p class="text-sm font-medium">Uprawnienia Kadry</p>
                         </a>
                     {% endif %}
-                    <!-- Moja grupa — tylko nauczyciel -->
+                    <!-- Nauczyciel -->
                     {% if perms.teacher.is_teacher %}
 
 
@@ -200,36 +200,45 @@
                                 <span class="text-sm font-bold uppercase tracking-tight italic">Brak Grupy</span>
                             </div>
                         {% endif %}
-
+                        <a href="{% url 'list_parent' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/10 text-gray-600 dark:text-gray-400 hover:text-primary transition-all">
+                            <span class="material-symbols-outlined">contact_phone</span>
+                            <span class="text-sm font-bold uppercase tracking-tight">Kontakt z Rodzicami</span>
+                        </a>
                     {% endif %}
-                    <!-- Obecność -->
+                    <!-- Rodzic -->
                     {% if perms.parent.is_parent %}
-                        <a href="{% url 'presence_calendar' %}"
-                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary transition-colors">
-                            <span class="material-symbols-outlined">event_available</span>
-                            <p class="text-sm font-medium leading-normal">Obecności</p>
-                        </a>
-
-                        <a href="{% url 'post_list_view' %}"
-                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary transition-colors">
-                            <span class="material-symbols-outlined">campaign</span>
-                            <p class="text-sm font-medium leading-normal">Wydarzenia</p>
-                        </a>
-
-
                         <div class="my-2 border-t border-gray-100 dark:border-gray-800"></div>
+                        <p class="px-3 text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">Strefa Rodzica</p>
 
-                        <a href="{% url 'contact' %}"
-                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary transition-colors">
-                            <span class="material-symbols-outlined">contact_support</span>
-                            <p class="text-sm font-medium leading-normal">Kontakt</p>
+                        <a href="{% url 'list_kids' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/10 text-gray-600 dark:text-gray-400 hover:text-primary transition-all">
+                            <span class="material-symbols-outlined">child_care</span>
+                            <span class="text-sm font-bold uppercase tracking-tight">Moje Dzieci</span>
                         </a>
+
+                        <a href="{% url 'parent_payments' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/10 text-gray-600 dark:text-gray-400 hover:text-primary transition-all">
+                            <span class="material-symbols-outlined">payments</span>
+                            <span class="text-sm font-bold uppercase tracking-tight">Moje Opłaty</span>
+                        </a>
+                        <a href="{% url 'list_teachers' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/10 text-gray-600 dark:text-gray-400 hover:text-primary transition-all">
+                            <span class="material-symbols-outlined">school</span>
+                            <span class="text-sm font-bold uppercase tracking-tight">Nauczyciele</span>
+                        </a>
+
+                        <a href="{% url 'presence_calendar' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/10 text-gray-600 dark:text-gray-400 hover:text-primary transition-all">
+                            <span class="material-symbols-outlined">event_available</span>
+                            <span class="text-sm font-bold uppercase tracking-tight">Obecności</span>
+                        </a>
+
                     {% endif %}
 
                     <!-- Wydarzenia -->
                     <a href="{% url 'post_list_view' %}"
                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary">
                         <span class="material-symbols-outlined">event</span> Wydarzenia
+                    </a>
+                    <a href="{% url 'contact' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/10 text-gray-600 dark:text-gray-400 hover:text-primary transition-all">
+                        <span class="material-symbols-outlined">contact_support</span>
+                        <span class="text-sm font-bold uppercase tracking-tight">Kontakt</span>
                     </a>
 
                 </nav>

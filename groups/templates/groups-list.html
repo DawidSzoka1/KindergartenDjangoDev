@@ -70,7 +70,7 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="material-symbols-outlined text-accent">school</span>
-                                <span class="font-medium">{{ teachers_count|default:'0' }} Nauczyciel</span>
+                                <span class="font-medium">{{ group.teachers_count|default:'0' }} {% if group.teachers_count == 1 %}Nauczyciel{% else %}Nauczycieli{% endif %}</span>
                             </div>
                         </div>
 

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="max-w-5xl mx-auto p-4 lg:p-8">
+        <header class="mb-10">
+            <h1 class="text-4xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">Historia Opłat</h1>
+
+            <form method="GET" class="mt-6 flex flex-wrap items-center gap-4 p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800">
+                <div class="flex flex-col min-w-[150px]">
+                    <label class="text-[9px] font-black uppercase text-gray-400 mb-1 ml-1">Filtruj dziecko</label>
+                    <select name="kid_id" onchange="this.form.submit()" class="text-xs font-bold border-none bg-gray-50 dark:bg-gray-800 rounded-xl focus:ring-primary">
+                        <option value="">Wszystkie dzieci</option>
+                        {% for kid in my_kids %}
+                            <option value="{{ kid.id }}" {% if selected_kid == kid.id %}selected{% endif %}>{{ kid.first_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="flex flex-col min-w-[150px]">
+                    <label class="text-[9px] font-black uppercase text-gray-400 mb-1 ml-1">Sortuj datę</label>
+                    <select name="sort" onchange="this.form.submit()" class="text-xs font-bold border-none bg-gray-50 dark:bg-gray-800 rounded-xl focus:ring-primary">
+                        <option value="desc" {% if selected_sort == 'desc' %}selected{% endif %}>Od najnowszych</option>
+                        <option value="asc" {% if selected_sort == 'asc' %}selected{% endif %}>Od najstarszych</option>
+                    </select>
+                </div>
+
+                <div class="ml-auto text-right">
+                    <p class="text-[9px] font-black text-primary uppercase">Do zapłaty</p>
+                    <p class="text-xl font-black text-primary">{{ total_unpaid }} zł</p>
+                </div>
+            </form>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {% for invoice in page_obj %}
+                <div class="bg-white dark:bg-[#0f1d0f] rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-sm relative overflow-hidden flex flex-col">
+
+                    <div class="flex justify-between items-start mb-8">
+                        <div class="flex items-center gap-4">
+                            <a href="{% url 'kid_details' invoice.kid.id %}" class="size-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xl hover:scale-105 transition-transform">
+                                {{ invoice.kid.first_name|slice:":1" }}
+                            </a>
+                            <div>
+                                <a href="{% url 'kid_details' invoice.kid.id %}" class="hover:text-primary transition-colors">
+                                    <h2 class="text-xl font-black uppercase leading-tight">{{ invoice.kid.first_name }} {{ invoice.kid.last_name }}</h2>
+                                </a>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Faktura: {{ invoice.month }}/{{ invoice.year }}</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase
+                    {% if invoice.status == 'paid' %}bg-green-100 text-green-700{% else %}bg-orange-100 text-orange-700{% endif %}">
+                    {{ invoice.get_status_display }}
+                </span>
+                    </div>
+
+                    <div class="space-y-4 mb-8 flex-1">
+                        <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-transparent">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-black uppercase text-gray-400">Czesne stałe</span>
+                                <span class="font-black text-gray-900 dark:text-white">{{ invoice.tuition_amount }} zł</span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-transparent">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] font-black uppercase text-gray-400">Wyżywienie</span>
+                            <span class="font-black text-gray-900 dark:text-white">{{ invoice.meals_amount }} zł</span>
+                        </div>
+
+                        <div class="flex justify-between text-[9px] font-bold text-primary uppercase tracking-widest">
+                            <span>Dni płatne: {{ invoice.calculated_days }}</span>
+                            <span>Stawka: {{ invoice.kid.kid_meals.per_day }} zł/dzień</span>
+                        </div>
+                    </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-gray-100 dark:border-gray-800">
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="text-xs font-black uppercase text-gray-400">Suma końcowa</span>
+                            <span class="text-3xl font-black text-primary">{{ invoice.total_amount }} zł</span>
+                        </div>
+
+                        {% if invoice.status != 'paid' %}
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="invoice_id" value="{{ invoice.id }}">
+                                <button type="submit" class="w-full py-4 bg-primary text-[#111811] font-black uppercase text-xs rounded-2xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                                    Opłać (Symulacja)
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full py-20 text-center bg-gray-50 dark:bg-gray-800/30 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-800">
+                    <p class="text-gray-400 font-bold uppercase text-xs">Brak faktur spełniających kryteria</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-12 flex items-center justify-center gap-4">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="p-3 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 text-primary hover:bg-primary/10 transition-all">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </a>
+            {% endif %}
+
+            <div class="px-6 py-3 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100">
+                <span class="text-[10px] font-black uppercase text-gray-400">Strona {{ page_obj.number }} z {{ page_obj.paginator.num_pages }}</span>
+            </div>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="p-3 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 text-primary hover:bg-primary/10 transition-all">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

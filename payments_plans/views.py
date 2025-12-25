@@ -4,15 +4,20 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.utils import timezone
 from .forms import PaymentPlanForm
-from .models import PaymentPlan
+from .models import PaymentPlan, SalaryPayment
 from django.core.exceptions import PermissionDenied
 from director.models import Director
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import (
     CreateView,
 )
-
+from django.db.models import Q, Sum
+from datetime import date
+from children.models import PresenceModel, Invoice, Kid
+from parent.models import ParentA
+from teacher.models import Employee
 
 # Create your views here.
 class AddPaymentsPlanView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
@@ -136,7 +141,7 @@ class PaymentPlanDeleteView(PermissionRequiredMixin, View):
 from django.db.models import Sum, Count
 from django.shortcuts import get_object_or_404, render
 from django.views import View
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from .models import PaymentPlan
 
 class PaymentPlanDetailsView(PermissionRequiredMixin, View):
@@ -165,3 +170,176 @@ class PaymentPlanDetailsView(PermissionRequiredMixin, View):
             'capacity_percent': min(int((kids_count / 15) * 100), 100) if 15 > 0 else 0, # Przykładowy limit 15 miejsc
         }
         return render(request, 'payment-plan-details.html', context)
+
+
+
+from django.core.paginator import Paginator
+
+class ParentPaymentsView(LoginRequiredMixin, View):
+    def get(self, request):
+        parent = get_object_or_404(ParentA, user=request.user)
+
+        # Pobieramy parametry z adresu URL
+        kid_id = request.GET.get('kid_id')
+        sort_order = request.GET.get('sort', 'desc') # Domyślnie najnowsze
+
+        # Bazowy QuerySet
+        invoices_qs = Invoice.objects.filter(kid__parenta=parent).select_related('kid', 'kid__kid_meals')
+
+        # Filtrowanie po dziecku
+        if kid_id and kid_id.isdigit():
+            invoices_qs = invoices_qs.filter(kid_id=int(kid_id))
+
+        # Sortowanie
+        if sort_order == 'asc':
+            invoices_qs = invoices_qs.order_by('year', 'month')
+        else:
+            invoices_qs = invoices_qs.order_by('-year', '-month')
+
+        # Logika obliczania dni (zamiast filtra divide)
+        for invoice in invoices_qs:
+            if invoice.kid.kid_meals and invoice.kid.kid_meals.per_day > 0:
+                invoice.calculated_days = int(invoice.meals_amount / invoice.kid.kid_meals.per_day)
+            else:
+                invoice.calculated_days = 0
+
+        # Paginacja
+        paginator = Paginator(invoices_qs, 4)
+        page_obj = paginator.get_page(request.GET.get('page'))
+
+        # Statystyki i lista dzieci do filtra
+        my_kids = parent.kids.all()
+        total_unpaid = invoices_qs.exclude(status='paid').aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+
+        return render(request, 'parent-payments.html', {
+            'page_obj': page_obj,
+            'my_kids': my_kids,
+            'total_unpaid': total_unpaid,
+            'selected_kid': int(kid_id) if kid_id and kid_id.isdigit() else None,
+            'selected_sort': sort_order
+        })
+
+    def post(self, request):
+        invoice_id = request.POST.get('invoice_id')
+        invoice = get_object_or_404(Invoice, id=invoice_id)
+
+        invoice.paid_amount = invoice.total_amount
+        invoice.status = 'paid'
+        invoice.save()
+
+        messages.success(request, f"Płatność za miesiąc {invoice.month}/{invoice.year} została zaksięgowana.")
+        return redirect('parent_payments')
+
+from dateutil.relativedelta import relativedelta
+class DirectorFinanceSummaryView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'director.is_director'
+
+    def get(self, request):
+        director = get_object_or_404(Director, user=request.user)
+        today = date.today()
+
+        # Pobieranie wybranego okresu z GET lub domyślnie poprzedni miesiąc
+        selected_month = int(request.GET.get('month', (today - relativedelta(months=1)).month))
+        selected_year = int(request.GET.get('year', (today - relativedelta(months=1)).year))
+
+        # Filtrowanie danych
+        invoices_qs = Invoice.objects.filter(principal=director, month=selected_month, year=selected_year)
+        salaries_qs = SalaryPayment.objects.filter(principal=director, month=selected_month, year=selected_year)
+
+        # Statystyki Przychody
+        total_expected = invoices_qs.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        total_received = invoices_qs.aggregate(Sum('paid_amount'))['paid_amount__sum'] or 0
+
+        # Statystyki Koszty - TUTAJ POPRAWKA
+        total_salaries_to_pay = salaries_qs.aggregate(Sum('base_salary'))['base_salary__sum'] or 0
+        # Sumujemy tylko te rekordy, gdzie is_paid == True
+        total_salaries_paid = salaries_qs.filter(is_paid=True).aggregate(Sum('base_salary'))['base_salary__sum'] or 0
+
+        # Paginacja (Dłużnicy i Pracownicy)
+        debtors_paginator = Paginator(invoices_qs.exclude(status='paid').select_related('kid'), 5)
+        salaries_paginator = Paginator(salaries_qs.select_related('employee'), 5)
+
+        # Pełna lista miesięcy dla selecta
+        months_list = [
+            (1, 'Styczeń'), (2, 'Luty'), (3, 'Marzec'), (4, 'Kwiecień'),
+            (5, 'Maj'), (6, 'Czerwiec'), (7, 'Lipiec'), (8, 'Sierpień'),
+            (9, 'Wrzesień'), (10, 'Październik'), (11, 'Listopad'), (12, 'Grudzień')
+        ]
+
+        context = {
+            'total_income': total_expected,
+            'received_income': total_received,
+            'total_salaries': total_salaries_to_pay,
+            'salaries_paid': total_salaries_paid, # Przekazujemy poprawną wartość
+            'balance': total_received - total_salaries_paid,
+            'debtors': debtors_paginator.get_page(request.GET.get('d_page')),
+            'salaries_list': salaries_paginator.get_page(request.GET.get('s_page')),
+            'selected_month': selected_month,
+            'selected_year': selected_year,
+            'months_list': months_list, # Przekazujemy listę do pętli w HTML
+        }
+        return render(request, 'director-finance.html', context)
+    def post(self, request):
+        director = get_object_or_404(Director, user=request.user)
+        action = request.POST.get('action')
+
+        # Pobieramy datę za jaką mamy generować (z formularza ukryte pola)
+        m_raw = request.POST.get('month') or request.GET.get('month')
+        y_raw = request.POST.get('year') or request.GET.get('year')
+
+        # Bezpieczna konwersja
+        m = int(m_raw) if m_raw else timezone.now().month
+        y = int(y_raw) if y_raw else timezone.now().year
+
+        if action == 'generate_all':
+            # 1. NAUCZYCIELE: Aktualizacja lub utworzenie
+            teachers = Employee.objects.filter(principal=director, is_active=True)
+            for t in teachers:
+                SalaryPayment.objects.update_or_create(
+                    principal=director, employee=t, month=m, year=y,
+                    defaults={'base_salary': t.salary or 0}
+                )
+
+            # 2. DZIECI: Przeliczenie obecności i aktualizacja faktur
+            first_day_of_month = date(y, m, 1)
+            if m == 12:
+                last_day_of_month = date(y, 12, 31)
+            else:
+                last_day_of_month = date(y, m + 1, 1) - relativedelta(days=1)
+            kids = Kid.objects.filter(
+                principal=director,
+                is_active=True,
+                start__lte=last_day_of_month
+            ).filter(
+                Q(end__isnull=True) | Q(end__gte=first_day_of_month)
+            )
+            for k in kids:
+                billable_days = PresenceModel.objects.filter(
+                    kid=k, day__month=m, day__year=y,
+                    presenceType__in=[1, 2, 4]
+                ).count()
+
+                meals_total = billable_days * (k.kid_meals.per_day if k.kid_meals else 0)
+                tuition = k.payment_plan.price if k.payment_plan else 0
+                total = tuition + meals_total
+
+                # Używamy update_or_create, aby zaktualizować kwoty jeśli faktura już była
+                Invoice.objects.update_or_create(
+                    kid=k, month=m, year=y, principal=director,
+                    defaults={
+                        'tuition_amount': tuition,
+                        'meals_amount': meals_total,
+                        'total_amount': total,
+                        'due_date': date(y, m, 10) if m != 12 else date(y+1, 1, 10)
+                    }
+                )
+            messages.success(request, f"Zaktualizowano rozliczenia za {m}/{y}")
+
+        elif action == 'pay_salary':
+                salary_id = request.POST.get('salary_id')
+                salary = get_object_or_404(SalaryPayment, id=salary_id, principal=director)
+                salary.is_paid = True
+                salary.payment_date = date.today()
+                salary.save()
+
+        return redirect(f'/podsumowanie-finansowe/?month={m}&year={y}')

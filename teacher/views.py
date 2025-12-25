@@ -5,6 +5,7 @@ from django.views import View
 from django.contrib import messages
 from director.models import Director, ContactModel
 from parent.models import ParentA
+from children.models import Kid
 from .models import Employee, roles
 from .forms import TeacherUpdateForm
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
@@ -23,17 +24,29 @@ class EmployeeProfileView(LoginRequiredMixin, View):
     def get(self, request, pk):
         employee = get_object_or_404(Employee, id=int(pk))
         user = self.request.user
+        context = {'employee': employee}
         if user.get_user_permissions() == {'director.is_director'}:
             if employee.principal.first() == user.director:
-                groups = Groups.objects.filter(principal=user.director, is_active=True )
-                return render(request, 'employee-profile.html',
-                              {'employee': employee, 'groups_list': groups})
-            messages.error(request, f"Nie ma takiego nauczyciela")
+                context['groups_list'] = Groups.objects.filter(principal=user.director, is_active=True)
+                # Paginacja dzieci w grupie tego nauczyciela
+                if employee.group:
+                    kids_queryset = Kid.objects.filter(group=employee.group, is_active=True).order_by('last_name')
+                    paginator = Paginator(kids_queryset, 6) # 6 dzieci na stronę w zakładce profilu
+                    page_number = request.GET.get('kids_page')
+                    context['kids'] = paginator.get_page(page_number)
+
+                return render(request, 'employee-profile.html', context)
+
+            messages.error(request, "Nie masz uprawnień do podglądu tego pracownika.")
             return redirect('list_teachers')
         elif user.get_user_permissions() == {'teacher.is_teacher'}:
             if user.employee == employee:
-                return render(request, 'employee-profile.html',
-                              {'employee': employee})
+                if employee.group:
+                    kids_queryset = Kid.objects.filter(group=employee.group, is_active=True).order_by('last_name')
+                    paginator = Paginator(kids_queryset, 6)
+                    page_number = request.GET.get('kids_page')
+                    context['kids'] = paginator.get_page(page_number)
+                return render(request, 'employee-profile.html', context)
         elif user.get_user_permissions() == {'parent.is_parent'}:
             parent = get_object_or_404(ParentA, user=user)
             parent_kids_in_teacher_groups = parent.kids.filter(
@@ -42,11 +55,8 @@ class EmployeeProfileView(LoginRequiredMixin, View):
             ).select_related('group')
             if parent_kids_in_teacher_groups.exists():
                 # Wyciągamy unikalne grupy tych dzieci
-                assigned_groups = set(kid.group for kid in parent_kids_in_teacher_groups)
-                return render(request, 'employee-profile.html', {
-                    'employee': employee,
-                    'groups_list': assigned_groups
-                })
+                context['assigned_groups'] = set(kid.group for kid in parent_kids_in_teacher_groups)
+                return render(request, 'employee-profile.html', context)
         raise PermissionDenied
 
 

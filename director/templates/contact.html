@@ -70,19 +70,24 @@
                     </h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {% for t in teachers %}
-                            <div class="p-4 bg-white dark:bg-[#0f1d0f] rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center justify-between group">
-                                <div class="flex items-center gap-4">
-                                    <div class="size-12 rounded-full bg-blue-50 dark:bg-gray-800 flex items-center justify-center text-blue-500 font-bold">
+                            <div class="p-4 bg-white dark:bg-[#0f1d0f] rounded-2xl border border-gray-100 dark:border-gray-800 flex items-center justify-between group gap-4">
+                                <div class="flex items-center gap-4 min-w-0">
+                                    <div class="size-12 shrink-0 rounded-full bg-blue-50 dark:bg-gray-800 flex items-center justify-center text-blue-500 font-bold">
                                         {% if t.first_name %}{{ t.first_name|slice:":1" }}{% else %}{{ t.user.email|slice:":1" }}{% endif %}
                                     </div>
-                                    <div>
-                                        <p class="font-bold text-gray-900 dark:text-white">
-                                            {% if t.first_name or t.last_name %}{{ t.first_name }} {{ t.last_name }}{% else %}{{ t.user.email }}{% endif %}
+                                    <div class="min-w-0">
+                                        <p class="font-bold text-gray-900 dark:text-white truncate">
+                                            {% if t.first_name or t.last_name %}
+                                                {{ t.first_name }} {{ t.last_name }}
+                                            {% else %}
+                                                {{ t.user.email }}
+                                            {% endif %}
                                         </p>
-                                        <p class="text-xs text-gray-400">Grupa: {{ t.group.name|default:"Brak przypisanej grupy" }}</p>
+                                        <p class="text-xs text-gray-400 truncate">Grupa: {{ t.group.name|default:"Brak przypisanej grupy" }}</p>
                                     </div>
                                 </div>
-                                <div class="flex gap-2">
+
+                                <div class="flex gap-2 shrink-0">
                                     <a href="{% url 'teacher-profile' t.id %}" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-primary transition-all" title="Profil">
                                         <span class="material-symbols-outlined text-sm">person</span>
                                     </a>

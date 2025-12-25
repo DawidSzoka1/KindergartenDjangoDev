@@ -267,21 +267,64 @@ class KidDeleteView(PermissionRequiredMixin, View):
 
 class KidParentInfoView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        user = request.user.get_user_permissions()
         kid = get_object_or_404(Kid, id=int(pk))
-        parents = None
-        if user == {'director.is_director'}:
-            if kid.principal.user.email == request.user.email:
-                parents = kid.parenta_set.all()
+        user_perms = request.user.get_all_permissions()
 
-        elif user == {'teacher.is_teacher'}:
-            if request.user.email in kid.group.employee_set.values_list('user__email', flat=True):
-                parents = kid.parenta_set.all()
+        # Logika sprawdzania dostępu
+        can_access = False
 
-        elif user == {'parent.is_parent'}:
-            if request.user.email in kid.parenta_set.values_list('user__email', flat=True):
-                parents = kid.parenta_set.all()
+        if 'director.is_director' in user_perms:
+            # Sprawdzenie czy dziecko należy do placówki dyrektora
+            if kid.principal.user == request.user:
+                can_access = True
 
-        if parents:
-            return render(request, 'kid-parent-info.html', {'kid': kid, 'parents': parents})
-        raise PermissionDenied
+        elif 'teacher.is_teacher' in user_perms:
+            # Sprawdzenie czy nauczyciel uczy w grupie tego dziecka
+            if kid.group and request.user.employee in kid.group.employee_set.all():
+                can_access = True
+
+        elif 'parent.is_parent' in user_perms:
+            # Sprawdzenie czy to rodzic tego konkretnego dziecka
+            if request.user.parenta in kid.parenta_set.all():
+                can_access = True
+
+        if not can_access:
+            raise PermissionDenied
+
+        parents = kid.parenta_set.all().select_related('user')
+        return render(request, 'kid-parent-info.html', {
+            'kid': kid,
+            'parents': parents,
+            'today': timezone.now()
+        })
+
+    def post(self, request, pk):
+        from django.db import transaction
+        """Obsługa odłączania rodzica od dziecka z weryfikacją placówki"""
+        user = request.user
+
+        # 1. Sprawdzenie podstawowych uprawnień dyrektora
+        if not user.has_perm('director.is_director'):
+            raise PermissionDenied
+
+        # 2. Pobranie dziecka i weryfikacja przynależności do placówki
+        kid = get_object_or_404(Kid, id=pk)
+
+        # Sprawdzamy czy dyrektor przypisany do dziecka to ten sam, który jest zalogowany
+        if kid.principal.user != user:
+            messages.error(request, "Nie masz uprawnień do zarządzania tym dzieckiem.")
+            return redirect('list_kids') # Lub inna strona zbiorcza
+
+        parent_id = request.POST.get('parent_id')
+        parent = get_object_or_404(ParentA, id=parent_id)
+
+        # 3. Bezpieczne odłączenie relacji
+        try:
+            with transaction.atomic():
+                # Usuwamy powiązanie w tabeli ManyToMany
+                kid.parenta_set.remove(parent)
+                messages.success(request, f"Opiekun {parent.first_name} został odłączony od dziecka {kid.first_name}.")
+        except Exception as e:
+            messages.error(request, "Wystąpił błąd podczas odłączania opiekuna.")
+
+        return redirect('kid_parent', pk=kid.id)

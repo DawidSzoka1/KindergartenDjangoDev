@@ -94,7 +94,7 @@
                                 <a @click.prevent="currentTab = 'groups'"
                                    :class="{ 'border-b-[#111811] dark:border-b-primary text-[#111811] dark:text-white': currentTab === 'groups', 'border-b-transparent text-[#618961] dark:text-gray-400': currentTab !== 'groups' }"
                                    href="#" class="flex flex-col items-center justify-center border-b-[3px] pb-[13px] pt-4 hover:text-[#111811] dark:hover:text-white transition-colors">
-                                    <p class="text-sm font-bold leading-normal tracking-[0.015em]">Przypisane Grupy</p>
+                                    <p class="text-sm font-bold leading-normal tracking-[0.015em]">Moja Grupa</p>
                                 </a>
                             </div>
                         </div>
@@ -176,65 +176,94 @@
                         </div>
 
                         <div x-show="currentTab === 'groups'" class="pt-6">
-                            <div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-                                    <h3 class="text-lg font-bold text-[#111811] dark:text-white">Przypisana Grupa</h3>
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                                    {% if perms.director.is_director %}
-                                        <button @click="showAssignmentModal = true"
-                                                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-[#111811] text-sm font-bold leading-normal tracking-[0.015em] mt-4 sm:mt-0 gap-2 hover:opacity-90">
-                                            <span class="material-symbols-outlined text-base">add</span>
-                                            <span class="truncate">Przypisz do Grupy</span>
-                                        </button>
-                                    {% endif %}
-                                </div>
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-left">
-                                        <thead>
-                                        <tr class="border-b border-gray-200 dark:border-gray-700">
-                                            <th class="p-4 text-sm font-semibold text-[#618961] dark:text-gray-400">Nazwa Grupy</th>
-                                            <th class="p-4 text-sm font-semibold text-[#618961] dark:text-gray-400">Rola</th>
-                                            <th class="p-4 text-sm font-semibold text-[#618961] dark:text-gray-400">Status</th>
-                                            <th class="p-4 text-sm font-semibold text-[#618961] dark:text-gray-400 text-right">Akcje</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
+                                <div class="lg:col-span-1 space-y-6">
+                                    <div class="bg-white dark:bg-gray-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800">
+                                        <div class="flex items-center justify-between mb-8">
+                                            <h3 class="text-xl font-black uppercase tracking-tighter text-[#111811] dark:text-white">Moja Grupa</h3>
+                                            <span class="p-2 bg-primary/10 rounded-xl text-primary">
+                        <span class="material-symbols-outlined">diversity_3</span>
+                    </span>
+                                        </div>
+
                                         {% if employee.group %}
-                                            <tr class="border-b border-gray-200 dark:border-gray-700">
-                                                <td class="p-4 text-sm font-medium text-[#111811] dark:text-gray-200">
+                                            <div class="space-y-6">
+                                                <div>
+                                                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Nazwa</p>
+                                                    <p class="text-2xl font-black text-primary uppercase">{{ employee.group.name }}</p>
+                                                </div>
+
+                                                <div class="grid grid-cols-2 gap-4">
+                                                    <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl">
+                                                        <p class="text-[10px] font-black text-gray-400 uppercase">Dzieci</p>
+                                                        <p class="text-xl font-black text-[#111811] dark:text-white">{{ employee.group.kid_set.count }}</p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="pt-4">
                                                     <a href="{% url 'group_details' pk=employee.group.pk %}"
-                                                       class="text-primary/80 dark:text-primary/90 hover:text-primary dark:hover:text-primary/70 transition-colors underline">
-                                                        {{ employee.group }}
+                                                       class="w-full flex items-center justify-center gap-2 py-4 bg-primary text-[#111811] font-black uppercase text-xs rounded-2xl hover:opacity-90 transition-all shadow-lg shadow-primary/20">
+                                                        <span class="material-symbols-outlined text-sm">visibility</span>
+                                                        Szczegóły grupy
                                                     </a>
-                                                </td>
-
-                                                <td class="p-4 text-sm text-[#111811] dark:text-gray-200">{{ employee.get_role_display }}</td>
-
-                                                <td class="p-4 text-sm text-[#111811] dark:text-gray-200">Główny przydział</td>
-
-                                                <td class="p-4 text-right">
-                                                    {% if perms.director.is_director %}
-                                                        <form method="POST" action="{% url 'remove_teacher_from_group' teacher_pk=employee.pk %}">
-                                                            {% csrf_token %}
-                                                            <button type="submit"
-                                                                    class="text-red-600 dark:text-red-500 hover:text-red-800 dark:hover:text-red-400 p-2 transition-colors"
-                                                                    title="Usuń nauczyciela z grupy"
-                                                                    onclick="return confirm('Czy na pewno chcesz usunąć {{ employee.first_name|default:employee.user.email }} z grupy {{ employee.group }}?');">
-                                                                <span class="material-symbols-outlined text-xl">delete</span>
-                                                            </button>
-                                                        </form>
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
+                                                </div>
+                                            </div>
                                         {% else %}
-                                            <tr>
-                                                <td colspan="4" class="p-4 text-center text-gray-500 dark:text-gray-400">
-                                                    Pracownik nie ma przypisanej grupy.
-                                                </td>
-                                            </tr>
+                                            <p class="text-center py-10 text-gray-400 italic font-bold">Brak przypisanej grupy.</p>
                                         {% endif %}
-                                        </tbody>
-                                    </table>
+                                    </div>
+                                </div>
+
+                                <div class="lg:col-span-2 bg-white dark:bg-gray-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800">
+                                    <h3 class="text-xl font-black uppercase tracking-tighter text-[#111811] dark:text-white mb-8">Lista Podopiecznych</h3>
+
+                                    {% if kids %}
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {% for kid in kids %}
+                                                <div class="group relative flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-transparent hover:border-primary/30 transition-all">
+                                                    <div class="flex items-center gap-4">
+                                                        <div class="size-12 rounded-full bg-primary/10 flex items-center justify-center font-black text-primary">
+                                                            {{ kid.first_name|slice:":1" }}
+                                                        </div>
+                                                        <div>
+                                                            <p class="font-bold text-[#111811] dark:text-gray-200">{{ kid.first_name }} {{ kid.last_name }}</p>
+                                                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Aktywny Uczeń</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <a href="{% url 'kid_details' pk=kid.pk %}"
+                                                       class="p-2 bg-white dark:bg-gray-700 rounded-xl text-gray-400 hover:text-primary hover:shadow-md transition-all">
+                                                        <span class="material-symbols-outlined">arrow_forward_ios</span>
+                                                    </a>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+
+                                        {% if kids.has_other_pages %}
+                                            <div class="mt-8 flex items-center justify-center gap-4">
+                                                {% if kids.has_previous %}
+                                                    <a href="?kids_page={{ kids.previous_page_number }}&currentTab=groups" class="p-3 bg-gray-100 dark:bg-gray-800 rounded-xl hover:bg-primary/20 transition-all">
+                                                        <span class="material-symbols-outlined">chevron_left</span>
+                                                    </a>
+                                                {% endif %}
+
+                                                <span class="text-xs font-black uppercase text-gray-400">Strona {{ kids.number }} z {{ kids.paginator.num_pages }}</span>
+
+                                                {% if kids.has_next %}
+                                                    <a href="?kids_page={{ kids.next_page_number }}&currentTab=groups" class="p-3 bg-gray-100 dark:bg-gray-800 rounded-xl hover:bg-primary/20 transition-all">
+                                                        <span class="material-symbols-outlined">chevron_right</span>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+
+                                    {% else %}
+                                        <div class="flex flex-col items-center justify-center py-20 bg-gray-50 dark:bg-gray-800 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+                                            <span class="material-symbols-outlined text-5xl text-gray-300 mb-4">person_search</span>
+                                            <p class="text-gray-400 font-bold uppercase text-xs">Brak przypisanych dzieci do tej grupy</p>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
