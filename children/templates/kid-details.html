@@ -189,6 +189,18 @@
                                 {% endif %}
                             </p>
                         </div>
+                        {% if kid.kid_meals %}
+                            <div class="pt-4 border-t border-gray-50 dark:border-gray-800">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Stawka za jeden dzień</p>
+                                <div class="flex items-baseline gap-1">
+                                    <p class="text-2xl font-black text-orange-600">{{ kid.kid_meals.per_day }}</p>
+                                    <p class="text-sm font-bold text-orange-600 uppercase">zł / dzień</p>
+                                </div>
+                                <p class="text-[10px] text-gray-400 font-bold uppercase mt-1">
+                                    Naliczane tylko za dni obecne i nieobecne niezgłoszone
+                                </p>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

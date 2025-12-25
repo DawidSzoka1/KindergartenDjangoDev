@@ -82,6 +82,7 @@ class CalendarKid(LoginRequiredMixin, View):
         permissions = request.user.get_user_permissions()
         kid = get_object_or_404(Kid, id=int(pk))
         month_number = int(month)
+        month_name = calendar.month_name[month_number]
         year_number = int(year)
         day_current = int(timezone.now().day)
         month_next = month_number + 1
@@ -98,7 +99,7 @@ class CalendarKid(LoginRequiredMixin, View):
             withyear=True)
         context = {'cal': mark_safe(cal), 'day_current': day_current, 'kid': kid, 'month': month_number,
                    'year': year, 'month_next': month_next, 'year_next': year_next,
-                   'month_previous': month_previous, 'year_previous': year_previous}
+                   'month_previous': month_previous, 'year_previous': year_previous, 'month_name': month_name,}
         if not kid.is_active:
             raise PermissionDenied
         elif permissions == {'director.is_director'}:

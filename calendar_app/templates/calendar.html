@@ -71,12 +71,21 @@
                     <form method="POST"
                           class="bg-white dark:bg-[#0f1d0f] p-8 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm flex flex-col h-full">
                         {% csrf_token %}
-                        <h3 class="text-lg font-black text-gray-900 dark:text-white mb-6 uppercase tracking-tight">
-                            Zarządzaj Dniem</h3>
+                        <div class="mb-6">
+                            <h3 class="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">
+                                Zarządzaj Dniem
+                            </h3>
+                            <p class="text-[10px] font-black text-primary uppercase tracking-widest">
+                                Edycja dla: {{ month_name }} {{ year }}
+                            </p>
+                        </div>
 
                         <div id="wholeDrop" style="display: none">
-                            <p class="text-xs font-bold text-gray-400 uppercase mb-4">Ustaw status dla wybranego dnia:: <span
-                                    id="selected-date-text" class="text-primary"></span></p>
+                            <p class="text-xs font-bold text-gray-400 uppercase mb-4">
+                                Ustaw status dla:
+                                <span id="selected-date-text" class="text-primary font-black"></span>
+                                <span class="text-primary font-black"> {{ year }}</span>
+                            </p>
 
                             <div class="space-y-3">
                                 {% if perms.parent.is_parent %}

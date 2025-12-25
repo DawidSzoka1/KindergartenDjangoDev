@@ -12,13 +12,6 @@
             </a>
         </div>
 
-        {% if messages %}
-            <div class="mb-6 rounded-lg bg-red-500/10 border border-red-500 p-4 text-center text-white text-lg font-bold">
-                {% for message in messages %}
-                    {{ message }}
-                {% endfor %}
-            </div>
-        {% endif %}
 
         <div class="bg-white dark:bg-background-dark/80 rounded-xl p-8 shadow-xl">
             <form method="post" class="space-y-6">

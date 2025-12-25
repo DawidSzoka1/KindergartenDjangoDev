@@ -19,14 +19,6 @@
                         <span class="text-[#111811] dark:text-white text-sm font-medium leading-normal">PROFIL RODZICA</span>
                     </div>
 
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="p-3 mb-4 rounded-lg text-white text-center font-semibold
-                        {% if message.tags == 'success' %}bg-green-600{% elif message.tags == 'error' %}bg-red-600{% else %}bg-blue-600{% endif %}" role="alert">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
 
                     <div class="flex p-4 @container mb-8 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                         <div class="flex w-full flex-col md:flex-row gap-6 items-start">

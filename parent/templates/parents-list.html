@@ -24,18 +24,7 @@
                         {% endif %}
                     </header>
 
-                    {% if messages %}
-                        {% if messages %}
-                            <div class="mt-6">
-                                {% for message in messages %}
-                                    <div class="p-4 rounded-lg bg-green-500 text-white text-center text-lg">
-                                        {{ message }}
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
 
-                    {% endif %}
 
                     {% if perms.director.is_director or perms.teacher.is_teacher %}
                         <div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-border-light dark:border-border-dark mb-6">

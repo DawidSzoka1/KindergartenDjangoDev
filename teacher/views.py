@@ -60,54 +60,59 @@ class EmployeeProfileView(LoginRequiredMixin, View):
         raise PermissionDenied
 
 
-class EmployeesListView(PermissionRequiredMixin, LoginRequiredMixin, View):
-    permission_required = "director.is_director"
-
+class EmployeesListView(LoginRequiredMixin, View):
     def get(self, request):
-        # 1. Pobieranie danych i filtry
-        user_director = Director.objects.get(user=request.user.id)
-
-        # Pobieranie parametru wyszukiwania z GET
         search_query = request.GET.get('search', '')
 
-        # Używamy startowego QuerySetu
-        teachers = Employee.objects.filter(principal=user_director)
+        # 1. LOGIKA DLA DYREKTORA
+        if hasattr(request.user, 'director_profile') or request.user.has_perm("director.is_director"):
+            user_director = get_object_or_404(Director, user=request.user)
+            teachers = Employee.objects.filter(principal=user_director)
 
-        # 2. Logika filtrowania (jeśli jest zapytanie)
+        # 2. LOGIKA DLA RODZICA
+        elif request.user.has_perm("parent.is_parent") or request.user.groups.filter(name='Rodzice').exists():
+            # Zakładamy, że model Parent ma relację do User i do Kid (które mają Group)
+            # Pobieramy grupy, do których należą dzieci tego rodzica
+            parent = get_object_or_404(ParentA, user=request.user)
+            child_groups = Groups.objects.filter(kid__parenta=parent).distinct()
+
+            # Pobieramy nauczycieli, którzy są przypisani do tych grup
+            # Zakładając, że Employee/Teacher ma relację do Groups
+            teachers = Employee.objects.filter(group__in=child_groups).distinct()
+
+        else:
+            # Jeśli to ktoś inny, odmawiamy dostępu
+            raise PermissionDenied
+
+        # 3. WSPÓLNA LOGIKA (Wyszukiwanie i Paginacja)
         if search_query:
-            # Wyszukujemy po emailu (z icontains)
+            # Szukamy po emailu lub imieniu/nazwisku dla wygody
             teachers = teachers.filter(
-                user__email__icontains=search_query
+                Q(user__email__icontains=search_query) |
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query)
             )
 
-        # Sortowanie
         teachers = teachers.order_by('-id')
 
-        # 3. Paginacja
         paginator = Paginator(teachers, 10)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
 
-        # Dodajemy 'search_query' do kontekstu, aby móc go użyć w szablonie (np. do zachowania wartości w polu wyszukiwania)
         context = {
             'page_obj': page_obj,
             'search_query': search_query,
+            'is_director': request.user.has_perm("director.is_director"), # flaga do szablonu
         }
 
         return render(request, 'employees-list.html', context)
 
     def post(self, request):
-        # W metodzie POST tylko pobieramy wartość z formularza i przekierowujemy do GET
         search = request.POST.get('search')
-
+        # Używamy reverse, aby zachować spójność adresów
         base_url = reverse('list_teachers')
-
         if search:
-            # 2. Dodaj parametr zapytania (?search=...) do podstawowego URL
-            full_url = f'{base_url}?search={search}'
-            return redirect(full_url)
-
-        # Jeśli pole było puste, nadal wracamy do czystej listy
+            return redirect(f'{base_url}?search={search}')
         return redirect('list_teachers')
 
 

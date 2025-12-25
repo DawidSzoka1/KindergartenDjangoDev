@@ -22,14 +22,7 @@
 
                     <div class="bg-white dark:bg-background-dark rounded-xl border border-gray-200 dark:border-gray-700 p-6 md:p-8 space-y-8">
 
-                        {% if messages %}
-                            {% for message in messages %}
-                                <div class="rounded-lg bg-red-500/10 p-4 flex items-start gap-4 border border-red-500 text-red-700 dark:text-red-300">
-                                    <span class="material-symbols-outlined flex-shrink-0">error</span>
-                                    <p class="text-sm font-medium">{{ message }}</p>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
+
 
                         <form method="post" action="#">
                             {% csrf_token %}

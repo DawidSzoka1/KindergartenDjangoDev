@@ -27,14 +27,6 @@
             {% endif %}
         </div>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mb-6 p-4 rounded-xl {% if message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %} font-medium shadow-sm flex items-center gap-3">
-                    <span class="material-symbols-outlined">info</span>
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
 
         {% if weekend %}
             <div class="bg-white dark:bg-gray-900 rounded-2xl p-12 text-center border border-dashed border-gray-300 dark:border-gray-700">

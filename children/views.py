@@ -97,6 +97,12 @@ class KidsListView(LoginRequiredMixin, View):
                 kids = groups.kid_set.filter(is_active=True).order_by('-id')
             else:
                 kids = None
+        elif request.user.get_user_permissions() == {'parent.is_parent'}:
+            # NOWA LOGIKA DLA RODZICA
+            parent = get_object_or_404(ParentA, user=request.user)
+            kids = parent.kids.filter(is_active=True)
+            groups_count = kids.values('group').distinct().count()
+
         else:
             raise PermissionDenied
 
@@ -128,6 +134,11 @@ class KidsListView(LoginRequiredMixin, View):
                 group = get_object_or_404(Employee, user=request.user.id).group
                 kids = group.kid_set.filter(first_name__icontains=search).filter(is_active=True).order_by('-id')
                 groups_count = groups.filter(is_active=True).count()
+            elif request.user.get_user_permissions() == {'parent.is_parent'}:
+                # NOWA LOGIKA DLA RODZICA
+                parent = get_object_or_404(ParentA, user=request.user.id)
+                kids = parent.kids.filter(is_active=True)
+                groups_count = kids.values('group').distinct().count()
             else:
                 raise PermissionDenied
             kids_count = kids.count()
