@@ -19,13 +19,6 @@
                     <h1 class="text-[#111811] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Edytuj Mój Profil</h1>
                 </div>
 
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="mb-6 p-4 rounded-xl text-center font-bold {% if message.tags == 'error' %}bg-red-500 text-white{% else %}bg-primary text-background-dark{% endif %} shadow-sm">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
 
                 <div class="bg-white dark:bg-black/20 p-6 rounded-xl shadow-sm border border-[#dbe6db] dark:border-gray-800">
                     <form method="post">

@@ -19,13 +19,7 @@
                     {% endif %}
                 </div>
 
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="mb-6 p-4 rounded-xl bg-purple-50 text-primary font-bold text-center border border-primary/20 shadow-sm">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
+
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {% for meal in page_obj %}

@@ -38,14 +38,6 @@
                         </div>
                     </div>
 
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="p-3 mb-4 rounded-lg text-white text-center font-semibold
-                        {% if message.tags == 'success' %}bg-green-600{% elif message.tags == 'error' %}bg-red-600{% else %}bg-blue-600{% endif %}" role="alert">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
 
                     <form method="GET" action="{% url 'add_parent_to_kid' parent.id %}" class="relative mb-4">
                         <input type="hidden" name="page" value="1"/>

@@ -128,17 +128,6 @@
             </button>
         </form>
 
-        <!-- GLOBAL MESSAGES -->
-        {% if messages %}
-            <div class="mt-4">
-                {% for message in messages %}
-                    <p class="text-sm {% if message.tags == 'error' %}text-red-500{% elif message.tags == 'success' %}text-green-500{% endif %}">
-                        {{ message }}
-                    </p>
-                {% endfor %}
-            </div>
-        {% endif %}
-
         <div class="mt-6 text-center">
             <p class="text-sm text-subtle-light dark:text-subtle-dark">
                 Masz już konto?

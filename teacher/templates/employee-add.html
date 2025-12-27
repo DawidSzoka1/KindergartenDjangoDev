@@ -20,14 +20,7 @@
                         <h1 class="text-text-light dark:text-text-dark text-3xl font-bold leading-tight tracking-tight">Dodaj Nowego Pracownika</h1>
                     </div>
 
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="p-3 mb-4 rounded-lg text-white text-center font-semibold
-                        {% if message.tags == 'success' %}bg-green-600{% elif message.tags == 'error' %}bg-error{% else %}bg-primary{% endif %}" role="alert">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
+
 
                     <div class="bg-card-light dark:bg-card-dark p-6 md:p-8 rounded-lg shadow-sm border border-border-light dark:border-border-dark">
 

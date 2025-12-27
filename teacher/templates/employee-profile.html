@@ -23,14 +23,6 @@
                         </span>
                     </div>
 
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="p-3 mb-4 rounded-lg text-white text-center font-semibold
-                                {% if message.tags == 'success' %}bg-green-600{% elif message.tags == 'error' %}bg-red-600{% else %}bg-blue-600{% endif %}" role="alert">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
-                    {% endif %}
 
                     <div class="flex p-4 @container bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                         <div class="flex w-full flex-col gap-4 @[520px]:flex-row @[520px]:justify-between @[520px]:items-center">

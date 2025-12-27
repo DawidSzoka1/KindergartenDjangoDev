@@ -17,13 +17,6 @@
                     <p class="text-[#618961] dark:text-[#a1cca1] text-base font-normal max-w-2xl">Prześlij nową grafikę, która będzie używana dla grup przedszkolnych lub planów żywieniowych.</p>
                 </div>
 
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="mb-6 p-4 rounded-xl text-center font-bold {% if message.tags == 'error' %}bg-red-500 text-white{% else %}bg-primary text-background-dark{% endif %} shadow-sm">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
-                {% endif %}
 
                 <div class="bg-white dark:bg-[#1a2e1a] rounded-xl shadow-sm border border-[#e5e7eb] dark:border-[#2a3e2a] p-6 md:p-8">
                     <form method="post" enctype="multipart/form-data" class="flex flex-col gap-8 max-w-[600px]">

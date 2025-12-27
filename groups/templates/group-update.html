@@ -29,14 +29,6 @@
                 </div>
             </header>
 
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="mb-4 p-3 rounded-lg text-center font-medium"
-                         style="background-color: #D9534F; color: white;">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
 
             <div class="bg-white dark:bg-gray-800 rounded-xl border border-neutral-border dark:border-gray-700 p-6 md:p-8 shadow-lg">
                 <form method="post" id="group-edit-form" action="">
