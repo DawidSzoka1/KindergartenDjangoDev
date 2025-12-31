@@ -21,7 +21,7 @@
 
         <div class="lg:col-span-2 space-y-8">
             <section>
-                <h2 class="text-xl font-black text-gray-900 dark:text-white uppercase mb-4">Twoje Dzieci</h2>
+                <p class="text-gray-500 mt-2 font-medium">Twoje dzieci w placówce {{ active_kindergarten.name }}:</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {% for kid in kids %}
                         <div class="bg-white dark:bg-[#0f1d0f] rounded-3xl border border-gray-200 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-md transition-all group">

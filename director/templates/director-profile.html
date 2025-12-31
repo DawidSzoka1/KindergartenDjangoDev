@@ -23,7 +23,7 @@
                     </div>
                     <div class="flex gap-3">
                         {# Tylko właściciel profilu może go edytować #}
-                        {% if request.user.id == director.user.id %}
+                        {% if request.user.id == director.user.id and active_role == 'director'%}
                             <a href="{% url 'give-permissions' %}" class="flex items-center justify-center gap-2 rounded-lg h-11 px-5 bg-gray-200 dark:bg-gray-700 text-[#111811] dark:text-white text-sm font-bold hover:bg-gray-300 transition-colors">
                                 <span class="material-symbols-outlined">verified_user</span>
                                 Uprawnienia
@@ -47,7 +47,7 @@
                             </h2>
                             <p class="text-[#618961] dark:text-primary text-lg font-black uppercase tracking-widest text-xs mb-6">Dyrektor Placówki</p>
 
-                            {% if request.user.id == director.user.id %}
+                            {% if request.user.id == director.user.id and active_role == 'director' %}
                                 <a href="{% url 'password_change' %}" class="w-full py-3 px-4 rounded-lg border-2 border-[#dbe6db] dark:border-gray-700 text-[#111811] dark:text-white font-bold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
                                     <span class="material-symbols-outlined">lock_reset</span>
                                     Zmień Hasło
@@ -59,7 +59,7 @@
                     <div class="lg:col-span-2 flex flex-col gap-6">
 
                         {# Statystyki widoczne TYLKO dla dyrektora #}
-                        {% if perms.director.is_director and request.user.id == director.user.id %}
+                        {% if active_role == 'director' %}
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
                                     <p class="text-2xl font-black text-primary">{{ groups.count }}</p>
@@ -70,11 +70,11 @@
                                     <p class="text-[10px] font-black uppercase text-[#618961]">Dzieci</p>
                                 </div>
                                 <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
-                                    <p class="text-2xl font-black text-primary">{{ director.employee_set.count }}</p>
+                                    <p class="text-2xl font-black text-primary">{{ director.kindergarten.employee_set.count }}</p>
                                     <p class="text-[10px] font-black uppercase text-[#618961]">Kadra</p>
                                 </div>
                                 <div class="bg-white dark:bg-[#1a2e1a] p-4 rounded-xl border border-[#dbe6db] dark:border-gray-800 text-center">
-                                    <p class="text-2xl font-black text-primary">{{ director.parenta_set.count }}</p>
+                                    <p class="text-2xl font-black text-primary">{{ director.kindergarten.parenta_set.count }}</p>
                                     <p class="text-[10px] font-black uppercase text-[#618961]">Rodzice</p>
                                 </div>
                             </div>
@@ -114,12 +114,12 @@
                         <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-xl border border-blue-100 dark:border-blue-800 flex items-start gap-4">
                             <span class="material-symbols-outlined text-blue-600 mt-1">help_center</span>
                             <div class="text-sm text-blue-800 dark:text-blue-200 leading-relaxed">
-                                {% if request.user.id == director.user.id %}
+                                {% if director.id == request.session.active_profile_id %}
                                     <p class="font-bold mb-1 uppercase tracking-tight">Twój panel zarządzania</p>
-                                    Dane widoczne powyżej są wykorzystywane do autoryzacji oraz generowania faktur i dokumentów placówki.
+                                    Zarządzasz obecnie placówką: <strong>{{ director.kindergarten.name }}</strong>.
                                 {% else %}
                                     <p class="font-bold mb-1 uppercase tracking-tight">Kontakt z dyrekcją</p>
-                                    Jeśli masz pytania dotyczące płatności, faktur lub spraw organizacyjnych, prosimy o kontakt pod powyższym adresem e-mail.
+                                    W sprawach formalnych prosimy o kontakt z biurem placówki {{ director.kindergarten.name }}.
                                 {% endif %}
                             </div>
                         </div>

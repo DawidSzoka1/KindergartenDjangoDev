@@ -9,7 +9,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
             <div class="lg:col-span-1 space-y-8">
                 <div class="p-8 bg-primary rounded-3xl text-white shadow-xl shadow-primary/20 relative overflow-hidden group">
-                    <h3 class="text-xl font-black uppercase mb-6">Biuro Placówki</h3>
+                    <h3 class="text-xl font-black uppercase mb-6">Biuro Placówki {{ contact.kindergarten_name|default:"" }}</h3>
                     <div class="space-y-4 relative z-10">
                         <div class="flex items-start gap-4">
                             <span class="material-symbols-outlined">location_on</span>
@@ -25,7 +25,7 @@
                         </div>
                     </div>
 
-                    {% if perms.director.is_director %}
+                    {% if active_role == 'director' %}
                         <div class="mt-8 pt-6 border-t border-white/20 relative z-10">
                             <a href="{% url 'contact-update' contact.id %}" class="flex items-center justify-center gap-2 py-3 bg-white text-primary rounded-xl font-black text-xs uppercase hover:bg-gray-100 transition-all">
                                 <span class="material-symbols-outlined text-sm">edit</span>
@@ -66,7 +66,7 @@
 
                 <section>
                     <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
-                        {% if perms.director.is_director %}Wszyscy Nauczyciele{% else %}Nauczyciele Twoich Dzieci{% endif %}
+                        {% if active_role == 'director' %}Wszyscy Nauczyciele{% else %}Nauczyciele Twoich Dzieci{% endif %}
                     </h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {% for t in teachers %}
@@ -91,7 +91,7 @@
                                     <a href="{% url 'teacher-profile' t.id %}" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-primary transition-all" title="Profil">
                                         <span class="material-symbols-outlined text-sm">person</span>
                                     </a>
-                                    {% if perms.director.is_director %}
+                                    {% if active_role == 'director' %}
                                         <a href="{% url 'teacher_update' t.id %}" class="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-400 hover:text-primary transition-all" title="Edytuj">
                                             <span class="material-symbols-outlined text-sm">edit</span>
                                         </a>

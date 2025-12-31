@@ -1,14 +1,14 @@
 from django.db import models
 from accounts.models import User
-from director.models import Director
+from director.models import Director, KindergartenOwnedModel
 from django.core.validators import RegexValidator
 from children.models import Kid
 
 
 # Create your models here.
-class ParentA(models.Model):
+class ParentA(KindergartenOwnedModel):
     gender_choices = ((1, 'Mezczyzna'), (2, 'Kobieta'))
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='parent_profiles')
     first_name = models.CharField(max_length=128, null=True)
     last_name = models.CharField(max_length=128, null=True)
     kids = models.ManyToManyField(Kid)
@@ -24,7 +24,7 @@ class ParentA(models.Model):
         message=(u'Kod pocztowy musi byc w formacie 00-000'),
         code="invalid_zip_code",
     )])
-    principal = models.ManyToManyField(Director)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.user.email} Profile'
@@ -33,3 +33,4 @@ class ParentA(models.Model):
         permissions = [
             ("is_parent", 'parent permission')
         ]
+        unique_together = ('user', 'kindergarten')

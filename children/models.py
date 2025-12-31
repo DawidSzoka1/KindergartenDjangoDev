@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from director.models import Director, GroupPhotos, MealPhotos
+from director.models import Director, GroupPhotos, MealPhotos, KindergartenOwnedModel
 from groups.models import Groups
 from meals.models import Meals
 from payments_plans.models import PaymentPlan
@@ -9,7 +9,7 @@ from payments_plans.models import PaymentPlan
 # Create your models here.
 
 
-class Kid(models.Model):
+class Kid(KindergartenOwnedModel):
     gender_choices = ((1, 'Chłopiec'), (2, 'Dziewczynka'))
     date_of_birth = models.DateField(null=True)
     first_name = models.CharField(max_length=128)
@@ -42,14 +42,14 @@ presenceChoices = (
 )
 
 
-class PresenceModel(models.Model):
+class PresenceModel(KindergartenOwnedModel):
     day = models.DateField(auto_created=True)
     kid = models.ForeignKey(Kid, on_delete=models.CASCADE)
     presenceType = models.IntegerField(choices=presenceChoices)
 
 
 
-class Invoice(models.Model):
+class Invoice(KindergartenOwnedModel):
     STATUS_CHOICES = (
         ('unpaid', 'Nieopłacona'),
         ('partial', 'Opłacona częściowo'),

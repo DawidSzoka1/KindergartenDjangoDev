@@ -1,12 +1,12 @@
 from django.db import models
-from director.models import Director
+from director.models import Director, KindergartenOwnedModel
 from groups.models import Groups
 
 
 # Create your models here.
 
 
-class PaymentPlan(models.Model):
+class PaymentPlan(KindergartenOwnedModel):
     FREQUENCY_CHOICES = (
         ('monthly', 'Miesięcznie'),
         ('quarterly', 'Kwartalnie'),
@@ -19,7 +19,6 @@ class PaymentPlan(models.Model):
     price = models.DecimalField(max_digits=7, decimal_places=2, default=500)
     frequency = models.CharField(max_length=20, choices=FREQUENCY_CHOICES, default='monthly')
     discount_info = models.CharField(max_length=255, null=True, blank=True) # np. Sibling Discount (10%)
-    principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     is_active = models.BooleanField(default=True)
     is_archived = models.BooleanField(default=False)
 
@@ -31,11 +30,10 @@ class PaymentPlan(models.Model):
 
 from teacher.models import Employee
 
-class SalaryPayment(models.Model):
+class SalaryPayment(KindergartenOwnedModel):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='salary_payments')
     month = models.IntegerField()
     year = models.IntegerField()
-    principal = models.ForeignKey(Director, on_delete=models.CASCADE, related_name='salary_payments', null=True)
     base_salary = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Pensja zasadnicza")
     bonus = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Premia")
 

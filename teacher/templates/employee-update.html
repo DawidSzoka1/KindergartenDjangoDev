@@ -19,15 +19,23 @@
                     </div>
 
 
-
+                    {% if messages %}
+                        <div class="max-w-4xl mx-auto mb-4">
+                            {% for message in messages %}
+                                <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                     <div class="bg-white dark:bg-zinc-900/50 rounded-xl border border-gray-200 dark:border-zinc-800">
-                        <form method="post" action="#">
+                        <form method="post" action="{% url 'teacher_update' pk=employee.id %}">
                             {% csrf_token %}
 
-                            {% if request.user.get_user_permissions == 'teacher.is_teacher' or valid %}
+                            {% if active_role == 'teacher' or valid %}
                                 <div class="flex flex-wrap items-center justify-between gap-4 px-6 pb-3 pt-5 border-b border-gray-200 dark:border-zinc-800">
                                     <h1 class="text-zinc-900 dark:text-white text-2xl font-bold tracking-tight">
-                                        Zmień dane osobowe: {{ employee.first_name }} {{ employee.last_name }}
+                                        Zmień dane osobowe: {{ employee.first_name|default:"" }} {{ employee.last_name|default:"" }}
                                     </h1>
                                     <a href="{% url 'teacher-profile' pk=employee.id %}" class="text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-primary flex items-center gap-1.5">
                                         <span class="material-symbols-outlined !text-lg">arrow_back</span>
@@ -54,9 +62,7 @@
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         {{ form.group.as_hidden }}
                                         {{ form.salary.as_hidden }}
-                                        {{ form.principal.as_hidden }}
                                         {{ form.role.as_hidden }}
-                                        {{ form.user.as_hidden }}
 
                                         {{ form.first_name|as_crispy_field }}
                                         {{ form.last_name|as_crispy_field }}

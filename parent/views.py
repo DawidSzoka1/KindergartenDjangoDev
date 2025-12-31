@@ -23,239 +23,307 @@ import string
 from django.conf import settings
 from django.db.models import Q, Count
 from django.db import transaction
+from blog.views import get_active_context
 
 
 @csrf_exempt
 def create_parent_ajax(request):
-    if request.method != "POST" or not request.user.is_authenticated:
-        return JsonResponse({"success": False, "error": "Brak dostępu"})
-    body = json.loads(request.body)
-    email = body.get('email', '').strip()
+    role, profile_id, k_id = get_active_context(request)
+
+    if request.method != "POST" or role != 'director':
+        return JsonResponse({"success": False, "error": "Brak uprawnień dyrektora"})
+
     try:
+        body = json.loads(request.body)
+        email = body.get('email', '').strip().lower()
+
         if not email or '@' not in email:
             return JsonResponse({"success": False, "error": "Wpisz poprawny e-mail"})
 
-        if User.objects.filter(email=email).exists():
-            return JsonResponse({"success": False, "error": "Ten e-mail już jest zajęty"})
+        with transaction.atomic():
+            # 1. Pobieramy lub tworzymy użytkownika
+            target_user = User.objects.filter(email=email).first()
+            created_new_user = False
+            password = None
 
-        # Generujemy hasło
-        import random, string
-        password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+            if not target_user:
+                # Tworzymy całkiem nowe konto
+                import random, string
+                password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+                target_user = User.objects.create_user(email=email, password=password)
+                created_new_user = True
+            else:
+                # Sprawdzamy, czy użytkownik nie ma już profilu rodzica w TEJ placówce
+                if ParentA.objects.filter(user=target_user, kindergarten_id=k_id).exists():
+                    return JsonResponse({"success": False, "error": "Ten użytkownik jest już rodzicem w tej placówce"})
 
-        # Tworzymy użytkownika i rodzica
-        user = User.objects.create_user(
-            email=email,
-            password=password
-        )
-        content_type = ContentType.objects.get_for_model(ParentA)
-        permission = Permission.objects.get(content_type=content_type, codename='is_parent')
-        principal = Director.objects.get(user=request.user.id)
-        par_user = ParentA.objects.create(user=user)
-        par_user.principal.add(principal)
-        par_user.user.user_permissions.clear()
-        par_user.user.user_permissions.add(permission)
-        user.parenta.save()
+            # 2. Tworzymy profil ParentA przypisany do placówki (k_id)
+            # KindergartenOwnedModel automatycznie obsługuje pole kindergarten_id
+            par_profile = ParentA.objects.create(
+                user=target_user,
+                kindergarten_id=k_id
+            )
 
-        # Wysyłamy e-mail z hasłem
-        subject = f"Zaproszenie do KinderManage – konto rodzica dla Twojego dziecka"
-        text_content = f"Cześć!\n\nTwoje konto zostało utworzone.\nE-mail: {email}\nHasło: {password}\n\nZaloguj się tutaj: {request.scheme}://{request.get_host()}\n\nPozdrawiamy,\nZespół KinderManage"
+            # 3. Nadajemy uprawnienie 'is_parent' (bez czyszczenia starych!)
+            content_type = ContentType.objects.get_for_model(ParentA)
+            permission = Permission.objects.get(content_type=content_type, codename='is_parent')
+            if not target_user.has_perm('parent.is_parent'):
+                target_user.user_permissions.add(permission)
 
-        html_content = render_to_string('email_to_parent.html', {
-            'password': password,
-            'email': email,
-            'login_url': f"{request.scheme}://{request.get_host()}"
-        })
+            # 4. Przygotowanie e-maila
+            if created_new_user:
+                subject = "Zaproszenie do przedszkola – konto rodzica"
+                template = 'email_to_parent.html'
+                msg_pass = password
+            else:
+                subject = "Nowy profil rodzica w systemie"
+                template = 'email_to_parent.html' # Informacja o dodaniu profilu do istniejącego konta
+                msg_pass = "Twoje dotychczasowe hasło"
 
-        msg = EmailMultiAlternatives(subject, text_content, settings.EMAIL_HOST_USER, [email])
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
+            html_content = render_to_string(template, {
+                'password': msg_pass,
+                'email': email,
+                'login_url': f"{request.scheme}://{request.get_host()}",
+                'kindergarten_name': par_profile.kindergarten.name
+            })
 
-        return JsonResponse({
-            "success": True,
-            "email": email
-        })
+            msg = EmailMultiAlternatives(
+                subject,
+                f"Twoje konto rodzica w {par_profile.kindergarten.name} jest gotowe.",
+                settings.EMAIL_HOST_USER,
+                [email]
+            )
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+
+            return JsonResponse({
+                "success": True,
+                "email": email,
+                "parent_id": par_profile.id,
+                "is_new": created_new_user
+            })
+
     except Exception as e:
-        User.objects.filter(email=email).first().delete()
-        return JsonResponse({"success": False, "error": str(e)})
+        return JsonResponse({"success": False, "error": f"Błąd serwera: {str(e)}"})
 
 
-class InviteParentView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
+class InviteParentView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        user = Director.objects.get(user=request.user.id)
-        kid = user.kid_set.filter(id=int(pk)).first()
-        if kid:
-            return render(request, 'parent-invite.html', {'kid': kid})
-        else:
+        role, profile_id, k_id = get_active_context(request)
+        if role != 'director':
             raise PermissionDenied
+
+        # Szukamy dziecka tylko w ramach aktywnej placówki
+        kid = get_object_or_404(Kid, id=pk, kindergarten_id=k_id)
+        return render(request, 'parent-invite.html', {'kid': kid})
 
     def post(self, request, pk):
-        user = Director.objects.get(user=request.user.id)
-        kid = user.kid_set.filter(id=int(pk)).first()
-        parent_email = request.POST.get('email')
-        if kid:
-            if parent_email:
-                try:
-                    test = User.objects.get(email=parent_email)
-                except User.DoesNotExist:
-                    test = None
-                if test:
-                    messages.error(request, 'Ten rodzic juz istnieje')
-                    return redirect('invite_parent', pk=pk)
-                try:
-                    password = User.objects.make_random_password()
-                    parent_user = User.objects.create_user(email=parent_email, password=password)
-                    ContactModel.objects.get(director__user__email=parent_email).delete()
-                    Director.objects.get(user__email=parent_email).delete()
-                    content_type = ContentType.objects.get_for_model(ParentA)
-                    permission = Permission.objects.get(content_type=content_type, codename='is_parent')
-                    par_user = ParentA.objects.create(user=parent_user)
-                    par_user.principal.add(user)
-                    par_user.kids.add(kid)
-                    par_user.user.user_permissions.clear()
-                    par_user.user.user_permissions.add(permission)
-                    parent_user.parenta.save()
-                except Exception as e:
-                    User.objects.filter(email=parent_email).first().delete()
-                    messages.error(request, f'Wystąpił blad {e}')
-                    return redirect('invite_parent', pk=pk)
-
-                subject = f"Zaproszenie na konto przedszkola dla rodzica {kid.first_name}"
-                from_email = EMAIL_HOST_USER
-                text_content = "Marchewka zaprasza do korzystania z konto do ubslugi dzieci"
-                html_content = render_to_string('email_to_parent.html', {'password': password, 'email': parent_email})
-                msg = EmailMultiAlternatives(subject, text_content, from_email, [parent_email])
-                msg.attach_alternative(html_content, "text/html")
-                msg.send()
-                messages.success(request, f"Udalo sie zaprosic rodzica o emailu {parent_email} ")
-                return redirect('list_kids')
-
-            else:
-                messages.error(request, 'wypelnij formularz')
-                return redirect('invite_parent', pk=pk)
-        else:
+        role, profile_id, k_id = get_active_context(request)
+        if role != 'director':
             raise PermissionDenied
 
+        kid = get_object_or_404(Kid, id=pk, kindergarten_id=k_id)
+        parent_email = request.POST.get('email', '').strip().lower()
 
-class AddParentToKidView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-    PAGINATE_BY = 10 # Ilość dzieci na stronę
+        if not parent_email:
+            messages.error(request, 'Proszę podać adres e-mail.')
+            return redirect('invite_parent', pk=pk)
+
+        try:
+            with transaction.atomic():
+                # 1. Sprawdzamy, czy użytkownik już istnieje
+                target_user = User.objects.filter(email=parent_email).first()
+                created_new_user = False
+                password = None
+
+                if not target_user:
+                    # Tworzymy nowe konto
+                    password = User.objects.make_random_password()
+                    target_user = User.objects.create_user(email=parent_email, password=password)
+                    created_new_user = True
+
+                # 2. Pobieramy lub tworzymy profil ParentA dla TEJ placówki
+                # Rodzic może już istnieć w systemie, ale nie mieć profilu w tym przedszkolu
+                parent_profile, created_profile = ParentA.objects.get_or_create(
+                    user=target_user,
+                    kindergarten_id=k_id
+                )
+
+                # 3. Przypisujemy dziecko do rodzica (relacja ManyToMany w modelu ParentA lub Kid)
+                # Zakładając, że ParentA ma pole ManyToMany 'kids'
+                if kid not in parent_profile.kids.all():
+                    parent_profile.kids.add(kid)
+
+                # 4. Nadajemy uprawnienie techniczne (bezpiecznie, bez clear())
+                content_type = ContentType.objects.get_for_model(ParentA)
+                permission = Permission.objects.get(content_type=content_type, codename='is_parent')
+                if not target_user.has_perm('parent.is_parent'):
+                    target_user.user_permissions.add(permission)
+
+                # 5. Przygotowanie treści e-maila
+                if created_new_user:
+                    subject = f"Zaproszenie – konto rodzica dla dziecka: {kid.first_name}"
+                    template = 'email_to_parent.html'
+                    msg_pass = password
+                else:
+                    subject = f"Nowe dziecko przypisane do Twojego konta: {kid.first_name}"
+                    template = 'email_to_parent.html'
+                    msg_pass = "Twoje obecne hasło"
+
+                html_content = render_to_string(template, {
+                    'password': msg_pass,
+                    'email': parent_email,
+                    'kid': kid,
+                    'kindergarten': parent_profile.kindergarten.name
+                })
+
+                msg = EmailMultiAlternatives(subject, "Zaproszenie", settings.EMAIL_HOST_USER, [parent_email])
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
+
+            messages.success(request, f"Pomyślnie zaproszono rodzica ({parent_email}) dla dziecka {kid.first_name}")
+            return redirect('list_kids')
+
+        except Exception as e:
+            messages.error(request, f'Wystąpił nieoczekiwany błąd: {e}')
+            return redirect('invite_parent', pk=pk)
+
+
+class AddParentToKidView(LoginRequiredMixin, View):
+    PAGINATE_BY = 10
 
     def get(self, request, pk):
-        parent = get_object_or_404(ParentA, id=int(pk))
-        user_director = get_object_or_404(Director, user=request.user)
+        # Pobieramy kontekst placówki z sesji
+        role, profile_id, k_id = get_active_context(request)
+
+        if role != 'director':
+            raise PermissionDenied
+
+        # Szukamy rodzica w ramach TEJ SAMEJ placówki
+        parent = get_object_or_404(ParentA, id=pk, kindergarten_id=k_id)
+
         search_query = request.GET.get('search', '').strip()
         page_number = request.GET.get('page')
 
-        # 1. Walidacja uprawnień (czy dyrektor jest przełożonym rodzica)
-        if parent.principal.filter(user=request.user).exists():
+        # 1. Pobieramy dzieci aktywne z TEJ placówki, które nie są jeszcze przypisane do tego rodzica
+        kids_qs = Kid.objects.filter(
+            kindergarten_id=k_id,
+            is_active=True
+        ).exclude(parenta=parent)
 
-            # 2. Pobieramy dzieci aktywne, nieprzypisane jeszcze do tego rodzica
-            kids_qs = user_director.kid_set.filter(is_active=True).exclude(parenta=parent)
+        # 2. Filtrowanie wyszukiwania
+        if search_query:
+            kids_qs = kids_qs.filter(
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query)
+            ).distinct()
 
-            # 3. Filtrowanie (jeśli search_query jest obecne)
-            if search_query:
-                kids_qs = kids_qs.filter(
-                    Q(first_name__icontains=search_query) |
-                    Q(last_name__icontains=search_query)
-                ).distinct()
+        # Sortowanie i paginacja
+        kids_qs = kids_qs.order_by('last_name', 'first_name')
+        paginator = Paginator(kids_qs, self.PAGINATE_BY)
+        kids_list = paginator.get_page(page_number)
 
-            # Sortowanie i paginacja
-            kids_qs = kids_qs.order_by('last_name', 'first_name')
-            paginator = Paginator(kids_qs, self.PAGINATE_BY)
-            kids_list = paginator.get_page(page_number)
-
-            # Wczytujemy z sesji/POST listę już zaznaczonych dzieci (jeśli użytkownik przeładował stronę)
-            # Lista ID dzieci, które były zaznaczone w ostatnim POST/GET
-            previously_selected_kids = request.session.get('selected_kids_for_parent_link', [])
-
-            context = {
-                'kids_list': kids_list,
-                'parent': parent,
-                'search_query': search_query,
-                'previously_selected_kids': previously_selected_kids,
-            }
-            return render(request, 'parent-kid-add.html', context)
-
-        raise PermissionDenied
+        context = {
+            'kids_list': kids_list,
+            'parent': parent,
+            'search_query': search_query,
+            # Przekazujemy listę ID dzieci już przypisanych (opcjonalnie do UI)
+            'assigned_kids_ids': list(parent.kids.values_list('id', flat=True))
+        }
+        return render(request, 'parent-kid-add.html', context)
 
     def post(self, request, pk):
-        parent = get_object_or_404(ParentA, id=int(pk))
-        user_director = get_object_or_404(Director, user=request.user)
+        role, profile_id, k_id = get_active_context(request)
 
-        # 1. Sprawdzamy, czy formularz POST to wyszukiwanie, czy zapis
+        if role != 'director':
+            raise PermissionDenied
+
+        parent = get_object_or_404(ParentA, id=pk, kindergarten_id=k_id)
+
+        # 1. Obsługa wyszukiwania przez POST (opcjonalnie)
         if 'search_button' in request.POST:
-            # Użyjemy tej logiki, jeśli musisz użyć POST do wyszukiwania
             search = request.POST.get('search', '').strip()
+            return redirect(f"{request.path}?search={search}")
 
-            # Zapisz aktualny stan checkboxów do sesji, zanim przeładujesz stronę GET
-            selected_kids = request.POST.getlist('kids', [])
-            request.session['selected_kids_for_parent_link'] = selected_kids
+        # 2. Logika przypisywania dzieci
+        kids_ids_to_link = request.POST.getlist('kids', [])
 
-            if search:
-                return redirect(f"{request.path}?search={search}")
-            else:
-                return redirect(request.path)
+        if not kids_ids_to_link:
+            messages.warning(request, 'Wybierz co najmniej jedno dziecko.')
+            return redirect(request.path)
 
+        # Pobieramy obiekty dzieci, upewniając się, że należą do placówki dyrektora
+        valid_kids = Kid.objects.filter(
+            id__in=kids_ids_to_link,
+            kindergarten_id=k_id,
+            is_active=True
+        )
 
-        # 2. Logika zapisu linków (główny submit)
-        if parent.principal.filter(user=request.user).exists():
+        count = 0
+        for kid in valid_kids:
+            # Zakładając relację ManyToMany 'kids' w modelu ParentA
+            if kid not in parent.kids.all():
+                parent.kids.add(kid)
+                count += 1
 
-            # Lista ID dzieci wybranych przez użytkownika
-            kids_ids_to_link = request.POST.getlist('kids', [])
-            if not kids_ids_to_link:
-                messages.warning(request, f'Wybierz conajmniej jedno dziecko do podpięcia')
-                return redirect(request.path)
-                # Sprawdzenie, czy dyrektor ma prawo do tych dzieci
-            valid_kids_qs = user_director.kid_set.filter(is_active=True, id__in=kids_ids_to_link)
-
-            count = 0
-            for kid in valid_kids_qs:
-                if kid not in parent.kids.all():
-                    parent.kids.add(kid)
-                    count += 1
-
-            # Usuwamy stan sesji po pomyślnym zapisie
-            if 'selected_kids_for_parent_link' in request.session:
-                del request.session['selected_kids_for_parent_link']
-
-            messages.success(request, f'Poprawnie dodano {count} dzieci do {parent.user.email}')
-            return redirect('parent_profile', pk=parent.id)
-
-        raise PermissionDenied
+        messages.success(request, f'Poprawnie przypisano {count} dzieci do rodzica {parent.user.email}')
+        # Upewnij się, że nazwa widoku profilu rodzica to 'parent_profile'
+        return redirect('parent_profile', pk=parent.id)
 
 
 class ParentListView(LoginRequiredMixin, View):
-
     def get(self, request):
-        user = request.user
+        # Pobieramy kontekst placówki z sesji
+        role, profile_id, k_id = get_active_context(request)
         search_query = request.GET.get('search', '')
-        if user.get_user_permissions() == {'director.is_director'}:
-            director = get_object_or_404(Director, user=user.id)
-            parents_qs = director.parenta_set.all().order_by('-id')
-        elif user.get_user_permissions() == {'teacher.is_teacher'}:
-            teacher = get_object_or_404(Employee, user=user.id)
-            parent_ids = teacher.group.kid_set.filter(is_active=True).values_list('parenta', flat=True).distinct()
-            # Pobieramy obiekty rodziców na podstawie zebranych ID
-            parents_qs = teacher.principal.first().parenta_set.filter(id__in=parent_ids)
+
+        # 1. LOGIKA FILTRACJI ZALEŻNA OD ROLI
+        if role == 'director':
+            # Dyrektor widzi wszystkich rodziców w swojej placówce
+            parents_qs = ParentA.objects.filter(kindergarten_id=k_id)
+
+        elif role == 'teacher':
+            # Pobieramy konkretny profil nauczyciela dla tej placówki
+            teacher = get_object_or_404(Employee, id=profile_id, kindergarten_id=k_id)
+
+            if not teacher.group:
+                # Jeśli nauczyciel nie ma grupy, nie widzi rodziców
+                parents_qs = ParentA.objects.none()
+            else:
+                # Nauczyciel widzi rodziców dzieci ze swojej grupy w tej placówce
+                parents_qs = ParentA.objects.filter(
+                    kids__group=teacher.group,
+                    kids__kindergarten_id=k_id,
+                    kindergarten_id=k_id
+                ).distinct()
         else:
             raise PermissionDenied
+
+        # 2. WYSZUKIWANIE (Pamiętaj, że imiona są w modelu User)
         if search_query:
-            # Używamy Q dla złożonego, ale prostego wyszukiwania
             parents_qs = parents_qs.filter(
                 Q(user__email__icontains=search_query) |
                 Q(first_name__icontains=search_query) |
                 Q(last_name__icontains=search_query)
             )
-        parents_qs = parents_qs.annotate(num_children=Count('kids')).order_by('-id')
+
+        # 3. STATYSTYKI I PAGINACJA
+        # Liczymy dzieci tylko w ramach TEJ placówki
+        parents_qs = parents_qs.annotate(
+            num_children=Count('kids', filter=Q(kids__kindergarten_id=k_id))
+        ).select_related('user').order_by('last_name')
+
         paginator = Paginator(parents_qs, 15)
-        page_number = request.GET.get("page")
-        page_obj = paginator.get_page(page_number)
-        return render(request, 'parents-list.html', {'page_obj': page_obj, 'search_query': search_query, })
+        page_obj = paginator.get_page(request.GET.get("page"))
+
+        context = {
+            'page_obj': page_obj,
+            'search_query': search_query,
+            'active_role': role
+        }
+        return render(request, 'parents-list.html', context)
 
     def post(self, request):
-        user = request.user
         search = request.POST.get('search', '').strip()
         if search:
             return redirect(f"{request.path}?search={search}")
@@ -264,138 +332,194 @@ class ParentListView(LoginRequiredMixin, View):
 
 class ParentProfileView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        user = request.user
-        parent = get_object_or_404(ParentA, id=int(pk))
-        context = {
-            'parent': parent
+        # Pobieramy kontekst placówki z sesji
+        role, profile_id, k_id = get_active_context(request)
 
+        # Pobieramy rodzica, upewniając się, że należy do TEJ placówki
+        parent = get_object_or_404(ParentA, id=pk, kindergarten_id=k_id)
+
+        context = {
+            'parent': parent,
+            'active_role': role,
+            # Pobieramy dzieci rodzica tylko z tej konkretnej placówki
+            'kids_in_kindergarten': parent.kids.filter(kindergarten_id=k_id, is_active=True)
         }
-        if user.get_user_permissions() == {'parent.is_parent'}:
-            if parent.user.email == user.email:
+
+        # 1. LOGIKA DLA RODZICA (dostęp do własnego profilu)
+        if role == 'parent':
+            # Sprawdzamy, czy ID z sesji zgadza się z ID profilu (jako stringi lub inty)
+            if str(parent.id) == str(profile_id):
                 return render(request, 'parent_profile.html', context)
-        elif user.get_user_permissions() == {'director.is_director'}:
-            director = get_object_or_404(Director, user=user.id)
-            if parent in director.parenta_set.all():
-                return render(request, 'parent_profile.html', context)
-        elif user.get_user_permissions() == {'teacher.is_teacher'}:
-            teacher = get_object_or_404(Employee, user=user.id)
-            if parent.kids.filter(group=teacher.group).filter(is_active=True):
-                return render(request, 'parent_profile.html', context)
+
+        # 2. LOGIKA DLA DYREKTORA (dostęp do wszystkich rodziców w placówce)
+        elif role == 'director':
+            # get_object_or_404 po k_id już zweryfikował przynależność do placówki
+            return render(request, 'parent_profile.html', context)
+
+        # 3. LOGIKA DLA NAUCZYCIELA (dostęp tylko jeśli uczy dziecko tego rodzica)
+        elif role == 'teacher':
+            teacher = get_object_or_404(Employee, id=profile_id, kindergarten_id=k_id)
+
+            if teacher.group:
+                # Sprawdzamy, czy rodzic ma przynajmniej jedno aktywne dziecko w grupie nauczyciela
+                has_access = parent.kids.filter(
+                    group=teacher.group,
+                    is_active=True,
+                    kindergarten_id=k_id
+                ).exists()
+
+                if has_access:
+                    return render(request, 'parent_profile.html', context)
 
         raise PermissionDenied
 
 
-class ParentUpdateView(PermissionRequiredMixin, View):
-    permission_required = 'parent.is_parent'
-
-    def check_permissions(self, user, parent):
-        """Sprawdza, czy użytkownik ma prawo do edycji tego profilu rodzica."""
-        # Własny rodzic:
-        if user.get_user_permissions() == {'parent.is_parent'} and parent.user.email == user.email:
-            return True
-
-        # Dyrektor:
-        if user.get_user_permissions() == {'director.is_director'}:
-            try:
-                director = Director.objects.get(user=user)
-                if parent.principal.filter(id=director.id).exists():
-                    return True
-            except Director.DoesNotExist:
-                pass
-
-        return False
-
+class ParentUpdateView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        parent = get_object_or_404(ParentA, id=int(pk))
+        role, profile_id, k_id = get_active_context(request)
+        # Pobieramy rodzica w ramach aktywnej placówki
+        parent = get_object_or_404(ParentA, id=pk, kindergarten_id=k_id)
 
-        if self.check_permissions(request.user, parent):
+        # WERYFIKACJA UPRAWNIEŃ
+        # 1. Dyrektor może edytować każdego rodzica w swojej placówce
+        # 2. Rodzic może edytować tylko swój własny profil (porównanie ID z sesji)
+        if role == 'parent' and str(parent.id) == str(profile_id):
             form = ParentUpdateForm(instance=parent)
             return render(request, 'parent-update.html', {'form': form, 'parent': parent})
 
         raise PermissionDenied
 
     def post(self, request, pk):
-        parent = get_object_or_404(ParentA, id=int(pk))
+        role, profile_id, k_id = get_active_context(request)
+        parent = get_object_or_404(ParentA, id=pk, kindergarten_id=k_id)
 
-        if self.check_permissions(request.user, parent):
+        if role == 'parent' and str(parent.id) == str(profile_id):
             form = ParentUpdateForm(request.POST, instance=parent)
+
             if form.is_valid():
-                form.save(commit=False) # Zapisz model, ale nie do bazy
+                # save() automatycznie zaktualizuje pola modelu ParentA zdefiniowane w Meta.fields/exclude
+                form.save()
 
-                # Ręcznie zaktualizuj pola inne niż ManyToMany (kids)
-                # Używamy form.instance, który ma już zaktualizowane dane z POST
-                parent.first_name = form.cleaned_data.get('first_name')
-                parent.last_name = form.cleaned_data.get('last_name')
-                parent.gender = form.cleaned_data.get('gender')
-                parent.phone = form.cleaned_data.get('phone')
-                parent.city = form.cleaned_data.get('city')
-                parent.address = form.cleaned_data.get('address')
-                parent.zip_code = form.cleaned_data.get('zip_code')
+                # Opcjonalnie: Jeśli imiona są w modelu User, a chcesz je edytować tutaj:
+                # user = parent.user
+                # user.first_name = request.POST.get('first_name')
+                # user.last_name = request.POST.get('last_name')
+                # user.save()
 
-                parent.save() # Zapisz zmiany do bazy
                 messages.success(request, 'Poprawnie zmieniono dane.')
                 return redirect('parent_profile', pk=parent.id)
 
-            # W przypadku błędu, renderujemy formularz ponownie z błędami
-            messages.error(request, 'Wystąpił błąd walidacji formularza. Sprawdź pola zaznaczone na czerwono.')
+            messages.error(request, 'Wystąpił błąd walidacji formularza.')
             return render(request, 'parent-update.html', {'form': form, 'parent': parent})
 
         raise PermissionDenied
 
 
-class ParentDeleteView(PermissionRequiredMixin, View):
-    permission_required = 'director.is_director'
-
+class ParentDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
         raise PermissionDenied
 
     def post(self, request, pk):
-        parent = get_object_or_404(ParentA, id=int(pk))
-        if parent.principal.first().user.email == request.user.email:
-            user = User.objects.get(id=parent.user.id)
-            user.delete()
-            messages.success(request, f'Rodzic {user} został usniety')
-            return redirect('list_parent')
-        raise PermissionDenied
+        # Pobieramy kontekst z sesji
+        role, profile_id, k_id = get_active_context(request)
+
+        if role != 'director':
+            raise PermissionDenied
+
+        # Szukamy profilu rodzica w ramach aktywnej placówki
+        parent = get_object_or_404(ParentA, id=pk, kindergarten_id=k_id)
+        parent_email = parent.user.email
+
+        # 1. Odpinamy rodzica od wszystkich jego dzieci W TEJ placówce
+        # Robimy to, aby nie zostawić "osieroconych" relacji w bazie
+        kids_in_this_kindergarten = parent.kids.filter(kindergarten_id=k_id)
+        for kid in kids_in_this_kindergarten:
+            parent.kids.remove(kid)
+
+        # 2. Usuwamy tylko ten konkretny profil rodzica
+        # Obiekt User pozostaje nienaruszony!
+        parent.delete()
+
+        # 3. Opcjonalnie: Jeśli to był ostatni profil ParentA tego użytkownika,
+        # można rozważyć odebranie uprawnienia is_parent, ale zazwyczaj się tego nie robi,
+        # by nie psuć dostępu do innych przedszkoli.
+
+        messages.success(request, f'Profil rodzica {parent_email} został usunięty z tej placówki.')
+        return redirect('list_parent')
 
 
 class ParentSearchView(LoginRequiredMixin, View):
     def get(self, request):
-        return redirect('list_parent')
+        # Pobieramy kontekst z sesji
+        role, profile_id, k_id = get_active_context(request)
+
+        # Tylko dyrektor i nauczyciel powinni mieć dostęp do wyszukiwarki rodziców
+        if role not in ['director', 'teacher']:
+            raise PermissionDenied
+
+        search_query = request.GET.get('search', '').strip()
+
+        # 1. Bazowy QuerySet dla aktywnej placówki
+        #
+        parents_qs = ParentA.objects.filter(kindergarten_id=k_id)
+
+        # 2. Logika wyszukiwania
+        if search_query:
+            parents_qs = parents_qs.filter(
+                Q(user__email__icontains=search_query) |
+                Q(user__first_name__icontains=search_query) |
+                Q(user__last_name__icontains=search_query)
+            )
+
+        # 3. Dodatkowe ograniczenie dla nauczyciela (widzi tylko rodziców ze swojej grupy)
+        if role == 'teacher':
+            teacher = get_object_or_404(Employee, id=profile_id)
+            if teacher.group:
+                parents_qs = parents_qs.filter(kids__group=teacher.group).distinct()
+            else:
+                parents_qs = ParentA.objects.none()
+
+        parents_qs = parents_qs.select_related('user').order_by('user__last_name')
+
+        # 4. Paginacja
+        paginator = Paginator(parents_qs, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        context = {
+            'page_obj': page_obj,
+            'search_query': search_query,
+            'active_role': role
+        }
+
+        return render(request, 'parents-list.html', context)
 
     def post(self, request):
-        search = request.POST.get('search')
+        # Metoda POST służy tu tylko do przekierowania na GET z parametrem search
+        search = request.POST.get('search', '').strip()
         if search:
-            parents = ParentA.objects.filter(principal=Director.objects.get(user=request.user.id)).filter(
-                user__email__icontains=search
-            ).order_by('-id')
-            paginator = Paginator(parents, 5)
-            page_number = request.POST.get('page')
-            page_obj = paginator.get_page(page_number)
-            parents = page_obj
-            return render(request, 'parents-list.html', {'parents': parents, 'page_obj': page_obj})
+            return redirect(f"{reverse('list_parent')}?search={search}")
         return redirect('list_parent')
 
 
 
-class InviteAndAssignParentView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-    template_name = 'parent-invite-standalone.html' # Będziemy renderować ten szablon tylko w przypadku błędów GET
+class InviteAndAssignParentView(LoginRequiredMixin, View):
+    template_name = 'parent-invite-standalone.html'
     PAGINATE_BY = 10
 
     def get(self, request):
-        # Pobierz listę dzieci do wyświetlenia w modalnym oknie
-        user_director = get_object_or_404(Director, user=request.user)
+        # 1. Pobieramy kontekst z sesji
+        role, profile_id, k_id = get_active_context(request)
+        if role != 'director':
+            raise PermissionDenied
+
         search_query = request.GET.get('search', '').strip()
         page_number = request.GET.get('page')
-        # Pobierz wszystkie aktywne dzieci dyrektora, które nie mają jeszcze rodzica (lub mają tylko jednego)
-        # Zależnie od twojej logiki, może to być:
-        # kids_list = user_director.kid_set.filter(parenta__isnull=True, is_active=True)
-        # Dla uproszczenia (i możliwości wielokrotnego przypisania):
-        kids_qs = user_director.kid_set.filter(is_active=True).order_by('last_name', 'first_name')
+
+        # 2. Pobieramy dzieci TYLKO z tej konkretnej placówki
+        kids_qs = Kid.objects.filter(kindergarten_id=k_id, is_active=True).order_by('last_name', 'first_name')
 
         if search_query:
-            # Filtrujemy tylko, jeśli jest zapytanie
             kids_qs = kids_qs.filter(
                 Q(first_name__icontains=search_query) |
                 Q(last_name__icontains=search_query)
@@ -403,94 +527,110 @@ class InviteAndAssignParentView(LoginRequiredMixin, PermissionRequiredMixin, Vie
 
         paginator = Paginator(kids_qs, self.PAGINATE_BY)
         page_obj = paginator.get_page(page_number)
+
         context = {
-            'kids_list': page_obj, # Przekazujemy obiekt paginacji
-            'search_query': search_query
+            'kids_list': page_obj,
+            'search_query': search_query,
+            'active_role': role
         }
-        # W widoku GET nie robimy nic, bo modal jest częścią innego szablonu (np. list_kids/list_parent)
-        # Jeśli ten widok byłby wywoływany samodzielnie, używamy:
         return render(request, self.template_name, context)
 
     def post(self, request):
+        role, profile_id, k_id = get_active_context(request)
+        if role != 'director':
+            raise PermissionDenied
+
+        # Obsługa wyszukiwania (przekierowanie na GET)
         if 'search_button' in request.POST:
-            # Obsługa wyszukiwania z pola tekstowego (wymagane dla paginacji)
             search = request.POST.get('search', '').strip()
+            return redirect(f"{request.path}?search={search}")
 
-            if search:
-
-                return redirect(f"{request.path}?search={search}")
-            else:
-                return redirect(request.path)
-        user_director = get_object_or_404(Director, user=request.user)
-        parent_email = request.POST.get('email', '').strip()
-        # Odbieramy listę ID dzieci (z checkboxów)
+        parent_email = request.POST.get('email', '').strip().lower()
         kid_ids = request.POST.getlist('kid_id')
 
-        # --- Walidacja ---
         if not parent_email:
             messages.error(request, 'Pole Email Rodzica jest wymagane.')
-            return redirect('invite_standalone_parent')
+            return redirect(request.path)
 
-        if User.objects.filter(email=parent_email).exists():
-            messages.error(request, 'Ten email jest już zajęty.')
-            return redirect('invite_standalone_parent')
-
-
-        # --- LOGIKA TWORZENIA KONTA Z TRANSAKCJĄ ---
         try:
             with transaction.atomic():
+                # 1. Pobierz lub utwórz Użytkownika (User)
+                target_user = User.objects.filter(email=parent_email).first()
+                created_new_user = False
+                password = None
 
-                # 1. Utwórz użytkownika
-                password = User.objects.make_random_password()
-                parent_user = User.objects.create_user(email=parent_email, password=password)
+                if not target_user:
+                    password = User.objects.make_random_password()
+                    target_user = User.objects.create_user(email=parent_email, password=password)
+                    created_new_user = True
 
-                # 2. Utwórz obiekt ParentA i przypisz Dyrektora
-                par_user = ParentA.objects.create(user=parent_user)
-                par_user.principal.add(user_director)
+                # 2. Pobierz lub utwórz profil ParentA dla TEJ placówki
+                # To zapobiega błędom, gdy rodzic ma już profil w innym Twoim przedszkolu
+                parent_profile, created_profile = ParentA.objects.get_or_create(
+                    user=target_user,
+                    kindergarten_id=k_id
+                )
 
-                # 3. Przypisz dzieci (jeśli istnieją)
+                # 3. Przypisz wybrane dzieci (tylko te z tej placówki!)
                 if kid_ids:
-                    kids_to_assign = user_director.kid_set.filter(id__in=kid_ids)
-                    par_user.kids.add(*kids_to_assign)
+                    valid_kids = Kid.objects.filter(id__in=kid_ids, kindergarten_id=k_id)
+                    parent_profile.kids.add(*valid_kids)
 
-                # 4. Przypisz uprawnienie 'is_parent'
+                # 4. Nadaj uprawnienie techniczne (BEZ .clear())
                 content_type = ContentType.objects.get_for_model(ParentA)
                 permission = Permission.objects.get(content_type=content_type, codename='is_parent')
-                par_user.user.user_permissions.clear()
-                par_user.user.user_permissions.add(permission)
-                par_user.save()
+                if not target_user.has_perm('parent.is_parent'):
+                    target_user.user_permissions.add(permission)
 
-                # 5. Wyślij zaproszenie
-                subject = "Zaproszenie na konto przedszkola dla rodzica"
-                from_email = EMAIL_HOST_USER
-                text_content = "Zostałeś zaproszony do utworzenia konta rodzica w systemie przedszkola."
-                html_content = render_to_string('email_to_parent.html', {'password': password, 'email': parent_email})
+                # 5. Wyślij odpowiedni e-mail
+                if created_new_user:
+                    subject = "Zaproszenie do systemu KinderManage"
+                    template = 'email_to_parent.html'
+                    msg_pass = password
+                else:
+                    subject = f"Nowy profil rodzica w placówce {parent_profile.kindergarten.name}"
+                    template = 'email_to_parent.html' # Szablon informujący o nowym profilu
+                    msg_pass = "Twoje dotychczasowe hasło"
 
-                msg = EmailMultiAlternatives(subject, text_content, from_email, [parent_email])
+                html_content = render_to_string(template, {
+                    'password': msg_pass,
+                    'email': parent_email,
+                    'kindergarten_name': parent_profile.kindergarten.name
+                })
+
+                msg = EmailMultiAlternatives(subject, "Zaproszenie", settings.EMAIL_HOST_USER, [parent_email])
                 msg.attach_alternative(html_content, "text/html")
                 msg.send()
 
-            messages.success(request, f"Pomyślnie utworzono konto i wysłano zaproszenie dla {parent_email}.")
+            messages.success(request, f"Pomyślnie przetworzono zaproszenie dla {parent_email}.")
             return redirect('list_parent')
 
         except Exception as e:
-            messages.error(request, f'Wystąpił błąd podczas tworzenia konta: {e}')
-            return redirect('invite_standalone_parent')
+            messages.error(request, f'Wystąpił błąd: {e}')
+            return redirect(request.path)
 
 
-class RemoveKidFromParentView(PermissionRequiredMixin, View):
-    permission_required = 'director.is_director'
-
+class RemoveKidFromParentView(LoginRequiredMixin, View):
     def post(self, request, parent_pk, kid_pk):
-        parent = get_object_or_404(ParentA, pk=parent_pk)
-        kid = get_object_or_404(Kid, pk=kid_pk)
+        # 1. Pobieramy aktywny kontekst z sesji
+        role, profile_id, k_id = get_active_context(request)
 
-        # Sprawdzamy, czy relacja istnieje i usuwamy ją
+        # 2. Weryfikacja roli dyrektora
+        if role != 'director':
+            raise PermissionDenied
+
+        # 3. Pobieramy rodzica i dziecko, upewniając się, że należą do TEJ SAMEJ placówki
+        # Zapobiega to manipulacji ID w celu odpinania dzieci w innych przedszkolach
+        parent = get_object_or_404(ParentA, pk=parent_pk, kindergarten_id=k_id)
+        kid = get_object_or_404(Kid, pk=kid_pk, kindergarten_id=k_id)
+
+        # 4. Sprawdzamy, czy relacja istnieje i usuwamy ją
         if kid in parent.kids.all():
-            parent.kids.remove(kid) # Usuwamy relację ManyToMany
-            messages.success(request, f"Pomyślnie odpięto dziecko {kid.first_name} od {parent.user.email}.")
+            parent.kids.remove(kid)
+            # Używamy user.first_name, bo dane są w modelu User
+            messages.success(request, f"Pomyślnie odpięto dziecko {kid.first_name} od rodzica {parent.user.email}.")
         else:
-            messages.warning(request, "To dziecko nie było przypisane do tego rodzica.")
+            messages.warning(request, "To dziecko nie jest przypisane do tego rodzica w tej placówce.")
 
-        # Przekierowujemy z powrotem na profil rodzica
-        return redirect('parent_profile', pk=parent_pk)
+        # 5. Przekierowanie na profil rodzica
+        return redirect('parent_profile', pk=parent.id)

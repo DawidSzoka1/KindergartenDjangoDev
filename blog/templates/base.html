@@ -8,11 +8,11 @@
 
     <title>
         {% if user.is_authenticated %}
-            {% if perms.director.is_director %}
+            {% if active_role == 'director' %}
                 Panel Dyrektora
-            {% elif perms.teacher.is_teacher %}
+            {% elif active_role == 'teacher' %}
                 Panel Nauczyciela
-            {% elif perms.parent.is_parent %}
+            {% elif active_role == 'parent' %}
                 Panel Rodzica
             {% else %}
                 Panel
@@ -26,6 +26,12 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 
     <!-- Czcionki -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -107,7 +113,7 @@
         </div>
     </div>
 </div>
-<body class=" ">
+<body class="bg-background-light dark:bg-background-dark ">
 
 <div class="flex min-h-screen w-full">
 {% if user.is_authenticated %}
@@ -115,9 +121,9 @@
         <!-- ======================= -->
         <!--    SIDEBAR PANELU       -->
         <!-- ======================= -->
-        <aside class="flex h-screen w-64 flex-col bg-white dark:bg-[#0f1d0f] border-r border-gray-300 dark:border-gray-800">
+        <aside class="sticky top-0 h-screen w-64 flex-shrink-0 flex-col bg-white dark:bg-[#0f1d0f] border-r border-gray-300 dark:border-gray-800 overflow-y-auto hidden md:flex">
 
-            <div class="p-4 flex flex-col gap-8">
+            <div class="flex flex-col h-full p-4 gap-8">
 
                 <!-- Logo -->
                 <a href="{% url 'home_page' %}" class="flex items-center gap-3">
@@ -138,7 +144,7 @@
                         <span class="material-symbols-outlined">grid_view</span>
                         Panel główny
                     </a>
-                    {% if perms.director.is_director %}
+                    {% if active_role == 'director' %}
                         <a href="{% url 'list_groups' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/10 text-text-light/80 dark:text-text-dark/80 hover:text-primary dark:hover:text-primary" href="#">
                             <span class="material-symbols-outlined">groups</span>
                             <p class="text-sm font-medium leading-normal">Grupy</p>
@@ -179,7 +185,7 @@
                         </a>
                     {% endif %}
                     <!-- Nauczyciel -->
-                    {% if perms.teacher.is_teacher %}
+                    {% if active_role == 'teacher' %}
 
 
                         <a href="{% url 'presence_calendar' %}"
@@ -188,8 +194,8 @@
                             <span class="text-sm font-bold uppercase tracking-tight">Obecność Grupy</span>
                         </a>
 
-                        {% if user.employee.group %}
-                            <a href="{% url 'group_details' pk=user.employee.group.id %}"
+                        {% if profile.group %}
+                            <a href="{% url 'group_details' pk=profile.group.id %}"
                                class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-primary/10 text-gray-600 dark:text-gray-400 hover:text-primary transition-all group">
                                 <span class="material-symbols-outlined">groups</span>
                                 <span class="text-sm font-bold uppercase tracking-tight">Moja Grupa</span>
@@ -206,7 +212,7 @@
                         </a>
                     {% endif %}
                     <!-- Rodzic -->
-                    {% if perms.parent.is_parent %}
+                    {% if active_role == 'parent' %}
                         <div class="my-2 border-t border-gray-100 dark:border-gray-800"></div>
                         <p class="px-3 text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">Strefa Rodzica</p>
 
@@ -246,12 +252,12 @@
                 <!-- Profil użytkownika -->
                 <div class="border-t border-gray-300 dark:border-gray-800 pt-4">
 
-                    {% if perms.teacher.is_teacher %}
-                        <a href="{% url 'teacher-profile' pk=user.employee.id %}"
-                    {% elif perms.parent.is_parent %}
-                        <a href="{% url 'parent_profile' user.parenta.id %}"
-                    {% elif perms.director.is_director %}
-                        <a href="{% url 'director_profile' pk=user.director.id %}"
+                    {% if active_role == 'teacher' %}
+                        <a href="{% url 'teacher-profile' pk=active_profile_id %}"
+                    {% elif active_role == 'parent' %}
+                        <a href="{% url 'parent_profile' pk=active_profile_id %}"
+                    {% elif active_role == 'director' %}
+                        <a href="{% url 'director_profile' pk=active_profile_id %}"
                     {% else %}
                         <a href="#"
                     {% endif %}
@@ -271,7 +277,117 @@
             </div>
         </aside>
 {% endif %}
-    <main class="flex-1 bg-background-light dark:bg-background-dark p-8">
+    <main class="flex-1 min-w-0 overflow-x-hidden p-4 md:p-8">
+        {% if user.is_authenticated %}
+            <div class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-center gap-4 bg-white dark:bg-[#0f1d0f] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                <div class="flex items-center gap-4">
+                    <div class="size-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black">
+                        <span class="material-symbols-outlined">account_circle</span>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Aktywna Sesja</p>
+                        <h2 class="text-sm font-black uppercase text-gray-900 dark:text-white">
+                            {# Wyświetlamy aktywną rolę z sesji #}
+                            {% if active_role == 'director' %}Dyrektor
+                            {% elif active_role == 'teacher' %}Nauczyciel
+                            {% elif active_role == 'parent' %}Rodzic
+                            {% endif %}
+                            {% if active_kindergarten %}
+                                <span class="text-primary mx-1">•</span>
+                                <span class="text-gray-500 dark:text-gray-400">{{ active_kindergarten.name }}</span>
+                            {% endif %}
+                        </h2>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <button class="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                        <span class="material-symbols-outlined text-sm">sync_alt</span>
+                        Przełącz profil
+                    </button>
+
+                    <div class="absolute right-0 top-full pt-2 w-72 hidden group-hover:block z-[100] animate-in fade-in slide-in-from-top-2">
+                        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-2xl p-4">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4 px-2">Dostępne Tożsamości</p>
+
+                            <div class="space-y-2">
+                                {# SEKCE DYREKTORA #}
+                                {% for dir in my_director_profiles %}
+                                    <form method="POST" action="{% url 'switch_account' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="role" value="director">
+                                        {# Przekazujemy ID profilu Director oraz ID Kindergarten jako principal_id #}
+                                        <input type="hidden" name="profile_id" value="{{ dir.id }}">
+                                        <input type="hidden" name="kindergarten_id" value="{{ dir.kindergarten.id }}">
+
+                                        <button class="w-full flex items-center justify-between p-3 rounded-2xl transition-all
+                                    {% if active_role == 'director' and active_kindergarten_id == dir.kindergarten.id|stringformat:'s' %}
+                                        bg-primary/10 border border-primary/20
+                                    {% else %}
+                                        hover:bg-primary/5
+                                    {% endif %} text-left">
+
+                                            <div class="flex items-center gap-3 text-left">
+                                                <span class="material-symbols-outlined text-primary">account_balance</span>
+                                                <div>
+                                                    {# Nazwa pobierana bezpośrednio z nowego modelu Kindergarten #}
+                                                    <p class="text-xs font-black uppercase">{{ dir.kindergarten.name }}</p>
+                                                    <p class="text-[9px] font-bold text-gray-400">ROLA: DYREKTOR</p>
+                                                </div>
+                                            </div>
+                                            {% if active_role == 'director' and active_kindergarten_id == dir.kindergarten.id|stringformat:'s' %}
+                                                <span class="material-symbols-outlined text-primary text-xs">check_circle</span>
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                {% endfor %}
+
+                                {# SEKCJA NAUCZYCIELA #}
+                                {% for emp in my_teacher_profiles %}
+                                    <form method="POST" action="{% url 'switch_account' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="role" value="teacher">
+                                        <input type="hidden" name="profile_id" value="{{ emp.id }}">
+                                        <input type="hidden" name="kindergarten_id" value="{{ emp.kindergarten.id }}">
+                                        <button class="w-full flex items-center justify-between p-3 rounded-2xl transition-all hover:bg-blue-500/10 text-left">
+                                            <div class="flex items-center gap-3">
+                                                <span class="material-symbols-outlined text-blue-500">school</span>
+                                                <div>
+                                                    <p class="text-xs font-black uppercase">{{ emp.kindergarten.name }}</p>
+                                                    <p class="text-[9px] font-bold text-gray-400">ROLA: NAUCZYCIEL</p>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </form>
+                                {% endfor %}
+
+                                {# SEKCJA RODZICA #}
+                                {% for parent in my_parent_profiles %}
+                                    {# Rodzic może mieć dzieci w różnych placówkach, iterujemy po nich #}
+
+                                        <form method="POST" action="{% url 'switch_account' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="role" value="parent">
+                                            <input type="hidden" name="profile_id" value="{{ parent.id }}">
+                                            <input type="hidden" name="kindergarten_id" value="{{ parent.kindergarten.id }}">
+                                            <button class="w-full flex items-center justify-between p-3 rounded-2xl transition-all hover:bg-green-500/10 text-left">
+                                                <div class="flex items-center gap-3 text-left">
+                                                    <span class="material-symbols-outlined text-green-500">family_restroom</span>
+                                                    <div>
+                                                        <p class="text-xs font-black uppercase">{{ parent.kindergarten.name }}</p>
+                                                        <p class="text-[9px] font-bold text-gray-400">ROLA: RODZIC </p>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        </form>
+
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         {% if messages %}
             <div class="max-w-4xl mx-auto mb-6 space-y-3">
                 {% for message in messages %}

@@ -1,7 +1,7 @@
 from django import forms
 from .models import Post, Director
 from groups.models import Groups
-
+from director.forms import KindergartenBaseForm
 
 class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
     def label_from_instance(self, group):
@@ -9,15 +9,20 @@ class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
         return f"{group.name}"
 
 
-class PostAddForm(forms.ModelForm):
+class PostAddForm(KindergartenBaseForm):
+    group = forms.ModelMultipleChoiceField(
+        queryset=Groups.objects.none(), # Queryset zostanie ustawiony w __init__ przez bazowy form
+        widget=forms.CheckboxSelectMultiple(),
+        required=False, # To pozwala na nie wybranie żadnej grupy
+        label='Grupy docelowe'
+    )
     class Meta:
         model = Post
         # Wybieramy konkretne pola, aby zachować kontrolę nad kolejnością
-        fields = ['title', 'event_date', 'category', 'content', 'group', 'author', 'director', 'is_active']
+        fields = ['title', 'event_date', 'category', 'content', 'group', 'author', 'is_active']
 
         widgets = {
             'author': forms.HiddenInput(),
-            'director': forms.HiddenInput(),
             'is_active': forms.HiddenInput(),
             'title': forms.TextInput(attrs={
                 'placeholder': 'np. Wycieczka do zoo',
@@ -47,27 +52,16 @@ class PostAddForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        # Wyciągamy obiekty dyrektora lub pracownika przekazane z widoku
-        director = kwargs.pop("director", None)
-        employee = kwargs.pop("employee", None)
+        employee_profile = kwargs.pop('employee', None)
+        role = kwargs.get('role')
 
         super().__init__(*args, **kwargs)
 
-        # Logika filtrowania grup w zależności od tego, kto dodaje post
-        if director:
-            # Dyrektor widzi wszystkie aktywne grupy w swojej placówce
-            self.fields['group'].queryset = Groups.objects.filter(
-                principal=director,
-                is_active=True
-            ).order_by('name')
+        # Upewniamy się, że pole nie jest wymagane
+        self.fields['group'].required = False
 
-        elif employee:
-            # Nauczyciel widzi tylko grupy, do których jest przypisany
-            # Używamy employee.group, ponieważ model Employee ma relację do Groups
-            self.fields['group'].queryset = Groups.objects.filter(
-                id=employee.group.id,
-                is_active=True
-            ) if employee.group else Groups.objects.none()
+        # Specyficzna logika dla nauczyciela
+        if role == 'teacher' and employee_profile:
+            if hasattr(employee_profile, 'group') and employee_profile.group:
+                self.fields['group'].queryset = self.fields['group'].queryset.filter(id=employee_profile.group.id)
 
-        # Dodatkowa klasa dla etykiet grup, aby ułatwić stylowanie w Tailwind
-        self.fields['group'].widget.attrs.update({'class': 'group-checkbox-input'})

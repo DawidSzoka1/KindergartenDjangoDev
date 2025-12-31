@@ -1,14 +1,14 @@
 # payments_plans/forms.py
 from django import forms
 from .models import PaymentPlan
+from director.forms import KindergartenBaseForm
 
-class PaymentPlanForm(forms.ModelForm):
+
+class PaymentPlanForm(KindergartenBaseForm):
     class Meta:
         model = PaymentPlan
-        fields = ['name', 'description', 'price', 'frequency', 'discount_info', 'principal', 'is_active', 'is_archived']
+        exclude = ['kindergarten', 'is_active', 'is_archived']
         widgets = {
-            'principal': forms.HiddenInput(),
-            'is_active': forms.HiddenInput(),
             'description': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Opisz co obejmuje ten plan...'}),
             'frequency': forms.Select(attrs={'class': 'form-select'}),
         }
@@ -19,3 +19,8 @@ class PaymentPlanForm(forms.ModelForm):
             'description': 'Opis planu',
             'discount_info': 'Informacje o zniżkach',
         }
+
+    def __init__(self, *args, **kwargs):
+        # Pobieramy k_id przekazane z widoku (get_form_kwargs)
+        self.active_principal_id = kwargs.pop('active_principal_id', None)
+        super().__init__(*args, **kwargs)

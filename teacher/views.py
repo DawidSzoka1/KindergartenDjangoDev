@@ -18,82 +18,110 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.db import transaction
+from blog.views import get_active_context
+
+
 
 class EmployeeProfileView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
-        employee = get_object_or_404(Employee, id=int(pk))
-        user = self.request.user
-        context = {'employee': employee}
-        if user.get_user_permissions() == {'director.is_director'}:
-            if employee.principal.first() == user.director:
-                context['groups_list'] = Groups.objects.filter(principal=user.director, is_active=True)
-                # Paginacja dzieci w grupie tego nauczyciela
-                if employee.group:
-                    kids_queryset = Kid.objects.filter(group=employee.group, is_active=True).order_by('last_name')
-                    paginator = Paginator(kids_queryset, 6) # 6 dzieci na stronę w zakładce profilu
-                    page_number = request.GET.get('kids_page')
-                    context['kids'] = paginator.get_page(page_number)
+        # Pobieramy kontekst placówki z sesji
+        role, profile_id, k_id = get_active_context(request)
 
-                return render(request, 'employee-profile.html', context)
+        # Pobieramy profil pracownika, upewniając się, że należy do TEJ placówki
+        employee = get_object_or_404(Employee, id=pk, kindergarten_id=k_id)
 
-            messages.error(request, "Nie masz uprawnień do podglądu tego pracownika.")
-            return redirect('list_teachers')
-        elif user.get_user_permissions() == {'teacher.is_teacher'}:
-            if user.employee == employee:
+        context = {
+            'employee': employee,
+            'active_role': role
+        }
+
+        # 1. LOGIKA DLA DYREKTORA
+        if role == 'director':
+            # Dyrektor widzi wszystkich pracowników swojej placówki
+            # Przekazujemy listę grup TEJ placówki do ewentualnej zmiany przypisania
+            context['groups_list'] = Groups.objects.filter(kindergarten_id=k_id, is_active=True)
+
+            if employee.group:
+                kids_queryset = Kid.objects.filter(group=employee.group, is_active=True).order_by('last_name')
+                paginator = Paginator(kids_queryset, 6)
+                context['kids'] = paginator.get_page(request.GET.get('kids_page'))
+
+            return render(request, 'employee-profile.html', context)
+
+        # 2. LOGIKA DLA NAUCZYCIELA
+        elif role == 'teacher':
+            # Nauczyciel może widzieć swój własny profil
+            if employee.id == profile_id:
                 if employee.group:
                     kids_queryset = Kid.objects.filter(group=employee.group, is_active=True).order_by('last_name')
                     paginator = Paginator(kids_queryset, 6)
-                    page_number = request.GET.get('kids_page')
-                    context['kids'] = paginator.get_page(page_number)
+                    context['kids'] = paginator.get_page(request.GET.get('kids_page'))
                 return render(request, 'employee-profile.html', context)
-        elif user.get_user_permissions() == {'parent.is_parent'}:
-            parent = get_object_or_404(ParentA, user=user)
-            parent_kids_in_teacher_groups = parent.kids.filter(
+
+            # Opcjonalnie: Nauczyciele mogą widzieć profile innych nauczycieli w tej samej placówce
+            # return render(request, 'employee-profile.html', context)
+
+        # 3. LOGIKA DLA RODZICA
+        elif role == 'parent':
+            # Rodzic widzi profil nauczyciela tylko, jeśli uczy on w grupie jego dziecka
+            parent = get_object_or_404(ParentA, id=profile_id)
+
+            # Sprawdzamy czy jakiekolwiek dziecko rodzica jest w grupie tego nauczyciela
+            has_common_group = parent.kids.filter(
+                kindergarten_id=k_id,
                 is_active=True,
                 group=employee.group
-            ).select_related('group')
-            if parent_kids_in_teacher_groups.exists():
-                # Wyciągamy unikalne grupy tych dzieci
-                context['assigned_groups'] = set(kid.group for kid in parent_kids_in_teacher_groups)
+            ).exists()
+
+            if has_common_group:
                 return render(request, 'employee-profile.html', context)
+
         raise PermissionDenied
 
 
 class EmployeesListView(LoginRequiredMixin, View):
     def get(self, request):
+        # Pobieramy aktywny kontekst z sesji (rola, profil_id, id_placówki)
+        role, profile_id, k_id = get_active_context(request)
         search_query = request.GET.get('search', '')
 
-        # 1. LOGIKA DLA DYREKTORA
-        if hasattr(request.user, 'director_profile') or request.user.has_perm("director.is_director"):
-            user_director = get_object_or_404(Director, user=request.user)
-            teachers = Employee.objects.filter(principal=user_director)
+        # 1. LOGIKA FILTRACJI ZALEŻNA OD ROLI
+        if role == 'director':
+            # Dyrektor widzi wszystkich pracowników przypisanych do aktywnej placówki
+            teachers = Employee.objects.filter(kindergarten_id=k_id)
 
-        # 2. LOGIKA DLA RODZICA
-        elif request.user.has_perm("parent.is_parent") or request.user.groups.filter(name='Rodzice').exists():
-            # Zakładamy, że model Parent ma relację do User i do Kid (które mają Group)
-            # Pobieramy grupy, do których należą dzieci tego rodzica
-            parent = get_object_or_404(ParentA, user=request.user)
-            child_groups = Groups.objects.filter(kid__parenta=parent).distinct()
+        elif role == 'parent':
+            # Rodzic widzi tylko nauczycieli grup, do których należą jego dzieci w tej placówce
+            parent = get_object_or_404(ParentA, id=profile_id, kindergarten_id=k_id)
+            child_groups = Groups.objects.filter(
+                kid__parenta=parent,
+                kindergarten_id=k_id
+            ).distinct()
 
-            # Pobieramy nauczycieli, którzy są przypisani do tych grup
-            # Zakładając, że Employee/Teacher ma relację do Groups
-            teachers = Employee.objects.filter(group__in=child_groups).distinct()
+            teachers = Employee.objects.filter(
+                group__in=child_groups,
+                kindergarten_id=k_id
+            ).distinct()
 
         else:
-            # Jeśli to ktoś inny, odmawiamy dostępu
-            raise PermissionDenied
+            # Nauczyciele zazwyczaj widzą listę współpracowników w tej samej placówce
+            if role == 'teacher':
+                teachers = Employee.objects.filter(kindergarten_id=k_id)
+            else:
+                raise PermissionDenied
 
-        # 3. WSPÓLNA LOGIKA (Wyszukiwanie i Paginacja)
+        # 2. WSPÓLNA LOGIKA (Wyszukiwanie i Paginacja)
         if search_query:
-            # Szukamy po emailu lub imieniu/nazwisku dla wygody
+            # Uwaga: first_name i last_name są teraz w modelu User (poprzednia poprawka)
             teachers = teachers.filter(
                 Q(user__email__icontains=search_query) |
-                Q(first_name__icontains=search_query) |
-                Q(last_name__icontains=search_query)
+                Q(user__first_name__icontains=search_query) |
+                Q(user__last_name__icontains=search_query)
             )
 
-        teachers = teachers.order_by('-id')
+        # Optymalizacja zapytań (zapobieganie N+1 dla danych użytkownika i grupy)
+        teachers = teachers.select_related('user', 'group').order_by('last_name')
 
         paginator = Paginator(teachers, 10)
         page_number = request.GET.get("page")
@@ -102,316 +130,310 @@ class EmployeesListView(LoginRequiredMixin, View):
         context = {
             'page_obj': page_obj,
             'search_query': search_query,
-            'is_director': request.user.has_perm("director.is_director"), # flaga do szablonu
+            'active_role': role,
         }
 
         return render(request, 'employees-list.html', context)
 
     def post(self, request):
         search = request.POST.get('search')
-        # Używamy reverse, aby zachować spójność adresów
         base_url = reverse('list_teachers')
         if search:
             return redirect(f'{base_url}?search={search}')
         return redirect('list_teachers')
 
 
-class EmployeeAddView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
+class EmployeeAddView(LoginRequiredMixin, View):
     def get(self, request):
-        user = Director.objects.get(user=request.user.id)
-        # Pobieramy tylko aktywne grupy przypisane do tego dyrektora
-        groups = user.groups_set.filter(is_active=True)
+        role, profile_id, k_id = get_active_context(request)
+        if role != 'director':
+            raise PermissionDenied
+
+        # Pobieramy grupy tylko dla aktywnej placówki
+        groups = Groups.objects.filter(kindergarten_id=k_id, is_active=True)
         return render(request, 'employee-add.html', {'groups': groups, 'roles': roles})
 
     def post(self, request):
-        user_director = Director.objects.get(user=request.user.id)
+        role, profile_id, k_id = get_active_context(request)
+        if role != 'director':
+            raise PermissionDenied
 
         # Wczytywanie danych
         role_pk = request.POST.get('role')
         salary_str = request.POST.get('salary')
-        group_id = request.POST.get('group') # Może być puste
-        teacher_email = request.POST.get('email')
+        group_id = request.POST.get('group')
+        teacher_email = request.POST.get('email').strip().lower()
 
-        # Wczesna walidacja wymaganych pól
         if not teacher_email or not role_pk or not salary_str:
-            messages.error(request, 'Wypełnij wszystkie wymagane pola (Email, Posada, Wynagrodzenie).')
+            messages.error(request, 'Wypełnij wymagane pola (Email, Posada, Wynagrodzenie).')
             return redirect('add_teacher')
 
         try:
-            role = int(role_pk)
             salary = float(salary_str)
+            target_role = int(role_pk)
 
-            # Walidacja, czy email nie jest zajęty
-            if User.objects.filter(email=teacher_email).exists():
-                messages.error(request, f'Ten email jest już zajęty.')
-                return redirect('add_teacher')
+            # Pobieramy lub ustawiamy None dla grupy w ramach placówki
+            group = None
+            if group_id:
+                group = get_object_or_404(Groups, id=group_id, kindergarten_id=k_id)
 
-        except ValueError:
-            messages.error(request, "Nieprawidłowy format wynagrodzenia lub roli.")
-            return redirect('add_teacher')
-
-        # Logika przypisania grupy:
-        group = None
-        if group_id:
-            # Sprawdzamy, czy wybrana grupa faktycznie należy do tego dyrektora
-            group = user_director.groups_set.filter(id=int(group_id)).first()
-            if not group:
-                # Jeśli grupa została wybrana, ale nie należy do dyrektora, to jest błąd.
-                messages.error(request, "Wybrana grupa jest nieprawidłowa.")
-                return redirect('add_teacher')
-
-        # Dodatkowa walidacja dla roli 'nauczyciel' (role=2)
-        if role == 2 and not group:
-            messages.error(request, "Dla roli 'nauczyciel' wymagane jest przypisanie grupy.")
-            return redirect('add_teacher')
-
-
-        # --- LOGIKA TWÓRCZA I TRANSKAJNA ---
-        try:
             with transaction.atomic():
-                # 1. Utwórz użytkownika
-                password = User.objects.make_random_password()
-                teacher_user = User.objects.create_user(email=teacher_email, password=password)
+                # 1. Sprawdzamy czy użytkownik o tym mailu już istnieje
+                target_user = User.objects.filter(email=teacher_email).first()
+                created_new_user = False
+                password = None
 
-                # Wyczyść stare rekordy (jeśli istnieją)
-                # Zostawiam ten fragment, ale jest BARDZO ryzykowne:
-                from director.models import ContactModel # Dodaj import
-                ContactModel.objects.filter(director__user__email=teacher_email).delete()
-                Director.objects.filter(user__email=teacher_email).delete()
+                if not target_user:
+                    # Tworzymy nowego użytkownika
+                    password = User.objects.make_random_password()
+                    target_user = User.objects.create_user(email=teacher_email, password=password)
+                    created_new_user = True
+                else:
+                    # Użytkownik istnieje - sprawdzamy czy nie ma już profilu pracownika W TEJ placówce
+                    if Employee.objects.filter(user=target_user, kindergarten_id=k_id).exists():
+                        messages.error(request, f'Ten użytkownik jest już pracownikiem w Twojej placówce.')
+                        return redirect('add_teacher')
 
-                # 2. Utwórz obiekt Pracownika
-                teacher_object = Employee.objects.create(
-                    user=teacher_user,
-                    role=role,
+                # 2. Tworzymy nowy profil Employee przypisany do placówki (k_id)
+                new_employee = Employee.objects.create(
+                    user=target_user,
+                    kindergarten_id=k_id, # Kluczowe dla systemu wieloprofilowego
+                    role=target_role,
                     salary=salary,
-                    group=group # Przypisujemy grupę (może być None)
+                    group=group,
+                    is_active=True
                 )
 
-                # 3. Przypisz Dyrektora jako principal
-                user_director.employee_set.add(teacher_object)
-
-                # 4. Przypisz uprawnienie 'is_teacher'
-                from django.contrib.contenttypes.models import ContentType
-                from django.contrib.auth.models import Permission
-
+                # 3. Nadajemy uprawnienie techniczne (jeśli jeszcze nie ma)
                 content_type = ContentType.objects.get_for_model(Employee)
                 permission = Permission.objects.get(content_type=content_type, codename='is_teacher')
-                teacher_object.user.user_permissions.clear()
-                teacher_object.user.user_permissions.add(permission)
+                if not target_user.has_perm('teacher.is_teacher'):
+                    target_user.user_permissions.add(permission)
 
-                teacher_user.employee.save() # To jest zbędne, obiekt został zapisany wyżej
+                # 4. Wysyłka e-maila
+                if created_new_user:
+                    # E-mail powitalny z hasłem dla całkiem nowego konta
+                    subject = "Zaproszenie do systemu przedszkola - Nowe konto"
+                    template = 'email_to_parent.html' # Twoja nazwa szablonu
+                else:
+                    # Informacja o dodaniu nowego profilu do istniejącego konta
+                    subject = "Dodano nowy profil pracownika"
+                    template = 'email_to_parent.html'
+                    password = "Twoje dotychczasowe hasło"
 
-            subject = f"Zaproszenie na konto przedszkola dla nauczyciela"
-            from_email = EMAIL_HOST_USER # Zmień na faktyczną zmienną z settings.py
-            text_content = "Marchewka zaprasza do korzystania z konto jako nauczyciel"
+                html_content = render_to_string(template, {
+                    'password': password,
+                    'email': teacher_email,
+                    'kindergarten': new_employee.kindergarten.name
+                })
+                msg = EmailMultiAlternatives(subject, "Zaproszenie", EMAIL_HOST_USER, [teacher_email])
+                msg.attach_alternative(html_content, "text/html")
+                msg.send()
 
-            html_content = render_to_string('email_to_parent.html', {'password': password, 'email': teacher_email})
-            msg = EmailMultiAlternatives(subject, text_content, from_email, [teacher_email])
-            msg.attach_alternative(html_content, "text/html")
-            msg.send()
-
-            messages.success(request, f"Udalo sie zaprosic nauczyciela o emailu {teacher_email}")
+            messages.success(request, f"Pomyślnie przypisano pracownika {teacher_email} do placówki.")
             return redirect('list_teachers')
 
         except Exception as e:
-            messages.error(request, f'Wystąpił nieoczekiwany błąd: {e}')
+            messages.error(request, f'Błąd podczas dodawania: {e}')
             return redirect('add_teacher')
 
 
 class EmployeeUpdateView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
-        employee = get_object_or_404(Employee, id=int(pk))
+        # Pobieramy kontekst placówki
+        role, profile_id, k_id = get_active_context(request)
 
-        # --- LOGIKA NAUCZYCIEL (Edycja Danych Osobowych) ---
-        if request.user.get_user_permissions() == {'teacher.is_teacher'}:
-            # Sprawdzamy, czy edytuje swój własny profil
-            try:
-                if request.user.employee == employee:
-                    form = TeacherUpdateForm(instance=employee)
-                    # Zmienna 'valid' działa jako flaga dla szablonu
-                    return render(request, 'employee-update.html',
-                                  {'form': form, 'valid': True, 'employee': employee})
-            except Employee.DoesNotExist:
-                pass # Kontynuuj do PermissionDenied
+        # Pobieramy profil pracownika w ramach tej samej placówki
+        employee = get_object_or_404(Employee, id=pk, kindergarten_id=k_id)
 
-        # --- LOGIKA DYREKTOR (Edycja Roli/Wynagrodzenia) ---
-        elif request.user.get_user_permissions() == {'director.is_director'}:
-            user_director = get_object_or_404(Director, user=request.user)
+        # --- LOGIKA NAUCZYCIEL (Edycja własnych danych kontaktowych) ---
+        if role == 'teacher' and employee.id == profile_id:
+            form = TeacherUpdateForm(instance=employee)
+            return render(request, 'employee-update.html', {
+                'form': form,
+                'valid': True,
+                'employee': employee
+            })
 
-            # Sprawdzamy, czy pracownik jest przypisany do tego dyrektora
-            if employee.principal.filter(id=user_director.id).exists():
+        # --- LOGIKA DYREKTOR (Edycja danych kadrowych pracownika) ---
+        elif role == 'director':
+            # Pobieramy tylko grupy z TEJ placówki
+            groups = Groups.objects.filter(kindergarten_id=k_id, is_active=True)
 
-                # DYREKTOR widzi formularz edycji roli/wynagrodzenia
-                # Tutaj MUSISZ przekazać: roles i groups, oraz instancję 'employee'
-
-                # Pobieramy grupy aktywne przypisane do tego dyrektora
-                groups = user_director.groups_set.filter(is_active=True)
-
-                # Używamy form = employee, bo nie używamy tu TeacherUpdateForm
-                return render(request, 'employee-update.html',
-                              {'employee': employee, 'roles': roles, 'groups': groups, 'valid': False})
+            return render(request, 'employee-update.html', {
+                'employee': employee,
+                'roles': roles,
+                'groups': groups,
+                'valid': False
+            })
 
         raise PermissionDenied
 
     def post(self, request, pk):
-        employee = get_object_or_404(Employee, id=int(pk))
+        role, profile_id, k_id = get_active_context(request)
+        employee = get_object_or_404(Employee, id=pk, kindergarten_id=k_id)
 
         # --- LOGIKA NAUCZYCIEL (POST: Dane Osobowe) ---
-        if request.user.get_user_permissions() == {'teacher.is_teacher'}:
-            # Sprawdzamy uprawnienia ponownie
-            try:
-                if Employee.objects.get(user=self.request.user) == employee:
-                    form = TeacherUpdateForm(request.POST, instance=employee)
-                    if form.is_valid():
-                        form.save()
-                        messages.success(request, 'Udalo sie zmienic dane.')
-                        return redirect('teacher-profile', pk=pk)
+        if role == 'teacher' and employee.id == profile_id:
+            form = TeacherUpdateForm(request.POST, instance=employee)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Zaktualizowano dane kontaktowe.')
+                return redirect('teacher-profile', pk=pk)
 
-                    # W przypadku błędu, wracamy do formularza z błędami i flagą 'valid'
-                    messages.error(request, 'Wystąpił błąd walidacji w formularzu.')
-                    return render(request, 'employee-update.html',
-                                  {'form': form, 'valid': True, 'employee': employee})
-            except Employee.DoesNotExist:
-                pass
+            return render(request, 'employee-update.html', {
+                'form': form, 'valid': True, 'employee': employee
+            })
 
         # --- LOGIKA DYREKTOR (POST: Rola/Wynagrodzenie) ---
-        elif request.user.get_user_permissions() == {'director.is_director'}:
-
-            # Dyrektor musi być przełożonym tego pracownika
-            user_director = get_object_or_404(Director, user=request.user)
-            if not employee.principal.filter(id=user_director.id).exists():
-                messages.error(request, "Brak uprawnień do edycji tego pracownika.")
-                return redirect('list_teachers')
-
-            # Wczytywanie surowych danych
+        elif role == 'director':
             role_pk = request.POST.get('role')
             salary_str = request.POST.get('salary')
-            group_id = request.POST.get('group') # group_id może być pusty (None)
+            group_id = request.POST.get('group')
 
             try:
-                # Walidacja danych
                 if not role_pk or not salary_str:
                     messages.error(request, "Rola i Wynagrodzenie są wymagane.")
                     return redirect('teacher_update', pk=pk)
 
-                role = int(role_pk)
-                salary = float(salary_str)
+                new_role = int(role_pk)
+                new_salary = float(salary_str)
 
-                # Aktualizacja Roli i Wynagrodzenia
-                employee.salary = salary
-                employee.role = role
-
-                # Logika przypisania Grupy (tylko jeśli rola to 2 'nauczyciel')
-                if role == 2:
+                # Weryfikacja grupy (musi należeć do placówki)
+                if new_role == 2: # Nauczyciel
                     if group_id:
-                        group_obj = get_object_or_404(Groups, id=int(group_id))
+                        group_obj = get_object_or_404(Groups, id=int(group_id), kindergarten_id=k_id)
                         employee.group = group_obj
                     else:
-                        # Nauczyciel musi mieć grupę (jeśli chcesz to wymusić)
-                        messages.error(request, "Dla roli 'nauczyciel' wymagane jest przypisanie grupy.")
+                        messages.error(request, "Nauczyciel musi być przypisany do grupy.")
                         return redirect('teacher_update', pk=pk)
                 else:
-                    # Dla innych ról, ustawiamy grupę na None
                     employee.group = None
 
+                employee.role = new_role
+                employee.salary = new_salary
                 employee.save()
-                messages.success(request, 'Udalo sie zmienic informacje.')
+
+                messages.success(request, 'Dane kadrowe zostały zaktualizowane.')
                 return redirect('teacher-profile', pk=pk)
 
             except ValueError:
-                messages.error(request, "Nieprawidłowy format danych (np. wynagrodzenia).")
-                return redirect('teacher_update', pk=pk)
-            except Exception as e:
-                messages.error(request, f"Wystąpił nieoczekiwany błąd: {e}")
+                messages.error(request, "Nieprawidłowy format ceny lub roli.")
                 return redirect('teacher_update', pk=pk)
 
         raise PermissionDenied
 
 
-class EmployeeDeleteView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
+class EmployeeDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
         raise PermissionDenied
 
     def post(self, request, pk):
-        employee = get_object_or_404(Employee, id=int(pk))
-        director = Director.objects.get(user=request.user.id)
-        if employee.principal.first() == director:
-            user = User.objects.get(employee=employee.id)
-            user.delete()
+        # Pobieramy kontekst placówki z sesji
+        role, profile_id, k_id = get_active_context(request)
 
-            messages.success(request, f'Udało sie usunąc {user}')
-            return redirect('list_teachers')
-        raise PermissionDenied
+        if role != 'director':
+            raise PermissionDenied
+
+        # Pobieramy profil pracownika w ramach TEJ placówki
+        employee = get_object_or_404(Employee, id=pk, kindergarten_id=k_id)
+
+        # 1. Odłączamy pracownika od grupy (jeśli był przypisany)
+        if employee.group:
+            employee.group = None
+
+        # 2. Logiczne usunięcie (Dezaktywacja profilu)
+        # Nie usuwamy obiektu User! Tylko wyłączamy ten konkretny profil Employee.
+        employee.is_active = False
+        employee.save()
+
+        # 3. Opcjonalnie: Usunięcie uprawnienia technicznego,
+        # ALE tylko jeśli użytkownik nie ma innych aktywnych profili nauczyciela
+        other_active_profiles = Employee.objects.filter(
+            user=employee.user,
+            is_active=True
+        ).exclude(id=employee.id)
+
+        if not other_active_profiles.exists():
+            from django.contrib.auth.models import Permission
+            permission = Permission.objects.get(codename='is_teacher')
+            employee.user.user_permissions.remove(permission)
+
+        messages.success(request, f'Pracownik {employee.user.get_full_name()} został dezaktywowany w tej placówce.')
+        return redirect('list_teachers')
 
 
 
-class AssignTeachersView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director" # Tylko dyrektor może przypisywać
-
+class AssignTeachersView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        # pk to ID pracownika, który jest modyfikowany
-        director = Director.objects.get(user=request.user.id)
-        employee = get_object_or_404(Employee, pk=pk)
-        if employee.principal.first() != director:
-            return redirect('list_teachers')
+        # Pobieramy kontekst placówki z sesji
+        role, profile_id, k_id = get_active_context(request)
+
+        # Tylko osoba z rolą dyrektora w danej placówce może zarządzać grupami
+        if role != 'director':
+            raise PermissionDenied
+
+        # Pobieramy profil pracownika, upewniając się, że należy do TEJ placówki
+        employee = get_object_or_404(Employee, id=pk, kindergarten_id=k_id)
 
         # Odbieramy wartość 'group_id' z formularza
         group_id = request.POST.get('group_id')
 
         try:
             if group_id:
-                # Jeśli wybrano grupę, pobierz obiekt grupy
-                selected_group = get_object_or_404(Groups, pk=group_id)
+                # KRYTYCZNE: Sprawdzamy, czy wybrana grupa należy do TEJ SAMEJ placówki co dyrektor i pracownik
+                selected_group = get_object_or_404(Groups, pk=group_id, kindergarten_id=k_id)
                 employee.group = selected_group
-                messages.success(request, f"Pomyślnie przypisano {employee.first_name} do grupy {selected_group.name}.")
+                # Używamy employee.user.first_name, bo usunęliśmy dublujące się pole z modelu Employee
+                messages.success(request, f"Pomyślnie przypisano {employee.user.first_name} do grupy {selected_group.name}.")
             else:
-                # Jeśli wybrano opcję "Brak grupy" (group_id jest puste)
+                # Usunięcie przypisania
                 employee.group = None
-                messages.success(request, f"Pomyślnie usunięto przypisanie grupy dla {employee.first_name}.")
+                messages.success(request, f"Pomyślnie usunięto przypisanie grupy dla {employee.user.first_name}.")
 
             employee.save()
 
         except Exception as e:
             messages.error(request, f"Wystąpił błąd podczas przypisywania grupy: {e}")
 
-        # Przekieruj z powrotem na stronę profilu nauczyciela
+        # Powrót na profil pracownika
         return redirect('teacher-profile', pk=employee.pk)
 
 
 
-class ChangeEmployeeGroupView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    # Nazwa tego widoku powinna być użyta w URL-ach, np. 'change_employee_group'
-    permission_required = 'director.is_director'
-
+class ChangeEmployeeGroupView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        # 1. Pobierz obiekt Pracownika (pk to ID pracownika)
-        director = Director.objects.get(user=request.user.id)
-        employee = get_object_or_404(Employee, pk=pk)
-        if employee.principal.first() != director:
-            return redirect('list_teachers')
-        # 2. Pobierz wartość 'group_id' z Modala (name="group_id" w radio buttonach)
+        # 1. Pobieramy kontekst sesji i rzutujemy ID na int dla poprawnego porównania
+        role, profile_id_raw, k_id = get_active_context(request)
+
+        # Weryfikacja roli
+        if role != 'director':
+            raise PermissionDenied
+
+        # 2. Pobieramy profil pracownika w ramach aktywnej placówki
+        # Zapobiega to edycji pracownika z innego przedszkola
+        employee = get_object_or_404(Employee, id=pk, kindergarten_id=k_id)
+
+        # 3. Pobieramy group_id z formularza
         group_id = request.POST.get('group_id')
 
         try:
             if group_id:
-                # Wybrano grupę: Znajdź obiekt grupy
-                selected_group = get_object_or_404(Groups, pk=group_id)
+                # KRYTYCZNE: Sprawdzamy, czy wybrana grupa należy do TEJ SAMEJ placówki (k_id)
+                # Zapobiega to wstrzyknięciu ID grupy z innej placówki
+                selected_group = get_object_or_404(Groups, pk=group_id, kindergarten_id=k_id)
                 employee.group = selected_group
-                messages.success(request, f"Pomyślnie przypisano {employee.user.email} do grupy {selected_group.name}.")
+                messages.success(request, f"Pomyślnie przypisano pracownika do grupy {selected_group.name}.")
             else:
-                # Wybrano opcję "Brak grupy" (group_id jest puste)
+                # Opcja "Brak grupy"
                 employee.group = None
-                messages.success(request, f"Pomyślnie usunięto przypisanie grupy dla {employee.user.email}.")
+                messages.success(request, f"Pomyślnie usunięto przypisanie grupy.")
 
             employee.save()
 
         except Exception as e:
             messages.error(request, f"Wystąpił błąd podczas przypisywania grupy: {e}")
 
-        # 3. PRZEKIEROWANIE DO PROFILU PRACOWNIKA
-        return redirect('teacher-profile', pk=employee.pk)
+        # 4. Przekierowanie do profilu pracownika
+        return redirect('teacher-profile', pk=employee.id)

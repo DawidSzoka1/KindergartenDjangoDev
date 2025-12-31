@@ -6,7 +6,7 @@
     <div class="max-w-7xl mx-auto p-4 lg:p-8">
 
         <div class="flex flex-wrap items-center gap-2 text-sm mb-8">
-            {% if perms.director.is_director or perms.teacher.is_teacher %}
+            {% if active_role == 'director' or active_role == 'teacher' %}
                 <a href="{% url 'list_kids' %}" class="text-primary hover:underline font-medium">Dzieci</a>
             {% endif %}
             <span class="text-gray-500">/</span>
@@ -34,7 +34,7 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4">
-                {% if perms.director.is_director %}
+                {% if active_role == 'director' %}
                     <a href="{% url 'change_kid_info' pk=kid.id %}"
                        class="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-[#111811] font-bold rounded-xl hover:bg-primary/90 shadow-md transition">
                         <span class="material-symbols-outlined">edit</span>
@@ -100,7 +100,7 @@
                 <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                     <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                         <h2 class="text-xl font-bold text-gray-900 dark:text-white">Rodzice / Opiekunowie</h2>
-                        {% if perms.director.is_director %}
+                        {% if active_role == 'director'  %}
                             <a href="{% url 'kid_parent' pk=kid.id %}" class="text-primary font-black text-xs uppercase tracking-widest hover:underline">
                                 Zarządzaj
                             </a>

@@ -4,7 +4,9 @@
         <main class="flex-1 flex flex-col">
             <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark px-10 py-4 bg-card-light dark:bg-card-dark sticky top-0 z-10">
                 <div class="flex items-center gap-4">
-                    <h2 class="text-text-light dark:text-text-dark text-xl font-black tracking-tighter uppercase">Panel Dyrektora: {{ user.first_name }}</h2>
+                    <h2 class="text-text-light dark:text-text-dark text-xl font-black tracking-tighter uppercase">
+                        {{ active_kindergarten.name|default:"Panel Dyrektora" }}
+                    </h2>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="flex flex-col items-end">
@@ -39,7 +41,7 @@
                             <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">campaign</span>
                             <span class="text-xs font-black uppercase">Ogłoszenie</span>
                         </a>
-                        <a href="{% url 'contact-update' user.director.id %}" class="flex flex-col items-center justify-center gap-2 p-4 bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark hover:border-primary hover:shadow-xl transition-all h-28 group">
+                        <a href="{% url 'contact-update' active_profile_id %}" class="flex flex-col items-center justify-center gap-2 p-4 bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark hover:border-primary hover:shadow-xl transition-all h-28 group">
                             <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">settings</span>
                             <span class="text-xs font-black uppercase">Ustawienia</span>
                         </a>

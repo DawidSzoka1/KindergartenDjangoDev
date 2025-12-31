@@ -75,6 +75,23 @@
                     <p class="text-red-500 text-sm mt-1">{{ error }}</p>
                 {% endfor %}
             </label>
+            <label class="flex flex-col w-full">
+                <p class="text-base font-medium leading-normal pb-2">Nazwa Twojej Placówki</p>
+                <input
+                        type="text"
+                        name="kindergarten_name"
+                        value="{{ form.kindergarten_name.value|default_if_none:'' }}"
+                        placeholder="np. Przedszkole Słoneczko"
+                        class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg
+                   text-text-light dark:text-text-dark bg-background-light dark:bg-background-dark
+                   focus:outline-0 focus:ring-2 focus:ring-primary/50 border
+                   {% if form.kindergarten_name.errors %}border-red-500{% else %}border-border-light{% endif %}
+                   dark:border-border-dark h-14 placeholder:text-subtle-light dark:placeholder:text-subtle-dark p-4 text-base"
+                />
+                {% for error in form.kindergarten_name.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
+            </label>
 
             <!-- PASSWORD -->
             <label class="flex flex-col w-full">

@@ -14,7 +14,6 @@
                     <form method="POST" class="p-8 flex flex-col gap-6">
                         {% csrf_token %}
                         {{ form.author.as_hidden }}
-                        {{ form.director.as_hidden }}
                         {{ form.is_active.as_hidden }}
 
                         {% if form.non_field_errors %}

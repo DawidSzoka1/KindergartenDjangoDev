@@ -1,14 +1,13 @@
 from django.db import models
-from director.models import Director, MealPhotos
+from director.models import Director, MealPhotos, KindergartenOwnedModel
 from groups.models import Groups
 
 
 # Create your models here.
 
-class Meals(models.Model):
+class Meals(KindergartenOwnedModel):
     name = models.CharField(max_length=128)
     description = models.TextField(null=True)
-    principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     photo = models.ForeignKey(MealPhotos, on_delete=models.CASCADE, null=True)
     per_day = models.DecimalField(max_digits=6, decimal_places=2, null=True)
     is_active = models.BooleanField(default=True)

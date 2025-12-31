@@ -21,7 +21,7 @@
                 {% for parent in parents %}
                     <div class="bg-white dark:bg-[#0f1d0f] rounded-3xl border border-gray-100 dark:border-gray-800 p-8 shadow-sm relative group">
 
-                        {% if perms.director.is_director %}
+                        {% if active_role == 'director' %}
                             <form method="POST" class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                                 {% csrf_token %}
                                 <input type="hidden" name="parent_id" value="{{ parent.id }}">

@@ -1,6 +1,6 @@
 from django.db import models
 from accounts.models import User
-from director.models import Director
+from director.models import Director, KindergartenOwnedModel
 from children.models import Groups
 from django.core.validators import RegexValidator
 
@@ -13,7 +13,7 @@ roles = (
 )
 
 
-class Employee(models.Model):
+class Employee(KindergartenOwnedModel):
     gender_choices = ((1, 'Mezczyzna'), (2, 'Kobieta'))
     first_name = models.CharField(max_length=128, null=True)
     last_name = models.CharField(max_length=128, null=True)
@@ -32,14 +32,15 @@ class Employee(models.Model):
         code="invalid_zip_code",
     )])
     gender = models.IntegerField(choices=gender_choices, null=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    principal = models.ManyToManyField(Director)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,  related_name='employee_profiles')
     is_active = models.BooleanField(default=True)
 
     class Meta:
         permissions = [
             ("is_teacher", "Is the teacher of some group")
         ]
+        unique_together = ('user', 'kindergarten')
 
     def __str__(self):
-        return f"{self.user.email}"
+        # Pobieramy imię i nazwisko z powiązanego modelu User
+        return f"{self.first_name} {self.last_name} ({self.kindergarten.name})"

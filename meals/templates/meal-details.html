@@ -39,7 +39,7 @@
                         </div>
 
                         <div class="mt-10 flex flex-wrap gap-4 pt-6 border-t border-gray-100 dark:border-gray-800">
-                            {% if perms.director.is_director %}
+                            {% if active_role == 'director' %}
                                 <a href="{% url 'meals_update' pk=meal.id %}" class="flex-1 flex items-center justify-center gap-2 py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition-all">
                                     <span class="material-symbols-outlined">edit</span> EDYTUJ PLAN
                                 </a>

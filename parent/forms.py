@@ -2,17 +2,13 @@ from django import forms
 from .models import ParentA
 from children.models import Kid
 from director.models import Director, User
+from director.forms import KindergartenBaseForm
 
 
-class ParentUpdateForm(forms.ModelForm):
-    kids = forms.ModelMultipleChoiceField(
-        queryset=Kid.objects.none(),
-        required=False,
-        widget=forms.HiddenInput()  # Używamy HiddenInput, aby nie wyświetlało się w szablonie
-    )
+class ParentUpdateForm(KindergartenBaseForm):
     class Meta:
         model = ParentA
-        fields = '__all__'
+        exclude = ['user', 'kindergarten', 'kids', 'principal']
 
         labels = {
             'first_name': "Imie:",
@@ -40,23 +36,10 @@ class ParentUpdateForm(forms.ModelForm):
         return phone_data
 
     def __init__(self, *args, **kwargs):
-        # Pobieramy instancję rodzica z argumentów (jeśli istnieje)
-        parent_instance = kwargs.get('instance')
         super().__init__(*args, **kwargs)
-
-        if parent_instance:
-            # Ustawiamy queryset pola 'kids' na tylko te dzieci,
-            # które są już przypisane do edytowanego rodzica.
-            self.fields['kids'].queryset = parent_instance.kids.all()
-            self.fields['principal'].queryset = parent_instance.principal.all()
-            self.initial['principal'] = parent_instance.principal.all()
-
-            # Ustawienia dla pola 'user' (ustawiamy wartość początkową)
-            self.fields['user'].queryset = User.objects.filter(pk=parent_instance.user.pk)
-            self.initial['user'] = parent_instance.user
-        else:
-            # Jeśli to jest formularz do tworzenia (bez instancji), nadal ustawiamy pusty queryset
-            self.fields['kids'].queryset = Kid.objects.none()
+        # Tutaj możesz dodać specyficzne klasy CSS dla pól
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-input-styled'})
 
     def clean_kids(self):
         # Zwracamy istniejący zestaw children, co usunie walidację "To pole jest wymagane".

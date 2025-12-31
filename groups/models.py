@@ -1,10 +1,10 @@
 from django.db import models
-from director.models import Director, GroupPhotos, MealPhotos
+from director.models import Director, GroupPhotos, MealPhotos, KindergartenOwnedModel
 from django.core.validators import MinValueValidator
 
 
 # Create your models here.
-class Groups(models.Model):
+class Groups(KindergartenOwnedModel):
     name = models.CharField(max_length=128)
     principal = models.ForeignKey(Director, on_delete=models.CASCADE, null=True)
     capacity = models.IntegerField(null=True, validators=[MinValueValidator(limit_value=1)])

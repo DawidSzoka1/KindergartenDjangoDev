@@ -15,7 +15,7 @@
                             <p class="text-text-light-secondary dark:text-text-dark-secondary text-base font-normal leading-normal">Widok i zarządzanie rekordami rodziców.</p>
                         </div>
 
-                        {% if perms.director.is_director %}
+                        {% if active_role == 'director' %}
                             <button class="flex items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-6 bg-primary text-white text-sm font-bold leading-normal tracking-wide shadow-sm hover:bg-primary/90 transition-colors"
                                     onclick="location.href='{% url 'invite_standalone_parent' %}'">
                                 <span class="material-symbols-outlined">add</span>
@@ -26,7 +26,7 @@
 
 
 
-                    {% if perms.director.is_director or perms.teacher.is_teacher %}
+                    {% if active_role == 'director' or active_role == 'teacher' %}
                         <div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-border-light dark:border-border-dark mb-6">
                             <form method="POST" action="{% url 'list_parent' %}" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {% csrf_token %}
@@ -131,7 +131,7 @@
                                                             Konto Rodzica
                                                         </a>
 
-                                                        {% if perms.director.is_director %}
+                                                        {% if active_role == 'director' %}
                                                             <button onclick="location.href='{% url 'add_parent_to_kid' parent.id %}'"
                                                                     class="block w-full text-left px-4 py-2 text-sm text-neutral-text dark:text-white hover:bg-neutral-background dark:hover:bg-gray-700 transition-colors">
                                                                 DODAJ DZIECKO

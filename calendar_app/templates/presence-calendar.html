@@ -15,7 +15,7 @@
                 <p class="text-[#618961] dark:text-gray-400">Dzisiaj jest {{ today|date:"l, d F Y" }}</p>
             </div>
 
-            {% if perms.director.is_director %}
+            {% if active_role == 'director' %}
                 <form method="POST" action="" class="relative w-full md:w-72">
                     {% csrf_token %}
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -60,7 +60,7 @@
                             <div class="flex items-center gap-3">
                                 <form method="POST" action="" class="flex items-center">
                                     {% csrf_token %}
-                                    {% if perms.teacher.is_teacher or perms.director.is_director %}
+                                    {% if active_role == 'director' or active_role == 'teacher' %}
                                         {% if presence.presenceType == 2 %}
                                             <button type="submit" name="data" value="{{ kid.id }} 1"
                                                     onclick="return confirm('Cofnąć obecność dla: {{ kid }}?');"
@@ -80,7 +80,7 @@
                                                 OZNACZ OBECNOŚĆ
                                             </button>
                                         {% endif %}
-                                    {% elif perms.parent.is_parent %}
+                                    {% elif active_role == 'parent' %}
                                         {% if tomorrow == 5 or tomorrow == 6 %}
                                             <span class="text-xs text-gray-400 italic">Jutro wolne</span>
                                         {% else %}
@@ -106,7 +106,7 @@
                                             <a href="{% url 'calendar' kid.id month year %}" class="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-colors">
                                                 <span class="material-symbols-outlined !text-lg">calendar_month</span> Kalendarz
                                             </a>
-                                            {% if perms.director.is_director %}
+                                            {% if active_role == 'director' %}
                                                 <div class="border-t border-gray-100 dark:border-gray-800"></div>
                                                 <a href="{% url 'change_kid_info' pk=kid.id %}" class="flex items-center gap-2 px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-primary/10 hover:text-primary transition-colors">
                                                     <span class="material-symbols-outlined !text-lg">edit</span> Edytuj

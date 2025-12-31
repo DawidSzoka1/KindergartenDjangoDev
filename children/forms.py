@@ -1,75 +1,45 @@
 from django import forms
 from .models import Kid, Director
+from director.forms import KindergartenBaseForm
 from parent.models import ParentA
+from groups.models import Groups
+from payments_plans.models import PaymentPlan
+from meals.models import Meals
 
-
-class KidAddForm(forms.ModelForm):
-
-    def __init__(self, *args, current_user=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        if current_user is not None:
-            self.fields['group'].queryset = Director.objects.get(user=current_user.id).groups_set.filter(is_active=True)
-            self.fields['kid_meals'].queryset = Director.objects.get(user=current_user.id).meals_set.filter(
-                is_active=True)
-            self.fields['payment_plan'].queryset = Director.objects.get(user=current_user.id).paymentplan_set.filter(
-                is_active=True)
-
-    class Meta:
-        model = Kid
-        fields = ['first_name', 'last_name', 'group', 'gender', 'start', 'end', 'payment_plan', 'kid_meals',
-                  'principal', 'date_of_birth']
-
-        widgets = {
-            'start': forms.DateInput(format=('%Y-%m-%d'), attrs={'type': 'date'}),
-            'end': forms.DateInput(format=('%Y-%m-%d'), attrs={'type': 'date'}),
-            'date_of_birth': forms.DateInput(format=('%Y-%m-%d'), attrs={'type': 'date'}),
-            'principal': forms.HiddenInput,
-
-        }
-
-        labels = {
-            'first_name': 'Imię:',
-            'last_name': 'Nazwisko:',
-            'group': 'Grupa:',
-            'gender': 'Płeć:',
-            'start': 'Początek umowy:',
-            'end': 'Koniec umowy:',
-            'payment_plan': 'Plan płatniczy:',
-            'kid_meals': 'Posiłek:',
-            'date_of_birth': 'Data urodzenia'
-        }
-
-class KidCreateForm(forms.ModelForm):
+class KidAddForm(KindergartenBaseForm):
+    # Pole do wyboru wielu rodziców jednocześnie
     parents = forms.ModelMultipleChoiceField(
         queryset=ParentA.objects.none(),
-        required=True,
+        required=False,
         label="Rodzice / Opiekunowie",
-        help_text="Wybierz jednego lub wielu. Pierwszy zostanie głównym opiekunem.",
-        widget=forms.SelectMultiple(attrs={'class': 'js-select2-parents'})
+        widget=forms.SelectMultiple(attrs={'class': 'js-select2 w-full'})
     )
 
     class Meta:
         model = Kid
-        fields = [
-            'first_name', 'last_name', 'date_of_birth', 'gender',
-            'group', 'payment_plan', 'kid_meals',
-            'start', 'end'
-        ]
+        fields = ['first_name', 'last_name', 'group', 'gender', 'start', 'end', 'payment_plan', 'kid_meals', 'date_of_birth']
         widgets = {
             'start': forms.DateInput(attrs={'type': 'date'}),
             'end': forms.DateInput(attrs={'type': 'date'}),
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
         }
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
+        active_principal_id = kwargs.pop('active_principal_id', None)
         super().__init__(*args, **kwargs)
-        if user:
+        if active_principal_id:
+            # Filtrujemy dostępnych rodziców tylko z tej placówki
             self.fields['parents'].queryset = ParentA.objects.filter(
-                principal__user=user
+                kindergarten_id=active_principal_id
             ).select_related('user')
 
+            # Filtrujemy pozostałe pola placówki
+            self.fields['group'].queryset = Groups.objects.filter(kindergarten_id=active_principal_id, is_active=True)
+            self.fields['kid_meals'].queryset = Meals.objects.filter(kindergarten_id=active_principal_id, is_active=True)
+            self.fields['payment_plan'].queryset = PaymentPlan.objects.filter(kindergarten_id=active_principal_id, is_active=True)
 
-class KidUpdateForm(forms.ModelForm):
+
+class KidUpdateForm(KindergartenBaseForm):
     parents = forms.ModelMultipleChoiceField(
         queryset=ParentA.objects.none(),
         required=False,
@@ -88,16 +58,19 @@ class KidUpdateForm(forms.ModelForm):
         widgets = {
             'start': forms.DateInput(attrs={'type': 'date'}),
             'end': forms.DateInput(attrs={'type': 'date'}),
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'}),
         }
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('current_user', None)
+        active_principal_id = kwargs.get('active_principal_id')
         super().__init__(*args, **kwargs)
 
-        if user:
+        if active_principal_id:
+            # Filtrowanie rodziców dostępnych w TEJ placówce
             self.fields['parents'].queryset = ParentA.objects.filter(
-                principal__user=user
+                kindergarten_id=active_principal_id
             ).select_related('user')
 
+        # Ustawiamy aktualnie przypisanych rodziców jako zaznaczonych
         if self.instance and self.instance.pk:
             self.fields['parents'].initial = self.instance.parenta_set.all()

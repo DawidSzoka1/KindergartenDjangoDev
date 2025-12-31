@@ -88,7 +88,7 @@
                             </p>
 
                             <div class="space-y-3">
-                                {% if perms.parent.is_parent %}
+                                {% if active_role == 'parent' %}
                                     <label class="flex items-center gap-3 p-4 border rounded-xl cursor-pointer hover:bg-primary/5">
                                         <input type="radio" name="presence" value="3" checked>
                                         <span class="material-symbols-outlined text-orange-500">event_busy</span>
@@ -97,7 +97,7 @@
                                             <p class="text-xs text-gray-400">Poinformuj placówkę o nieobecności dziecka</p>
                                         </div>
                                     </label>
-                                {% elif perms.teacher.is_teacher or perms.director.is_director %}
+                                {% elif active_role == 'director' or active_role == 'teacher' %}
                                     <label class="flex items-center gap-3 p-4 border rounded-xl cursor-pointer">
                                         <input type="radio" name="presence" value="2">
                                         <span class="material-symbols-outlined text-green-500">check_circle</span>
@@ -134,27 +134,56 @@
     </main>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const days = document.querySelectorAll("#days");
+        window.openPresenceModal = function(day) {
             const wholeDrop = document.getElementById('wholeDrop');
             const noSelection = document.getElementById('no-selection-msg');
             const selectedText = document.getElementById('selected-date-text');
             const dayInput = document.getElementById('selected_day_input');
+            const currentDayVal = parseInt(document.getElementById('currentDay').value) || 0;
 
-            days.forEach(btn => {
-                btn.addEventListener("click", function () {
-                    const day = this.querySelector('.day-num').innerText;
+            // Pobieramy dane z Django
+            const activeRole = "{{ active_role }}";
+            const monthName = "{{ month_name }}";
 
-                    // UI Update
-                    days.forEach(b => b.classList.remove('ring-2', 'ring-primary'));
-                    this.classList.add('ring-2', 'ring-primary');
+            // Logika blokady dat
+            const isTodayOrFuture = day >= currentDayVal;
+            const isFutureOnly = day > currentDayVal;
 
-                    wholeDrop.style.display = 'block';
-                    noSelection.style.display = 'none';
-                    selectedText.innerText = day + " {{ month_name }}";
-                    dayInput.value = day;
+            let canEdit = false;
+            if (activeRole === 'parent' && isFutureOnly) {
+                canEdit = true;
+            } else if ((activeRole === 'director' || activeRole === 'teacher') && isTodayOrFuture) {
+                canEdit = true;
+            }
+
+            if (canEdit) {
+                // UI: Podświetlenie wybranego dnia
+                document.querySelectorAll('button[onclick^="openPresenceModal"]').forEach(btn => {
+                    btn.classList.remove('ring-4', 'ring-primary', 'z-30', 'scale-110');
                 });
-            });
-        });
+
+                // event.currentTarget wskazuje na kliknięty przycisk
+                if (event && event.currentTarget) {
+                    event.currentTarget.classList.add('ring-4', 'ring-primary', 'z-30', 'scale-110');
+                }
+
+                // Pokazywanie formularza
+                wholeDrop.style.display = 'block';
+                noSelection.style.display = 'none';
+
+                // Ustawianie danych
+                selectedText.innerText = day + " " + monthName;
+                dayInput.value = day;
+
+                // Scroll do formularza na mobile
+                if (window.innerWidth < 1024) {
+                    wholeDrop.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            } else {
+                alert(activeRole === 'parent' ?
+                    "Jako rodzic możesz zgłaszać nieobecności tylko z wyprzedzeniem (od jutra)." :
+                    "Nie można edytować dat historycznych.");
+            }
+        };
     </script>
 {% endblock %}

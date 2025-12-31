@@ -9,4 +9,5 @@ urlpatterns = [
     path("wydarzenia/<int:pk>/", views.PostDetailView.as_view(), name='post_detail'),
     path("wydarzenia/dodaj/", views.PostAddView.as_view(), name='post_add'),
     path("", views.Home.as_view(), name="home_page"),
+    path('switch-account/', views.SwitchAccountView.as_view(), name='switch_account'),
 ]

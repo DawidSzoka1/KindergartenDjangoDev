@@ -109,9 +109,9 @@
                     <div class="flex-1">
                         <label class="mb-2 block text-sm font-semibold">Wybierz rodzica</label>
                         <div class="relative">
-                            <select name="principal" id="principal-select" required class="js-select2 w-full">
+                            <select name="parents" id="parents-select" required class="js-select2 w-full">
                                 <option value="">--- Wybierz rodzica ---</option>
-                                {% for parent in form.fields.principal.queryset %}
+                                {% for parent in form.fields.parents.queryset %}
                                     <option value="{{ parent.pk }}">{{ parent.user.username|default:'' }} ({{ parent.user.email }})</option>
                                 {% endfor %}
                             </select>
@@ -236,8 +236,10 @@
 
             const spinner = document.getElementById('create-parent-spinner');
             const text = document.getElementById('create-parent-text');
-            spinner.classList.remove('hidden');
-            text.classList.add('hidden');
+
+            // Pokaż ładowanie
+            if (spinner) spinner.classList.remove('hidden');
+            if (text) text.classList.add('hidden');
 
             fetch("{% url 'create_parent_ajax' %}", {
                 method: "POST",
@@ -250,21 +252,32 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Dodaj nowego rodzica do selecta
-                        const select = document.getElementById('principal-select');
-                        const option = new Option(data.full_name + " (" + email + ")", data.parent_id, true, true);
-                        select.add(option);
-                        $('.js-select2').trigger('change'); // odśwież Select2
+                        // 1. Znajdź select obsługiwany przez Select2
+                        const $select = $('#parents-select');
 
+                        // 2. Stwórz nową opcję (tekst, wartość, zaznaczona, wybrana)
+                        const newOption = new Option(data.email, data.parent_id, true, true);
+
+                        // 3. Dodaj do selecta i wymuś odświeżenie Select2
+                        $select.append(newOption).trigger('change');
+
+                        // 4. Zamknij modal i wyczyść pole
                         closeAddParentModal();
-                        alert("Rodzic dodany i wybrany!");
+
+                        // Opcjonalne powiadomienie (możesz usunąć alert dla lepszego UX)
+                        console.log("Dodano rodzica: " + data.email);
                     } else {
                         alert("Błąd: " + data.error);
                     }
                 })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Wystąpił błąd podczas komunikacji z serwerem.');
+                })
                 .finally(() => {
-                    spinner.classList.add('hidden');
-                    text.classList.remove('hidden');
+                    // Przywróć przycisk
+                    if (spinner) spinner.classList.add('hidden');
+                    if (text) text.classList.remove('hidden');
                 });
         }
     </script>

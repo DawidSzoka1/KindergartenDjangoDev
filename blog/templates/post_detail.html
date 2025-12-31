@@ -30,13 +30,13 @@
                         </div>
                     </div>
 
-                    {% if perms.director.is_director or perms.teacher.is_teacher %}
+                    {% if active_role == 'director' or active_role == 'teacher' %}
                         <div class="flex gap-3">
                             <a href="{% url 'post_update' pk=post.id %}"
                                class="flex items-center gap-2 rounded-lg h-10 px-4 bg-white dark:bg-[#223322] border border-[#dbe6db] dark:border-[#334433] text-sm font-bold hover:bg-gray-50 transition-all">
                                 <span class="material-symbols-outlined text-[20px]">edit</span> Edytuj
                             </a>
-                            {% if perms.director.is_director %}
+                            {% if active_role == 'director' %}
                                 <form method="POST" action="{% url 'post_delete' post.id %}"
                                       onsubmit="return confirm('Czy na pewno chcesz usunąć to wydarzenie?');">
                                     {% csrf_token %}

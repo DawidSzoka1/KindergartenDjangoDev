@@ -10,7 +10,7 @@
                 <div class="max-w-7xl mx-auto">
 
                     <div class="flex flex-wrap gap-2 mb-6 pt-4">
-                        {% if perms.parent.is_parent %}
+                        {% if active_role == 'parent' %}
                             <a class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal hover:underline" href="{% url 'home_page' %}">MENU</a>
                         {% else %}
                             <a class="text-[#618961] dark:text-gray-400 text-sm font-medium leading-normal hover:underline" href="{% url 'list_parent' %}">LISTA RODZICÓW</a>
@@ -57,7 +57,7 @@
                             </div>
 
                             <div class="flex w-full md:w-auto gap-3 flex-wrap">
-                                {% if perms.parent.is_parent %}
+                                {% if active_role == 'parent' %}
                                     <button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-100 dark:bg-white/10 text-[#111811] dark:text-white text-sm font-bold leading-normal tracking-[0.015em] flex-1 md:flex-auto hover:bg-gray-200 dark:hover:bg-white/20"
                                             onclick="location.href='{% url 'parent_update' parent.id %}'">
                                         <span class="truncate">EDYTUJ PROFIL</span>
@@ -132,7 +132,7 @@
                                                     <a href="{% url 'kid_details' kid.id %}" class="flex items-center justify-center size-8 rounded-lg hover:bg-[#f0f4f0] dark:hover:bg-white/10 text-[#618961] dark:text-gray-400" title="Zobacz Profil">
                                                         <span class="material-symbols-outlined text-xl">visibility</span>
                                                     </a>
-                                                    {% if perms.director.is_director %}
+                                                    {% if active_role == 'director' %}
                                                         <form method="POST" action="{% url 'remove_kid_from_parent' parent_pk=parent.id kid_pk=kid.id %}" onsubmit="return confirm('Czy na pewno chcesz odpiąć dziecko {{ kid.first_name }} od rodzica {{ parent.first_name|default:parent.user.email }}?');">
                                                             {% csrf_token %}
                                                             <button type="submit"
@@ -149,7 +149,7 @@
                                         <p class="text-sm text-[#618961] dark:text-gray-400 p-2">Ten rodzic nie ma przypisanych aktywnych dzieci.</p>
                                     {% endfor %}
 
-                                    {% if perms.director.is_director %}
+                                    {% if active_role == 'director' %}
                                         <div class="pt-4">
                                             <button onclick="location.href='{% url 'add_parent_to_kid' parent.id %}'"
                                                     class="flex items-center gap-2 min-w-[84px] cursor-pointer justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-[#111811] dark:text-background-dark text-sm font-bold leading-normal tracking-[0.015em] hover:opacity-90">

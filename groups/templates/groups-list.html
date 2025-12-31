@@ -8,7 +8,7 @@
             <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
                 <h1 class="text-3xl font-bold tracking-tight text-text-primary-light dark:text-text-primary-dark">GRUPY</h1>
 
-                {% if perms.director.is_director %}
+                {% if active_role == 'director' %}
                     <a href="{% url 'add_group' %}" class="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
                         <span class="material-symbols-outlined">add</span>
                         <span class="truncate">DODAJ GRUPĘ</span>

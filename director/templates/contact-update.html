@@ -26,6 +26,7 @@
                         <div class="space-y-6">
                             <h3 class="text-xs font-black text-primary uppercase tracking-widest border-b border-gray-100 dark:border-gray-800 pb-2">Dane Podstawowe</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 custom-form-grid">
+                                {{ form.kindergarten_name|as_crispy_field }}
                                 {{ form.email_address|as_crispy_field }}
                                 {{ form.phone|as_crispy_field }}
                             </div>

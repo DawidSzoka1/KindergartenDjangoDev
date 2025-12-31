@@ -11,7 +11,7 @@
                         <h1 class="text-gray-900 dark:text-white text-3xl font-black uppercase tracking-tight">Plany Żywieniowe</h1>
                         <p class="text-gray-500 dark:text-gray-400">Zarządzaj dostępnymi posiłkami i stawkami dziennymi dla dzieci.</p>
                     </div>
-                    {% if perms.director.is_director %}
+                    {% if active_role == 'director' %}
                         <a href="{% url 'add_meal' %}" class="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-white font-bold shadow-lg hover:bg-primary/90 transition-all">
                             <span class="material-symbols-outlined">add_circle</span>
                             Dodaj Nowy Posiłek

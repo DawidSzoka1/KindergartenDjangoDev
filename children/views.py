@@ -1,10 +1,12 @@
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from teacher.models import Employee
 from groups.models import Groups
+from meals.models import Meals
+from payments_plans.models import PaymentPlan
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import KidAddForm, KidUpdateForm
 from .models import Kid
@@ -17,13 +19,13 @@ from django.views.generic import (
     CreateView,
     UpdateView,
 )
+from blog.views import get_active_context
 
 
 # Create your views here.
 
 
-class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
-    permission_required = "director.is_director"
+class AddKidView(UserPassesTestMixin, SuccessMessageMixin, CreateView):
     model = Kid
     template_name = 'kid-add.html'
     form_class = KidAddForm
@@ -32,8 +34,9 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMix
 
     def get_initial(self):
         initial = super(AddKidView, self).get_initial()
+        role, profile_id, principal_id = get_active_context(self.request)
         initial = initial.copy()
-        initial['principal'] = Director.objects.get(user=self.request.user.id)
+        initial['principal'] = get_object_or_404(Director, id=principal_id)
         return initial
 
     def get_form_kwargs(self, **kwargs):
@@ -41,7 +44,11 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMix
          This is necessary to only display members that belong to a given user"""
 
         kwargs = super().get_form_kwargs()
-        kwargs['current_user'] = self.request.user
+        role, profile_id, k_id = get_active_context(self.request)
+        kwargs.update({
+            'current_user': self.request.user,
+            'active_principal_id': k_id  # Przekazujemy ID przedszkola do formy
+        })
         return kwargs
 
     def get_form(self, form_class=None):
@@ -53,66 +60,94 @@ class AddKidView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMix
         return form
 
     def form_valid(self, form):
+        # 1. Obsługa daty na czas nieokreślony
         if self.request.POST.get('indefinite'):
             form.instance.end = None
 
-        kid = form.save(commit=False)  # pobieramy instancję
-        kid.save()  # zapisujemy w bazie
+        # 2. Przypisanie placówki do dziecka
+        role, profile_id, k_id = get_active_context(self.request)
+        form.instance.kindergarten_id = k_id
 
-        messages.success(self.request, self.success_message)
-        return super().form_valid(form)
+        # 3. Zapis dziecka
+        response = super().form_valid(form)
+        kid = self.object
+
+        # 4. PRZYPISANIE RODZICÓW
+        # Pobieramy listę ID rodziców z pola 'parents' (zdefiniowanego w KidAddForm)
+        selected_parents = form.cleaned_data.get('parents')
+        if selected_parents:
+            for parent in selected_parents:
+                parent.kids.add(kid) # Zakładając, że ParentA ma kids = ManyToManyField(Kid)
+
+        return response
 
     def test_func(self):
-        director = get_object_or_404(Director, user=self.request.user.id)
-        if director.groups_set.filter(is_active=True):
-            if director.meals_set.filter(is_active=True):
-                if director.paymentplan_set.filter(is_active=True):
-                    return True
-        return False
+        role, profile_id, k_id = get_active_context(self.request)
+        if role != 'director':
+            return False
+        # Sprawdzamy czy placówka ma wymagane dane bazowe
+        has_groups = Groups.objects.for_kindergarten(k_id).filter(is_active=True).exists()
+        has_meals = Meals.objects.for_kindergarten(k_id).filter(is_active=True).exists()
+        has_plans = PaymentPlan.objects.for_kindergarten(k_id).filter(is_active=True).exists()
+        return has_groups and has_meals and has_plans
 
     def handle_no_permission(self):
-        director = get_object_or_404(Director, user=self.request.user.id)
-        if not director.groups_set.filter(is_active=True):
-            messages.error(self.request, 'Dodaj najpierw jakas grupe')
+        role, profile_id, k_id = get_active_context(self.request)
+        # 1. Sprawdzenie roli (bez zmian)
+        if role != 'director':
+            raise PermissionDenied
+
+        # 2. Sprawdzanie zasobów w ramach całej placówki (k_id)
+        # Używamy managerów for_kindergarten, aby sprawdzić czy JAKIKOLWIEK dyrektor dodał te dane
+        if not Groups.objects.for_kindergarten(k_id).filter(is_active=True).exists():
+            messages.error(self.request, 'W placówce nie ma jeszcze żadnej grupy. Dodaj ją najpierw.')
             return redirect('add_group')
-        if not director.meals_set.filter(is_active=True):
-            messages.error(self.request, 'Dodaj najpierw jakis posilke')
+
+        if not Meals.objects.for_kindergarten(k_id).filter(is_active=True).exists():
+            messages.error(self.request, 'W placówce nie ma zdefiniowanych posiłków.')
             return redirect('add_meal')
-        if not director.paymentplan_set.filter(is_active=True):
-            messages.error(self.request, 'Dodaj najpierw jakis plan platniczy')
+
+        if not PaymentPlan.objects.for_kindergarten(k_id).filter(is_active=True).exists():
+            messages.error(self.request, 'W placówce nie ma planów płatniczych.')
             return redirect('add_payment_plans')
 
-        return redirect('add_meal')
+        # Fallback, jeśli test_func zwrócił False z innego powodu
+        return redirect('home_page')
 
 
 class KidsListView(LoginRequiredMixin, View):
     def get(self, request):
-        if request.user.get_user_permissions() == {'director.is_director'}:
-            kids = get_object_or_404(Director, user=request.user.id).kid_set.filter(is_active=True).order_by('-id')
-            groups_count = Groups.objects.filter(principal=request.user.id, is_active=True).count()
-        elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
-            groups = get_object_or_404(Employee, user=request.user.id).group
-            groups_count = groups.filter(is_active=True).count()
-            if groups.is_active:
-                kids = groups.kid_set.filter(is_active=True).order_by('-id')
+        role, profile_id, k_id = get_active_context(request)
+        search_query = request.GET.get('search', '')
+        kids_queryset = Kid.objects.for_kindergarten(k_id).filter(is_active=True)
+        if role == 'director':
+            kids = kids_queryset
+            groups_count = Groups.objects.for_kindergarten(k_id).filter(is_active=True).count()
+        elif role == 'teacher':
+            teacher = get_object_or_404(Employee, id=profile_id, user=request.user)
+            group = teacher.group
+            if group and group.is_active:
+                kids = kids_queryset.filter(group=group).order_by('-id')
+                groups_count = 1
             else:
-                kids = None
-        elif request.user.get_user_permissions() == {'parent.is_parent'}:
+                kids = Kid.objects.none()
+                groups_count = 0
+        elif role == 'parent':
             # NOWA LOGIKA DLA RODZICA
-            parent = get_object_or_404(ParentA, user=request.user)
-            kids = parent.kids.filter(is_active=True)
+            parent = get_object_or_404(ParentA, id=profile_id, user=request.user)
+            kids = parent.kids.filter(is_active=True, kindergarten_id=k_id)
             groups_count = kids.values('group').distinct().count()
 
         else:
             raise PermissionDenied
-
+        if search_query:
+            kids = kids.filter(
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query)
+            )
         paginator = Paginator(kids, 10)
         kids_count = kids.count()
-        avg = 0
-        for kid in kids:
-            print(kid.date_of_birth)
-            avg += kid.years_old()
-        avg /= kids_count
+        avg = sum(k.years_old() for k in kids) / kids_count if kids_count > 0 else 0
         page = request.GET.get('page')
         page_obj = paginator.get_page(page)
         month = int(timezone.now().month)
@@ -124,62 +159,36 @@ class KidsListView(LoginRequiredMixin, View):
 
     def post(self, request):
         search = request.POST.get('search')
+        # Przekierowanie do GET zapewnia poprawne działanie paginacji z filtrem wyszukiwania
         if search:
-            if request.user.get_user_permissions() == {'director.is_director'}:
-                kids = get_object_or_404(Director, user=request.user.id).kid_set.filter(
-                    first_name__icontains=search).filter(
-                    is_active=True).order_by('-id')
-                groups_count = Groups.objects.filter(principal=request.user.id, is_active=True).count()
-            elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
-                group = get_object_or_404(Employee, user=request.user.id).group
-                kids = group.kid_set.filter(first_name__icontains=search).filter(is_active=True).order_by('-id')
-                groups_count = groups.filter(is_active=True).count()
-            elif request.user.get_user_permissions() == {'parent.is_parent'}:
-                # NOWA LOGIKA DLA RODZICA
-                parent = get_object_or_404(ParentA, user=request.user.id)
-                kids = parent.kids.filter(is_active=True)
-                groups_count = kids.values('group').distinct().count()
-            else:
-                raise PermissionDenied
-            kids_count = kids.count()
-            avg = 0
-            for kid in kids:
-                print(kid.date_of_birth)
-                avg += kid.years_old()
-            avg /= kids_count if kids_count > 0 else 1
-            paginator = Paginator(kids, 10)
-            page = request.GET.get('page')
-            page_obj = paginator.get_page(page)
-            month = int(timezone.now().month)
-            year = int(timezone.now().year)
-            return render(request, 'kids-list.html',
-                          {'page_obj': page_obj, 'month': month, 'year': year, 'total_kids': kids_count,
-                           'groups_count': groups_count, 'avg_age': avg})
+            return redirect(f"{reverse('list_kids')}?search={search}")
         return redirect('list_kids')
 
 
 class DetailsKidView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
-        kid = Kid.objects.filter(id=int(pk)).filter(is_active=True).first()
-        if kid:
-            meals = None
-            if kid.kid_meals:
-                if kid.kid_meals.is_active == True:
-                    meals = kid.kid_meals
+        role, profile_id, k_id = get_active_context(request)
+        kid = get_object_or_404(Kid, id=pk, kindergarten_id=k_id, is_active=True)
+        if str(kid.kindergarten.id) != str(k_id):
+            raise PermissionDenied
+        meals = kid.kid_meals if kid.kid_meals and kid.kid_meals.is_active else None
+        can_view = False
+        if role == 'director':
+            can_view = True
+        elif role == 'teacher':
+            teacher = get_object_or_404(Employee, id=profile_id, user=request.user)
+            if kid.group == teacher.group:
+                can_view = True
+        elif role == 'parent':
+            parent = get_object_or_404(ParentA, id=profile_id, user=request.user)
+            if parent.kids.filter(id=kid.id).exists():
+                can_view = True
 
-            if request.user.get_user_permissions() == {'director.is_director'}:
-                if kid.principal.user.email == request.user.email:
-                    return render(request, 'kid-details.html', {'kid': kid, 'meals': meals})
-            elif request.user.get_user_permissions() == {'teacher.is_teacher'}:
-                teachers = kid.group.employee_set.values_list('user__email', flat=True)
-                if request.user.email in teachers:
-                    return render(request, 'kid-details.html', {'kid': kid, 'meals': meals})
-            elif request.user.get_user_permissions() == {'parent.is_parent'}:
-                parents = kid.parenta_set.values_list('user__email', flat=True)
-                if request.user.email in parents:
-                    return render(request, 'kid-details.html', {'kid': kid, 'meals': meals})
-        raise PermissionDenied
+        if not can_view:
+            raise PermissionDenied
+
+        return render(request, 'kid-details.html', {'kid': kid, 'meals': meals})
 
 
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
@@ -188,8 +197,8 @@ from django.views.generic import UpdateView
 from django.urls import reverse_lazy
 from .forms import KidUpdateForm
 
-class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
-    permission_required = "director.is_director"
+
+class ChangeKidInfoView(UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     model = Kid
     template_name = 'kid-update-info.html'
     form_class = KidUpdateForm
@@ -200,8 +209,12 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
 
     def get_form_kwargs(self, **kwargs):
         """Przekazuje current_user do formularza"""
-        kwargs = super(ChangeKidInfoView, self).get_form_kwargs()
-        kwargs.update({'current_user': self.request.user})
+        kwargs = super().get_form_kwargs()
+        role, profile_id, k_id = get_active_context(self.request)
+        kwargs.update({
+            'current_user': self.request.user,
+            'active_principal_id': k_id  # Przekazujemy ID przedszkola
+        })
         return kwargs
 
     def get_form(self, form_class=None):
@@ -216,10 +229,11 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
     # --- TO JEST METODA, KTÓREJ BRAKOWAŁO ---
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Pobieramy wszystkich rodziców przypisanych do tego dyrektora,
-        # żeby wypełnić <select> w HTML
-        context['all_parents'] = ParentA.objects.filter(principal__user=self.request.user)
+        role, profile_id, k_id = get_active_context(self.request)
+        # Pobieramy rodziców należących do TEJ placówki
+        context['all_parents'] = ParentA.objects.filter(kindergarten_id=k_id)
         return context
+
     # -----------------------------------------
 
     def form_valid(self, form):
@@ -233,16 +247,13 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
 
         # Obsługa rodziców (wielu, z inputa hidden)
         parents_input = self.request.POST.get('parents', '')
-
+        role, profile_id, k_id = get_active_context(self.request)
         if parents_input:
             # Rozbijamy string "1,2,5" na listę liczb
             parent_ids = [int(pid) for pid in parents_input.split(',') if pid.strip().isdigit()]
 
             # Pobieramy rodziców z bazy (tylko należących do tego dyrektora)
-            parents = ParentA.objects.filter(
-                id__in=parent_ids,
-                principal__user=self.request.user
-            )
+            parents = ParentA.objects.filter(id__in=parent_ids, kindergarten_id=k_id)
             kid.parenta_set.set(parents)
         else:
             # Jeśli lista pusta, usuwamy powiązania
@@ -252,51 +263,49 @@ class ChangeKidInfoView(PermissionRequiredMixin, UserPassesTestMixin, SuccessMes
         return super().form_valid(form)
 
     def test_func(self):
+        role, profile_id, k_id = get_active_context(self.request)
         kid = self.get_object()
-        try:
-            return self.request.user == kid.principal.user and kid.is_active
-        except Exception:
-            return False
+        # Sprawdzamy, czy dyrektor ma dostęp do placówki, do której należy dziecko
+        return role == 'director' and kid.kindergarten_id == int(k_id)
+
 
 class KidDeleteView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
-    def get(self, request, pk):
-        raise PermissionDenied
+    permission_required = 'director.is_director'
 
     def post(self, request, pk):
-        kid = get_object_or_404(Kid, id=int(pk))
-        director = get_object_or_404(Director, user=request.user.id)
-        if kid.principal == director:
-            kid.is_active = False
-            kid.save()
-            messages.success(request,
-                             f'Popprawnie usunieto dziecko {kid}')
-            return redirect('list_kids')
-        raise PermissionDenied
+        role, profile_id, k_id = get_active_context(request)
+        if role != 'director':
+            raise PermissionDenied
+        kid = get_object_or_404(Kid, id=pk, kindergarten_id=k_id)
+        kid.is_active = False
+        kid.save()
+
+        messages.success(request, f'Poprawnie usunięto dziecko: {kid}')
+        return redirect('list_kids')
 
 
 class KidParentInfoView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        kid = get_object_or_404(Kid, id=int(pk))
         user_perms = request.user.get_all_permissions()
-
+        role, profile_id, k_id = get_active_context(request)
+        kid = get_object_or_404(Kid, id=pk, kindergarten_id=k_id)
         # Logika sprawdzania dostępu
         can_access = False
 
-        if 'director.is_director' in user_perms:
-            # Sprawdzenie czy dziecko należy do placówki dyrektora
-            if kid.principal.user == request.user:
+        if role == 'director':
+            # Każdy dyrektor przypisany do tej placówki ma dostęp
+            can_access = True
+
+        elif role == 'teacher':
+            # Sprawdzenie przez aktywny profil nauczyciela z sesji
+            teacher = get_object_or_404(Employee, id=profile_id)
+            if kid.group == teacher.group:
                 can_access = True
 
-        elif 'teacher.is_teacher' in user_perms:
-            # Sprawdzenie czy nauczyciel uczy w grupie tego dziecka
-            if kid.group and request.user.employee in kid.group.employee_set.all():
-                can_access = True
-
-        elif 'parent.is_parent' in user_perms:
-            # Sprawdzenie czy to rodzic tego konkretnego dziecka
-            if request.user.parenta in kid.parenta_set.all():
+        elif role == 'parent':
+            # Sprawdzenie przez aktywny profil rodzica z sesji
+            parent = get_object_or_404(ParentA, id=profile_id)
+            if parent.kids.filter(id=kid.id).exists():
                 can_access = True
 
         if not can_access:
@@ -312,22 +321,23 @@ class KidParentInfoView(LoginRequiredMixin, View):
     def post(self, request, pk):
         from django.db import transaction
         """Obsługa odłączania rodzica od dziecka z weryfikacją placówki"""
+        role, profile_id, k_id = get_active_context(request)
         user = request.user
 
         # 1. Sprawdzenie podstawowych uprawnień dyrektora
-        if not user.has_perm('director.is_director'):
+        if role != 'director':
             raise PermissionDenied
 
         # 2. Pobranie dziecka i weryfikacja przynależności do placówki
-        kid = get_object_or_404(Kid, id=pk)
+        kid = get_object_or_404(Kid, id=pk, kindergarten_id=k_id)
 
         # Sprawdzamy czy dyrektor przypisany do dziecka to ten sam, który jest zalogowany
         if kid.principal.user != user:
             messages.error(request, "Nie masz uprawnień do zarządzania tym dzieckiem.")
-            return redirect('list_kids') # Lub inna strona zbiorcza
+            return redirect('list_kids')  # Lub inna strona zbiorcza
 
         parent_id = request.POST.get('parent_id')
-        parent = get_object_or_404(ParentA, id=parent_id)
+        parent = get_object_or_404(ParentA, id=parent_id, kindergarten_id=k_id)
 
         # 3. Bezpieczne odłączenie relacji
         try:

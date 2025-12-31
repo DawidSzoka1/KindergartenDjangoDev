@@ -9,7 +9,7 @@ from .forms import PaymentPlanForm
 from .models import PaymentPlan, SalaryPayment
 from django.core.exceptions import PermissionDenied
 from director.models import Director
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.views.generic import (
     CreateView,
 )
@@ -18,24 +18,35 @@ from datetime import date
 from children.models import PresenceModel, Invoice, Kid
 from parent.models import ParentA
 from teacher.models import Employee
+from blog.views import get_active_context
+
 
 # Create your views here.
-class AddPaymentsPlanView(PermissionRequiredMixin, SuccessMessageMixin, CreateView):
-    permission_required = "director.is_director"
+class AddPaymentsPlanView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = PaymentPlan
     template_name = 'payment-plan-add.html'
     form_class = PaymentPlanForm
     success_url = reverse_lazy('list_payments_plans')
-    success_message = "Plan platnicz dodany porpawnie"
+    success_message = "Plan płatniczy został dodany poprawnie."
 
-    def get_initial(self):
-        initial = super(AddPaymentsPlanView, self).get_initial()
-        initial = initial.copy()
-        initial['principal'] = Director.objects.get(user=self.request.user.id)
-        return initial
+    def get_form_kwargs(self):
+        """Przekazujemy k_id do formularza (jeśli jest potrzebne do filtrowania)."""
+        kwargs = super().get_form_kwargs()
+        role, profile_id, k_id = get_active_context(self.request)
+        kwargs['active_principal_id'] = k_id
+        return kwargs
 
     def form_valid(self, form):
-        form.instance.save()
+        # Pobieramy kontekst placówki
+        role, profile_id, k_id = get_active_context(self.request)
+
+        if role != 'director':
+            raise PermissionDenied
+
+        # Automatycznie przypisujemy plan do aktywnej placówki i profilu dyrektora
+        form.instance.kindergarten_id = k_id
+        form.instance.principal_id = profile_id  # Opcjonalnie, jeśli zostawiłeś to pole
+
         return super().form_valid(form)
 
 
@@ -44,28 +55,30 @@ from django.db.models import Avg, Count
 
 from django.db.models import Q, Avg, Count
 
-class PaymentPlansListView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
+class PaymentPlansListView(LoginRequiredMixin, View):
     def get(self, request):
-        director = request.user.director
-        # Podstawowy QuerySet planów tego dyrektora
-        payments_plans = PaymentPlan.objects.filter(principal=director).order_by('-id')
+        # Pobieramy aktywny kontekst sesji
+        role, profile_id, k_id = get_active_context(request)
 
-        # 1. Pobieranie parametrów z filtrów
+        if role != 'director':
+            raise PermissionDenied
+
+        # 1. Podstawowy QuerySet planów dla aktywnej placówki
+        # Używamy managera .for_kindergarten(k_id) lub filtra po kindergarten_id
+        payments_plans = PaymentPlan.objects.filter(kindergarten_id=k_id).order_by('-id')
+
+        # 2. Pobieranie parametrów z filtrów
         search_query = request.GET.get('search', '')
         frequency_filter = request.GET.get('frequency', '')
         status_filter = request.GET.get('status', '')
 
-        # 2. Logika filtrowania tekstu (szukaj w nazwie)
+        # 3. Logika filtrowania
         if search_query:
             payments_plans = payments_plans.filter(name__icontains=search_query)
 
-        # 3. Logika filtrowania częstotliwości
         if frequency_filter:
             payments_plans = payments_plans.filter(frequency=frequency_filter)
 
-        # 4. Logika filtrowania statusu
         if status_filter == 'active':
             payments_plans = payments_plans.filter(is_active=True, is_archived=False)
         elif status_filter == 'archived':
@@ -73,10 +86,16 @@ class PaymentPlansListView(PermissionRequiredMixin, View):
         elif status_filter == 'inactive':
             payments_plans = payments_plans.filter(is_active=False)
 
-        # Statystyki (obliczane po filtracji lub na całości - zazwyczaj na całości placówki)
-        stats_plans = PaymentPlan.objects.filter(principal=director, is_active=True)
+        # 4. Statystyki obliczane dla CAŁEJ placówki (k_id)
+        # Dzięki temu każdy dyrektor widzi te same globalne dane finansowe przedszkola
+        stats_plans = PaymentPlan.objects.filter(kindergarten_id=k_id, is_active=True)
+
         avg_price = stats_plans.aggregate(Avg('price'))['price__avg'] or 0
-        most_popular = stats_plans.annotate(kids_num=Count('kid')).order_by('-kids_num').first()
+
+        # Obliczamy popularność na podstawie dzieci przypisanych do planów w tej placówce
+        most_popular = stats_plans.annotate(
+            kids_num=Count('kid', filter=Q(kid__is_active=True))
+        ).order_by('-kids_num').first()
 
         # Paginacja
         paginator = Paginator(payments_plans, 10)
@@ -87,54 +106,79 @@ class PaymentPlansListView(PermissionRequiredMixin, View):
             'total_plans': stats_plans.count(),
             'avg_price': round(avg_price, 2),
             'most_popular': most_popular,
-            # Przekazujemy wartości filtrów z powrotem do szablonu, by zachować stan pól
             'current_search': search_query,
             'current_frequency': frequency_filter,
             'current_status': status_filter,
         }
         return render(request, 'payments-plans-list.html', context)
 
-class PaymentPlanUpdateView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
+class PaymentPlanUpdateView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        director = request.user.director
-        plan = get_object_or_404(PaymentPlan, id=pk, principal=director)
-        form = PaymentPlanForm(instance=plan)
+        # Pobieramy k_id z sesji użytkownika
+        role, profile_id, k_id = get_active_context(request)
+
+        if role != 'director':
+            raise PermissionDenied
+
+        # Szukamy planu w ramach aktywnej placówki
+        plan = get_object_or_404(PaymentPlan, id=pk, kindergarten_id=k_id)
+
+        # Przekazujemy k_id do formularza przez kwargs
+        form = PaymentPlanForm(instance=plan, active_principal_id=k_id)
+
         return render(request, 'payment-plan-update.html', {'form': form, 'plan': plan})
 
     def post(self, request, pk):
-        director = request.user.director
-        plan = get_object_or_404(PaymentPlan, id=pk, principal=director)
-        form = PaymentPlanForm(request.POST, instance=plan)
+        role, profile_id, k_id = get_active_context(request)
+
+        if role != 'director':
+            raise PermissionDenied
+
+        plan = get_object_or_404(PaymentPlan, id=pk, kindergarten_id=k_id)
+
+        # Przekazujemy dane POST oraz k_id do formularza
+        form = PaymentPlanForm(request.POST, instance=plan, active_principal_id=k_id)
 
         if form.is_valid():
             form.save()
             messages.success(request, 'Poprawnie zaktualizowano plan płatniczy.')
-            return redirect('payment_plan_details', pk=plan.id)
+            # Upewnij się, że nazwa widoku 'payment_plan_details' jest poprawna w urls.py
+            return redirect('list_payments_plans')
 
-        # Jeśli są błędy, renderujemy stronę ponownie (nie redirect!)
+        messages.error(request, "Popraw błędy w formularzu.")
         return render(request, 'payment-plan-update.html', {'form': form, 'plan': plan})
 
 
-class PaymentPlanDeleteView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
+class PaymentPlanDeleteView(LoginRequiredMixin, View):
     def get(self, request, pk):
         raise PermissionDenied
 
     def post(self, request, pk):
-        payment = get_object_or_404(PaymentPlan, id=int(pk))
-        director = Director.objects.get(user=request.user.id)
-        if payment.principal == director:
-            for kid in payment.kid_set.filter(is_active=True):
-                kid.payment_plan = None
-                kid.save()
-            payment.delete()
-            messages.success(request,
-                             f'Popprawnie usunieto plan platniczy {payment}')
-            return redirect('list_payments_plans')
-        raise PermissionDenied
+        # Pobieramy kontekst placówki z sesji
+        role, profile_id, k_id = get_active_context(request)
+
+        # Weryfikacja roli dyrektora dla aktywnej placówki
+        if role != 'director':
+            raise PermissionDenied
+
+        # Pobieramy plan, upewniając się, że należy do tej placówki
+        payment = get_object_or_404(PaymentPlan, id=pk, kindergarten_id=k_id, is_active=True)
+
+        # 1. Odłączamy plan od aktywnych dzieci w ramach tej placówki
+        # Robimy to tylko dla dzieci przypisanych do tego przedszkola
+        kids_with_plan = payment.kid_set.filter(is_active=True, kindergarten_id=k_id)
+
+        # Masowa aktualizacja dla wydajności (bezpieczniejsza niż pętla for)
+        kids_with_plan.update(payment_plan=None)
+
+        # 2. Usuwanie logiczne (Soft Delete)
+        # Zamiast usuwać rekord, oznaczamy go jako archiwalny/nieaktywny
+        payment.is_active = False
+        payment.is_archived = True
+        payment.save()
+
+        messages.success(request, f'Pomyślnie wycofano plan płatniczy: {payment.name}')
+        return redirect('list_payments_plans')
 
 
 # payments_plans/views.py
@@ -144,20 +188,25 @@ from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from .models import PaymentPlan
 
-class PaymentPlanDetailsView(PermissionRequiredMixin, View):
-    permission_required = "director.is_director"
-
+class PaymentPlanDetailsView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        director = request.user.director
-        # Pobieranie planu przypisanego do dyrektora
-        plan = get_object_or_404(PaymentPlan, id=pk, principal=director)
+        # Pobieramy kontekst placówki z sesji
+        role, profile_id, k_id = get_active_context(request)
 
-        # Pobieranie dzieci z podziałem na statusy
-        all_enrolled = plan.kid_set.all().select_related('group')
-        active_kids = all_enrolled.filter(is_active=True)
-        past_kids = all_enrolled.filter(is_active=False)
+        if role != 'director':
+            raise PermissionDenied
 
-        # Statystyki finansowe
+        # 1. Pobieranie planu przypisanego do placówki
+        #
+        plan = get_object_or_404(PaymentPlan, id=pk, kindergarten_id=k_id)
+
+        # 2. Pobieranie dzieci - filtrujemy dodatkowo po kindergarten_id dla pewności
+        all_enrolled = plan.kid_set.filter(kindergarten_id=k_id).select_related('group')
+
+        active_kids = all_enrolled.filter(is_active=True).order_by('last_name')
+        past_kids = all_enrolled.filter(is_active=False).order_by('-id')
+
+        # 3. Statystyki finansowe
         kids_count = active_kids.count()
         projected_revenue = kids_count * plan.price
 
@@ -167,28 +216,42 @@ class PaymentPlanDetailsView(PermissionRequiredMixin, View):
             'past_kids': past_kids,
             'kids_count': kids_count,
             'projected_revenue': projected_revenue,
-            'capacity_percent': min(int((kids_count / 15) * 100), 100) if 15 > 0 else 0, # Przykładowy limit 15 miejsc
+            # Przykładowy limit miejsc można pobrać z ustawień placówki lub zostawić jako stałą
+            'capacity_percent': min(int((kids_count / 20) * 100), 100) if 20 > 0 else 0,
         }
+
         return render(request, 'payment-plan-details.html', context)
 
 
 
 from django.core.paginator import Paginator
+from django.db.models import Sum
 
 class ParentPaymentsView(LoginRequiredMixin, View):
     def get(self, request):
-        parent = get_object_or_404(ParentA, user=request.user)
+        # Pobieramy aktywny kontekst sesji (rolę, ID profilu rodzica i ID placówki)
+        role, profile_id, k_id = get_active_context(request)
+
+        if role != 'parent':
+            raise PermissionDenied
+
+        # Pobieramy konkretny profil rodzica dla TEJ placówki
+        parent = get_object_or_404(ParentA, id=profile_id, kindergarten_id=k_id)
 
         # Pobieramy parametry z adresu URL
         kid_id = request.GET.get('kid_id')
-        sort_order = request.GET.get('sort', 'desc') # Domyślnie najnowsze
+        sort_order = request.GET.get('sort', 'desc')
 
-        # Bazowy QuerySet
-        invoices_qs = Invoice.objects.filter(kid__parenta=parent).select_related('kid', 'kid__kid_meals')
+        # Bazowy QuerySet faktur ograniczony do dzieci rodzica W TEJ placówce
+        #
+        invoices_qs = Invoice.objects.filter(
+            kid__parenta=parent,
+            kid__kindergarten_id=k_id
+        ).select_related('kid', 'kid__kid_meals')
 
-        # Filtrowanie po dziecku
+        # Filtrowanie po dziecku (dodatkowa weryfikacja czy dziecko należy do k_id)
         if kid_id and kid_id.isdigit():
-            invoices_qs = invoices_qs.filter(kid_id=int(kid_id))
+            invoices_qs = invoices_qs.filter(kid_id=int(kid_id), kid__kindergarten_id=k_id)
 
         # Sortowanie
         if sort_order == 'asc':
@@ -196,7 +259,7 @@ class ParentPaymentsView(LoginRequiredMixin, View):
         else:
             invoices_qs = invoices_qs.order_by('-year', '-month')
 
-        # Logika obliczania dni (zamiast filtra divide)
+        # Logika obliczania dni (bez zmian, ale bezpieczna dzięki select_related)
         for invoice in invoices_qs:
             if invoice.kid.kid_meals and invoice.kid.kid_meals.per_day > 0:
                 invoice.calculated_days = int(invoice.meals_amount / invoice.kid.kid_meals.per_day)
@@ -207,8 +270,8 @@ class ParentPaymentsView(LoginRequiredMixin, View):
         paginator = Paginator(invoices_qs, 4)
         page_obj = paginator.get_page(request.GET.get('page'))
 
-        # Statystyki i lista dzieci do filtra
-        my_kids = parent.kids.all()
+        # Statystyki i lista dzieci (tylko z tej placówki)
+        my_kids = parent.kids.filter(kindergarten_id=k_id, is_active=True)
         total_unpaid = invoices_qs.exclude(status='paid').aggregate(Sum('total_amount'))['total_amount__sum'] or 0
 
         return render(request, 'parent-payments.html', {
@@ -220,9 +283,16 @@ class ParentPaymentsView(LoginRequiredMixin, View):
         })
 
     def post(self, request):
-        invoice_id = request.POST.get('invoice_id')
-        invoice = get_object_or_404(Invoice, id=invoice_id)
+        role, profile_id, k_id = get_active_context(request)
 
+        if role != 'parent':
+            raise PermissionDenied
+
+        invoice_id = request.POST.get('invoice_id')
+        # Krytyczne: sprawdzamy czy faktura należy do dziecka w aktywnej placówce
+        invoice = get_object_or_404(Invoice, id=invoice_id, kid__kindergarten_id=k_id)
+
+        # Logika opłacania
         invoice.paid_amount = invoice.total_amount
         invoice.status = 'paid'
         invoice.save()
@@ -231,35 +301,41 @@ class ParentPaymentsView(LoginRequiredMixin, View):
         return redirect('parent_payments')
 
 from dateutil.relativedelta import relativedelta
-class DirectorFinanceSummaryView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    permission_required = 'director.is_director'
 
+from django.db.models import Sum, Q
+from django.utils import timezone
+from datetime import date
+from dateutil.relativedelta import relativedelta
+
+class DirectorFinanceSummaryView(LoginRequiredMixin, View):
     def get(self, request):
-        director = get_object_or_404(Director, user=request.user)
-        today = date.today()
+        # Pobieramy aktywny kontekst placówki
+        role, profile_id, k_id = get_active_context(request)
 
-        # Pobieranie wybranego okresu z GET lub domyślnie poprzedni miesiąc
+        if role != 'director':
+            raise PermissionDenied
+
+        today = date.today()
+        # Pobieranie wybranego okresu
         selected_month = int(request.GET.get('month', (today - relativedelta(months=1)).month))
         selected_year = int(request.GET.get('year', (today - relativedelta(months=1)).year))
 
-        # Filtrowanie danych
-        invoices_qs = Invoice.objects.filter(principal=director, month=selected_month, year=selected_year)
-        salaries_qs = SalaryPayment.objects.filter(principal=director, month=selected_month, year=selected_year)
+        # Filtrowanie danych wyłącznie po k_id (placówce)
+        invoices_qs = Invoice.objects.filter(kindergarten_id=k_id, month=selected_month, year=selected_year)
+        salaries_qs = SalaryPayment.objects.filter(kindergarten_id=k_id, month=selected_month, year=selected_year)
 
         # Statystyki Przychody
         total_expected = invoices_qs.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
         total_received = invoices_qs.aggregate(Sum('paid_amount'))['paid_amount__sum'] or 0
 
-        # Statystyki Koszty - TUTAJ POPRAWKA
+        # Statystyki Koszty
         total_salaries_to_pay = salaries_qs.aggregate(Sum('base_salary'))['base_salary__sum'] or 0
-        # Sumujemy tylko te rekordy, gdzie is_paid == True
         total_salaries_paid = salaries_qs.filter(is_paid=True).aggregate(Sum('base_salary'))['base_salary__sum'] or 0
 
-        # Paginacja (Dłużnicy i Pracownicy)
+        # Paginacja
         debtors_paginator = Paginator(invoices_qs.exclude(status='paid').select_related('kid'), 5)
-        salaries_paginator = Paginator(salaries_qs.select_related('employee'), 5)
+        salaries_paginator = Paginator(salaries_qs.select_related('employee', 'employee__user'), 5)
 
-        # Pełna lista miesięcy dla selecta
         months_list = [
             (1, 'Styczeń'), (2, 'Luty'), (3, 'Marzec'), (4, 'Kwiecień'),
             (5, 'Maj'), (6, 'Czerwiec'), (7, 'Lipiec'), (8, 'Sierpień'),
@@ -270,49 +346,46 @@ class DirectorFinanceSummaryView(LoginRequiredMixin, PermissionRequiredMixin, Vi
             'total_income': total_expected,
             'received_income': total_received,
             'total_salaries': total_salaries_to_pay,
-            'salaries_paid': total_salaries_paid, # Przekazujemy poprawną wartość
+            'salaries_paid': total_salaries_paid,
             'balance': total_received - total_salaries_paid,
             'debtors': debtors_paginator.get_page(request.GET.get('d_page')),
             'salaries_list': salaries_paginator.get_page(request.GET.get('s_page')),
             'selected_month': selected_month,
             'selected_year': selected_year,
-            'months_list': months_list, # Przekazujemy listę do pętli w HTML
+            'months_list': months_list,
         }
         return render(request, 'director-finance.html', context)
+
     def post(self, request):
-        director = get_object_or_404(Director, user=request.user)
+        role, profile_id, k_id = get_active_context(request)
+        if role != 'director':
+            raise PermissionDenied
+
         action = request.POST.get('action')
-
-        # Pobieramy datę za jaką mamy generować (z formularza ukryte pola)
-        m_raw = request.POST.get('month') or request.GET.get('month')
-        y_raw = request.POST.get('year') or request.GET.get('year')
-
-        # Bezpieczna konwersja
-        m = int(m_raw) if m_raw else timezone.now().month
-        y = int(y_raw) if y_raw else timezone.now().year
+        m = int(request.POST.get('month', timezone.now().month))
+        y = int(request.POST.get('year', timezone.now().year))
 
         if action == 'generate_all':
-            # 1. NAUCZYCIELE: Aktualizacja lub utworzenie
-            teachers = Employee.objects.filter(principal=director, is_active=True)
+            # 1. NAUCZYCIELE: Filtrujemy po placówce
+            teachers = Employee.objects.filter(kindergarten_id=k_id, is_active=True)
             for t in teachers:
                 SalaryPayment.objects.update_or_create(
-                    principal=director, employee=t, month=m, year=y,
+                    kindergarten_id=k_id, employee=t, month=m, year=y,
                     defaults={'base_salary': t.salary or 0}
                 )
 
-            # 2. DZIECI: Przeliczenie obecności i aktualizacja faktur
-            first_day_of_month = date(y, m, 1)
-            if m == 12:
-                last_day_of_month = date(y, 12, 31)
-            else:
-                last_day_of_month = date(y, m + 1, 1) - relativedelta(days=1)
+            # 2. DZIECI: Rozliczenie obecności w ramach placówki
+            first_day = date(y, m, 1)
+            last_day = first_day + relativedelta(day=31)
+
             kids = Kid.objects.filter(
-                principal=director,
+                kindergarten_id=k_id,
                 is_active=True,
-                start__lte=last_day_of_month
+                start__lte=last_day
             ).filter(
-                Q(end__isnull=True) | Q(end__gte=first_day_of_month)
+                Q(end__isnull=True) | Q(end__gte=first_day)
             )
+
             for k in kids:
                 billable_days = PresenceModel.objects.filter(
                     kid=k, day__month=m, day__year=y,
@@ -323,23 +396,23 @@ class DirectorFinanceSummaryView(LoginRequiredMixin, PermissionRequiredMixin, Vi
                 tuition = k.payment_plan.price if k.payment_plan else 0
                 total = tuition + meals_total
 
-                # Używamy update_or_create, aby zaktualizować kwoty jeśli faktura już była
                 Invoice.objects.update_or_create(
-                    kid=k, month=m, year=y, principal=director,
+                    kid=k, month=m, year=y, kindergarten_id=k_id,
                     defaults={
                         'tuition_amount': tuition,
                         'meals_amount': meals_total,
                         'total_amount': total,
-                        'due_date': date(y, m, 10) if m != 12 else date(y+1, 1, 10)
+                        'due_date': (first_day + relativedelta(months=1, day=10))
                     }
                 )
-            messages.success(request, f"Zaktualizowano rozliczenia za {m}/{y}")
+            messages.success(request, f"Zaktualizowano rozliczenia placówki za {m}/{y}")
 
         elif action == 'pay_salary':
-                salary_id = request.POST.get('salary_id')
-                salary = get_object_or_404(SalaryPayment, id=salary_id, principal=director)
-                salary.is_paid = True
-                salary.payment_date = date.today()
-                salary.save()
+            salary_id = request.POST.get('salary_id')
+            # Weryfikujemy czy wypłata należy do tej placówki
+            salary = get_object_or_404(SalaryPayment, id=salary_id, kindergarten_id=k_id)
+            salary.is_paid = True
+            salary.payment_date = date.today()
+            salary.save()
 
         return redirect(f'/podsumowanie-finansowe/?month={m}&year={y}')

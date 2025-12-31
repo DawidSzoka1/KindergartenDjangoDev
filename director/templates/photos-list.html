@@ -11,7 +11,7 @@
                         <h2 class="text-[#111811] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Zarządzaj Ikonami</h2>
                         <p class="text-[#618961] dark:text-gray-400 text-base font-normal leading-normal">Przeglądaj i zarządzaj ikonami dla grup oraz planów żywieniowych.</p>
                     </div>
-                    {% if perms.director.is_director %}
+                    {% if active_role == 'director' %}
                         <a href="{% url 'photo_add' %}" class="flex items-center justify-center rounded-lg bg-[#13ec13] px-4 py-2 text-sm font-bold text-[#111811] hover:bg-[#13ec13]/90 transition-colors shadow-sm">
                             <span class="material-symbols-outlined mr-2 text-xl">add</span>
                             Dodaj Nową Ikonkę
@@ -64,7 +64,7 @@
                                         {% endif %}
                                     </td>
                                     <td class="px-6 py-3 text-right">
-                                        {% if perms.director.is_director %}
+                                        {% if active_role == 'director' %}
                                             <form method="POST" action="{% url 'photo_delete' pk=photo.id %}" class="inline">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="delete" value="{% if photo.meal_photos %}2{% else %}1{% endif %}">

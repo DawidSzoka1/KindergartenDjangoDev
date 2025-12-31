@@ -37,7 +37,7 @@
                     </div>
                 </form>
 
-                {% if perms.director.is_director or perms.teacher.is_teacher %}
+                {% if active_role == 'director' or active_role == 'teacher' %}
                     <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800">
                         <a href="{% url 'post_add' %}" class="w-full flex items-center justify-center gap-2 py-4 bg-purple-50 text-primary font-black rounded-2xl border-2 border-dashed border-primary/30 hover:bg-primary hover:text-white transition-all">
                             <span class="material-symbols-outlined">add_circle</span> DODAJ NOWE
@@ -89,7 +89,7 @@
                                 Szczegóły
                             </a>
 
-                            {% if post.author == user %}
+                            {% if post.author == user or active_role == 'director' %}
                                 <div class="flex items-center gap-2 pl-4 border-l border-gray-100 dark:border-gray-800">
                                     <a href="{% url 'post_update' pk=post.id %}" class="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-primary transition-colors">
                                         <span class="material-symbols-outlined">edit</span>
